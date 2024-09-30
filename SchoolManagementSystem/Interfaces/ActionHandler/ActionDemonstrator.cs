@@ -1,4 +1,3 @@
-// File: SchoolManagementSystem/Interfaces/ActionHandler/ActionDemonstrator.cs
 namespace SchoolManagementSystem.Interfaces.ActionHandler
 {
     public static class ActionDemonstrator
@@ -19,13 +18,16 @@ namespace SchoolManagementSystem.Interfaces.ActionHandler
             }
         }
 
-        public static void DemonstrateTeacherActions(ITeacherActions teacher)
+        private static void DemonstrateTeacherActions(ITeacherActions teacher)
         {
             try
             {
                 teacher.Teach();
                 teacher.CheckAttendance();
-                Console.WriteLine($"{teacher.GetTeacherFullName()} has completed teaching and attendance check.");
+                teacher.GradePapers();
+                teacher.PrepareLesson();
+                teacher.AttendMeeting();
+                Console.WriteLine($"{teacher.GetFullName()} has completed teaching and attendance check.");
             }
             catch (Exception ex)
             {
@@ -33,7 +35,7 @@ namespace SchoolManagementSystem.Interfaces.ActionHandler
             }
         }
 
-        public static void DemonstrateStudentActions(IStudentActions student)
+        private static void DemonstrateStudentActions(IStudentActions student)
         {
             try
             {
@@ -42,7 +44,7 @@ namespace SchoolManagementSystem.Interfaces.ActionHandler
                 student.SubmitAssignment();
                 student.Study();
                 student.ParticipateInClass();
-                Console.WriteLine($"{student.GetStudentFullName()} has completed learning activities.");
+                Console.WriteLine($"{student.GetFullName()} has completed learning and participation in class.");
             }
             catch (Exception ex)
             {

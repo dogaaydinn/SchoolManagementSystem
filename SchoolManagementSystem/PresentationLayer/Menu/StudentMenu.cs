@@ -6,7 +6,6 @@ namespace SchoolManagementSystem.PresentationLayer.Menu;
 
 public static class StudentMenu
 {
-
     public static void DisplayStudentMenu(List<Student> students, List<Course> courses)
     {
         while (true)
@@ -19,11 +18,12 @@ public static class StudentMenu
             Console.WriteLine("5. Display Student Names");
             Console.WriteLine("6. Demonstrate Student Actions");
             Console.WriteLine("7. Display Course Names");
-            Console.WriteLine("8. Exit");
+            Console.WriteLine("8. Update Student ID");
+            Console.WriteLine("9. Exit");
             Console.Write("Enter your choice: ");
 
             var choice = Console.ReadLine();
-        
+
             switch (choice)
             {
                 case "1":
@@ -36,7 +36,14 @@ public static class StudentMenu
                     StudentHandler.DisplayCourseDetails(courses);
                     break;
                 case "4":
-                    StudentHandler.DemonstrateActions(students, courses);
+                    if (students.Count > 0)
+                    {
+                        PersonHandler.DemonstrateActions(students[0]);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No students available to demonstrate actions.");
+                    }
                     break;
                 case "5":
                     StudentHandler.DisplayStudentNames(students);
@@ -48,6 +55,9 @@ public static class StudentMenu
                     StudentHandler.DisplayCourseNames(courses);
                     break;
                 case "8":
+                    StudentHandler.UpdateStudentId(students);
+                    break;
+                case "9":
                     return;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");

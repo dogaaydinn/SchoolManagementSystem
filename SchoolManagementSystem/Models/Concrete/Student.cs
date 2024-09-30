@@ -38,6 +38,7 @@ public class Student : SchoolMember, IStudentActions
         Console.WriteLine($"{GetStudentFullName()} is doing homework.");
     }
     
+
     public void Learn()
     {
         Console.WriteLine($"{GetStudentFullName()} is learning.");
@@ -76,6 +77,7 @@ public class Student : SchoolMember, IStudentActions
     {
         return EnrolledCourses.AsReadOnly();
     }
+    
 
     public bool MeetsEnrollmentCriteria(Course course)
     {

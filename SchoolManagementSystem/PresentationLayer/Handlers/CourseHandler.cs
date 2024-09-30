@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 
@@ -5,8 +7,61 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class CourseHandler
 {
+    private static void DisplayCourseActions(Course course)
+    {
+        Exceptions.Expectations.CheckCourseNotNull(course);
+
+        while (true)
+        {
+            var courseName = course.GetCourseName();
+            if (string.IsNullOrEmpty(courseName))
+            {
+                Console.WriteLine("Course name is invalid.");
+                return;
+            }
+
+            Console.WriteLine($"\nActions for {courseName}:");
+            Console.WriteLine("1. Enroll Students");
+            Console.WriteLine("2. List Students");
+            Console.WriteLine("3. View Grades");
+            Console.WriteLine("4. Back to Course Names");
+            Console.Write("Enter your choice (1, 2, 3, or 4): ");
+
+            var input = Console.ReadLine();
+            if (!int.TryParse(input, out var choice) || choice < 1 || choice > 4)
+            {
+                Console.WriteLine("Invalid choice. Please select 1, 2, 3, or 4.");
+                continue;
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    // Enroll student logic here if needed
+                    Console.WriteLine("Enroll student logic not implemented.");
+                    break;
+
+                case 2:
+                    course.ListStudents();
+                    break;
+
+                case 3:
+                    course.ListGrades();
+                    break;
+
+                case 4:
+                    return;
+            }
+
+            Console.WriteLine("Would you like to perform another action? (yes/no)");
+            var continueResponse = Console.ReadLine()?.Trim().ToLower();
+            if (continueResponse != "yes") break;
+        }
+    }
     public static void DisplayCourseDetails(List<Course>? courses)
     {
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
+
         Console.WriteLine("Do you want to search by:");
         Console.WriteLine("1. Course ID");
         Console.WriteLine("2. Course Name");
@@ -26,7 +81,9 @@ public static class CourseHandler
             case 1:
                 Console.WriteLine("Enter course ID to display details:");
                 if (int.TryParse(Console.ReadLine(), out var courseId))
-                    course = courses.Find(c => c.GetCourseId() == courseId);
+                {
+                    if (courses != null) course = courses.Find(c => c.GetCourseId() == courseId);
+                }
                 else
                     Console.WriteLine("Invalid course ID.");
                 break;
@@ -34,7 +91,9 @@ public static class CourseHandler
             case 2:
                 Console.WriteLine("Enter course name to display details:");
                 var courseName = Console.ReadLine();
-                course = courses.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
+                if (courses != null)
+                    course = courses.Find(c =>
+                        c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
                 break;
 
             case 3:
@@ -55,13 +114,16 @@ public static class CourseHandler
             if (userResponse == "yes") DisplayCourseNames(courses);
         }
     }
-
     private static void DisplayCourseNames(List<Course>? courses)
     {
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
+
         while (true)
         {
             Console.WriteLine("Course Names:");
-            for (var i = 0; i < courses.Count; i++) Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()}");
+            if (courses != null)
+                for (var i = 0; i < courses.Count; i++)
+                    Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()}");
 
             Console.WriteLine(
                 "Enter the number of the course to view details or perform actions, or type 'exit' to return to the main menu:");
@@ -69,6 +131,7 @@ public static class CourseHandler
 
             if (input == "exit") return;
 
+            Debug.Assert(courses != null, nameof(courses) + " != null");
             if (int.TryParse(input, out var courseIndex) && courseIndex > 0 && courseIndex <= courses.Count)
             {
                 var selectedCourse = courses[courseIndex - 1];
@@ -86,6 +149,8 @@ public static class CourseHandler
 
     public static void ListStudentsInCourses(List<Course>? courses)
     {
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
+
         while (true)
         {
             Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
@@ -96,16 +161,20 @@ public static class CourseHandler
                 Console.WriteLine("Enter course name to list students:");
                 var courseName = Console.ReadLine();
 
-                var course = courses.Find(c =>
-                    c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
+                if (courses != null)
+                {
+                    var course = courses.Find(c =>
+                        c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
 
-                if (course != null)
-                    course.ListStudents();
-                else
-                    Console.WriteLine("Course not found.");
+                    if (course != null)
+                        course.ListStudents();
+                    else
+                        Console.WriteLine("Course not found.");
+                }
             }
             else
             {
+                Debug.Assert(courses != null, nameof(courses) + " != null");
                 foreach (var course in courses) course.ListStudents();
             }
 
@@ -114,36 +183,41 @@ public static class CourseHandler
             if (continueResponse != "yes") break;
         }
     }
-
     public static void DisplayTotalCourses(List<Course>? courses)
     {
-        Console.WriteLine($"Total courses: {courses.Count}");
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
 
-        Console.WriteLine("Would you like to:");
-        Console.WriteLine("1. List all courses");
-        Console.WriteLine("2. View course details");
-        Console.Write("Enter your choice (1 or 2): ");
-
-        if (!int.TryParse(Console.ReadLine(), out var choice) || (choice != 1 && choice != 2))
+        if (courses != null)
         {
-            Console.WriteLine("Invalid choice. Please select 1 or 2.");
-            return;
-        }
+            Console.WriteLine($"Total courses: {courses.Count}");
 
-        switch (choice)
-        {
-            case 1:
-                DisplayCourseNames(courses);
-                break;
+            Console.WriteLine("Would you like to:");
+            Console.WriteLine("1. List all courses");
+            Console.WriteLine("2. View course details");
+            Console.Write("Enter your choice (1 or 2): ");
 
-            case 2:
-                DisplayCourseDetails(courses);
-                break;
+            if (!int.TryParse(Console.ReadLine(), out var choice) || (choice != 1 && choice != 2))
+            {
+                Console.WriteLine("Invalid choice. Please select 1 or 2.");
+                return;
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    DisplayCourseNames(courses);
+                    break;
+
+                case 2:
+                    DisplayCourseDetails(courses);
+                    break;
+            }
         }
     }
-
     public static void DisplayStudents(List<Course>? courses)
     {
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
+
         Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
         var response = Console.ReadLine()?.Trim().ToLower();
 
@@ -152,7 +226,7 @@ public static class CourseHandler
             Console.WriteLine("Enter course name to list students:");
             var courseName = Console.ReadLine();
 
-            var course = courses.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
+            var course = courses?.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
 
             if (course != null)
                 ShowStudents(course.GetEnrolledStudents());
@@ -161,6 +235,7 @@ public static class CourseHandler
         }
         else
         {
+            if (courses == null) return;
             foreach (var course in courses)
             {
                 Console.WriteLine($"\nCourse: {course.GetCourseName()}");
@@ -168,9 +243,10 @@ public static class CourseHandler
             }
         }
     }
-
     private static void ShowStudents(List<Student?> students)
     {
+        Exceptions.Expectations.CheckStudentsNotNull(students);
+
         if (students.Count == 0)
         {
             Console.WriteLine("No students enrolled.");
@@ -184,6 +260,8 @@ public static class CourseHandler
 
     public static void DisplayCourseGrades(List<Course>? courses)
     {
+        Exceptions.Expectations.CheckCoursesNotNull(courses);
+
         Console.WriteLine("Do you want to search by:");
         Console.WriteLine("1. Course ID");
         Console.WriteLine("2. Course Name");
@@ -207,12 +285,13 @@ public static class CourseHandler
                     return;
                 }
 
-                course = courses.Find(c => c.GetCourseId() == courseId);
+                if (courses != null) course = courses.Find(c => c.GetCourseId() == courseId);
                 break;
 
             case 2:
                 Console.WriteLine("Enter course name to display the grades:");
                 var courseName = Console.ReadLine();
+                Debug.Assert(courses != null, nameof(courses) + " != null");
                 course = courses.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
                 break;
         }
@@ -242,32 +321,35 @@ public static class CourseHandler
             if (userResponse == "yes") DisplayCourseNames(courses);
         }
     }
+public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> students)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
 
-    public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> students)
+    while (true)
     {
-        while (true)
+        Console.WriteLine("Would you like to:");
+        Console.WriteLine("1. Enroll a student in a course");
+        Console.WriteLine("2. Unenroll a student from a course");
+        Console.WriteLine("3. Exit");
+        Console.Write("Enter your choice (1, 2, or 3): ");
+
+        if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 3)
         {
-            Console.WriteLine("Would you like to:");
-            Console.WriteLine("1. Enroll a student in a course");
-            Console.WriteLine("2. Unenroll a student from a course");
-            Console.WriteLine("3. Exit");
-            Console.Write("Enter your choice (1, 2, or 3): ");
+            Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
+            continue;
+        }
 
-            if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 3)
-            {
-                Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
-                continue;
-            }
+        if (choice == 3) break;
 
-            if (choice == 3) break;
+        Console.WriteLine("Enter the course ID:");
+        if (!int.TryParse(Console.ReadLine(), out var courseId))
+        {
+            Console.WriteLine("Invalid course ID. Please try again.");
+            continue;
+        }
 
-            Console.WriteLine("Enter the course ID:");
-            if (!int.TryParse(Console.ReadLine(), out var courseId))
-            {
-                Console.WriteLine("Invalid course ID. Please try again.");
-                continue;
-            }
-
+        if (courses != null)
+        {
             var course = courses.Find(c => c.GetCourseId() == courseId);
             if (course == null)
             {
@@ -300,23 +382,28 @@ public static class CourseHandler
                     Console.WriteLine($"{student.GetStudentFullName()} has been unenrolled from {course.GetCourseName()}.");
                     break;
             }
-
-            Console.WriteLine("Would you like to perform another action? (yes/no)");
-            var continueResponse = Console.ReadLine()?.Trim().ToLower();
-            if (continueResponse != "yes") break;
         }
+
+        Console.WriteLine("Would you like to perform another action? (yes/no)");
+        var continueResponse = Console.ReadLine()?.Trim().ToLower();
+        if (continueResponse != "yes") break;
+    }
+}
+
+public static void RemoveStudentInteractive(List<Course>? courses)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    Console.WriteLine("Enter the course ID from which you want to remove a student:");
+    if (!int.TryParse(Console.ReadLine(), out int courseId))
+    {
+        Console.WriteLine("Invalid course ID.");
+        return;
     }
 
-    public static void RemoveStudentInteractive(List<Course>? courses)
+    if (courses != null)
     {
-        Console.WriteLine("Enter the course ID from which you want to remove a student:");
-        if (!int.TryParse(Console.ReadLine(), out int courseId))
-        {
-            Console.WriteLine("Invalid course ID.");
-            return;
-        }
-
-        var course = courses?.FirstOrDefault(c => c.GetCourseId() == courseId);
+        var course = courses.FirstOrDefault(c => c.GetCourseId() == courseId);
         if (course == null)
         {
             Console.WriteLine("Course not found.");
@@ -340,45 +427,6 @@ public static class CourseHandler
         student.UnenrollFromCourse(course);
     }
 }
-    
-    private static void DisplayCourseActions(Course course)
-    {
-        while (true)
-        {
-            Console.WriteLine($"\nActions for {course.GetCourseName()}:");
-            Console.WriteLine("1. Enroll Students");
-            Console.WriteLine("2. List Students");
-            Console.WriteLine("3. View Grades");
-            Console.WriteLine("4. Back to Course Names");
-            Console.Write("Enter your choice (1, 2, 3, or 4): ");
-
-            if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 4)
-            {
-                Console.WriteLine("Invalid choice. Please select 1, 2, 3, or 4.");
-                continue;
-            }
-
-            switch (choice)
-            {
-                case 1:
-                    // Enroll student logic here if needed
-                    break;
-
-                case 2:
-                    course.ListStudents();
-                    break;
-
-                case 3:
-                    course.ListGrades();
-                    break;
-
-                case 4:
-                    return; 
-            }
-
-            Console.WriteLine("Would you like to perform another action? (yes/no)");
-            var continueResponse = Console.ReadLine()?.Trim().ToLower();
-            if (continueResponse != "yes") break;
-        }
-    }
 }
+    
+

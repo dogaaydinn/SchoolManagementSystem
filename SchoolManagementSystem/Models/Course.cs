@@ -165,7 +165,7 @@ public class Course : ISchoolActions
 
         try
         {
-            student!.SetGpa(newGpa);
+            student.SetGpa(newGpa);
             Console.WriteLine($"Updated GPA for {student.GetStudentFullName()} in course {_courseName}.");
         }
         catch (ArgumentOutOfRangeException ex)

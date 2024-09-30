@@ -6,4 +6,5 @@ public interface ISchoolActions
 {
     void AssignCourse(Course course);
     void RemoveCourse(Course course);
+    
 }

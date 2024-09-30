@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class MenuHandler
 {
-    public static void DisplayMainMenu(List<Student> students, List<Course>? courses, List<Teacher> teachers)
+    public static void DisplayMainMenu(List<Student> students, List<Course>? courses, List<Teacher> teachers, List<Admin> admins)
     {
         while (true)
         {
@@ -18,7 +18,7 @@ public static class MenuHandler
             Console.WriteLine("5. Exit");
             Console.Write("Enter your choice: ");
             var choice = Console.ReadLine();
-            
+
             if (string.IsNullOrEmpty(choice))
             {
                 Console.WriteLine("Input cannot be empty. Please try again.");
@@ -37,7 +37,15 @@ public static class MenuHandler
                     CourseMenu.DisplayCourseMenu(courses, students);
                     break;
                 case "4":
-                    SchoolMenu.DisplaySchoolMenu(students, courses, teachers);
+                    Admin admin = admins.FirstOrDefault();
+                    if (admin != null)
+                    {
+                        SchoolMenu.DisplaySchoolMenu(courses, students, teachers, admin);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No admin available.");
+                    }
                     break;
                 case "5":
                     Console.Write("Are you sure you want to exit? (y/n): ");

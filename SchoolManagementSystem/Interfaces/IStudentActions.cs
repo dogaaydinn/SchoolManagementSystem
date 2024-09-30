@@ -10,4 +10,5 @@ public interface IStudentActions : IPersonActions
     void AttendClass();
     void DoHomework();
     
+    string GetFullName();
 }

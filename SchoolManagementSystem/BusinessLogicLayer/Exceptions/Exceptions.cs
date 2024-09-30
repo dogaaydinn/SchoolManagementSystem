@@ -1,58 +1,88 @@
-using System;
+using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Models;
+using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.BusinessLogicLayer.Exceptions
 {
     public static class Exceptions
     {
-        public class StudentNotFoundException : Exception
+        public static class Expectations
         {
-            public StudentNotFoundException() 
-                : base("Student not found.")
+            public static void CheckPersonNotNull(IPersonActions? person)
             {
+                if (person == null)
+                {
+                    throw new ArgumentNullException(nameof(person), "Person cannot be null.");
+                }
             }
 
-            public StudentNotFoundException(string studentId) 
-                : base($"Student with ID {studentId} not found.")
+            public static void CheckCourseNotNull(Course? course)
             {
-            }
-        }
-
-        public class CourseNotFoundException : Exception
-        {
-            public CourseNotFoundException() 
-                : base("Course not found.")
-            {
+                if (course == null)
+                {
+                    throw new ArgumentNullException(nameof(course), "Course cannot be null.");
+                }
             }
 
-            public CourseNotFoundException(string courseId) 
-                : base($"Course with ID {courseId} not found.")
+            public static void CheckCoursesNotNull(List<Course>? courses)
             {
-            }
-        }
-
-        public class TeacherNotFoundException : Exception
-        {
-            public TeacherNotFoundException() 
-                : base("Teacher not found.")
-            {
+                if (courses == null || courses.Count == 0)
+                {
+                    throw new ArgumentNullException(nameof(courses), "Courses list cannot be null or empty.");
+                }
             }
 
-            public TeacherNotFoundException(string teacherId) 
-                : base($"Teacher with ID {teacherId} not found.")
+            public static void CheckStudentsNotNull(List<Student?> students)
             {
-            }
-        }
-
-        public class GradeNotFoundException : Exception
-        {
-            public GradeNotFoundException() 
-                : base("Grade not found.")
-            {
+                if (students == null || students.Count == 0)
+                {
+                    throw new ArgumentNullException(nameof(students), "Students list cannot be null or empty.");
+                }
             }
 
-            public GradeNotFoundException(string studentId, string courseId) 
-                : base($"Grade not found for student ID {studentId} in course ID {courseId}.")
+            public static void CheckTeachersNotNull(List<Teacher> teachers)
             {
+                if (teachers == null)
+                {
+                    throw new ArgumentNullException(nameof(teachers), "Teachers list cannot be null.");
+                }
+            }
+
+            public static void CheckStudentNotNull(Student? student)
+            {
+                if (student == null)
+                {
+                    throw new ArgumentNullException(nameof(student), "Student cannot be null.");
+                }
+            }
+
+            public static void GradeNotFoundException(string studentId, string courseId)
+            {
+                throw new Exception($"Grade not found for student ID {studentId} in course ID {courseId}.");
+            }
+
+            public class StudentNotFoundException : Exception
+            {
+                public StudentNotFoundException(string studentId)
+                    : base($"Student with ID {studentId} not found.")
+                {
+                }
+            }
+
+            public class CourseNotFoundException : Exception
+            {
+                public CourseNotFoundException(string courseId)
+                    : base($"Course with ID {courseId} not found.")
+                {
+                }
+            }
+
+            public class TeacherNotFoundException : Exception
+            {
+                public TeacherNotFoundException(string teacherId)
+                    : base($"Teacher with ID {teacherId} not found.")
+                {
+                }
             }
         }
     }

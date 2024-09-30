@@ -1,23 +1,14 @@
-// File: SchoolManagementSystem/Interfaces/ActionHandler/SchoolActionDemonstrator.cs
 using SchoolManagementSystem.Models;
-using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.Interfaces.ActionHandler
 {
     public static class SchoolActionDemonstrator
     {
-        public static void DemonstrateCourseActions(ICourseManagement courseManager, Course course)
+        public static void DemonstrateSchoolActions(ISchoolActions schoolActions, Course course)
         {
-            Console.WriteLine("Demonstrating course-specific actions:");
-            courseManager.AssignCourse(course);
-            courseManager.RemoveCourse(course);
-        }
-
-        public static void DemonstrateTeacherManagement(ITeacherManagement teacherManager, Student student, double grade)
-        {
-            Console.WriteLine("Demonstrating teacher-specific management actions:");
-            teacherManager.AssignGrade(student, grade);
-            teacherManager.ManageClassroom();
+            Console.WriteLine("Demonstrating school-specific actions:");
+            schoolActions.AssignCourse(course);
+            schoolActions.RemoveCourse(course);
         }
     }
 }

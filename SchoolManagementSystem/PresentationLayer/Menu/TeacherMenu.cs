@@ -23,33 +23,32 @@ public static class TeacherMenu
             Console.WriteLine("11. Update Teacher Details");
             Console.WriteLine("12. List Students in Courses");
             Console.WriteLine("13. Demonstrate Teacher Actions");
-            Console.WriteLine("13. Exit");
+            Console.WriteLine("14. Exit");
             Console.Write("Enter your choice: ");
 
             var choice = Console.ReadLine();
-            
+
             switch (choice)
             {
                 case "1":
-                    TeacherHandler.DemonstrateActions(teachers);
+                    SchoolHandler.DemonstrateActions(teachers[0]);
                     break;
                 case "2":
-                    TeacherHandler.EnrollStudentInCourse(teachers, students);
-                    break;
+                    SchoolHandler.EnrollStudentInCourse(teachers, students);
                 case "3":
-                    TeacherHandler.AssignCoursesToStudents(teachers, students);
+                    SchoolHandler.AssignCoursesToStudents(teachers, students);
                     break;
                 case "4":
-                    TeacherHandler.RecordGradesForStudents(teachers, students);
+                    SchoolHandler.RecordGradesForStudents(teachers, students);
                     break;
                 case "5":
-                    TeacherHandler.DisplayAllDetails(teachers, students);
+                    SchoolHandler.DisplayAllDetails(teachers, students);
                     break;
                 case "6":
-                    TeacherHandler.AssignGradeToStudent(teachers, students);
+                    StudentHandler.AssignGradeToStudent(teachers, students);
                     break;
                 case "7":
-                    TeacherHandler.UpdateStudentGPA(students);
+                    .UpdateStudentGPA(students);
                     break;
                 case "8":
                     TeacherHandler.DisplayStudentNames(students);
@@ -64,15 +63,12 @@ public static class TeacherMenu
                     TeacherHandler.UpdateTeacherDetails(teachers);
                     break;
                 case "12":
-                    TeacherHandler.UpdateTeacherDetails(teachers);
-                    break;
-                case "13":
                     TeacherHandler.ListStudentsInCourses(teachers);
                     break;
-                case "14":
-                    TeacherHandler.DemonstrateTeacherMethods(teacher);
+                case "13":
+                    TeacherHandler.DemonstrateTeacherMethods(teachers);
                     break;
-                case "15":
+                case "14":
                     return;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");

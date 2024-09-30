@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
 
 namespace SchoolManagementSystem.Models.Concrete;
@@ -46,7 +47,7 @@ public class Teacher : SchoolMember, ITeacherActions
     {
         Console.WriteLine($"{GetFullName()} is attending the meeting {GetSubject()} lesson.");
     }
-
+    
     #endregion
     #region Methods
 
