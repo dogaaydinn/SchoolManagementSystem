@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 
@@ -7,323 +8,342 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class CourseHandler
 {
-    private static void DisplayCourseActions(Course course)
+private static void DisplayCourseActions(Course course, object user)
+{
+    Exceptions.Expectations.CheckCourseNotNull(course);
+
+    if (!HasPermission(user, course))
     {
-        Exceptions.Expectations.CheckCourseNotNull(course);
-
-        while (true)
-        {
-            var courseName = course.GetCourseName();
-            if (string.IsNullOrEmpty(courseName))
-            {
-                Console.WriteLine("Course name is invalid.");
-                return;
-            }
-
-            Console.WriteLine($"\nActions for {courseName}:");
-            Console.WriteLine("1. Enroll Students");
-            Console.WriteLine("2. List Students");
-            Console.WriteLine("3. View Grades");
-            Console.WriteLine("4. Back to Course Names");
-            Console.Write("Enter your choice (1, 2, 3, or 4): ");
-
-            var input = Console.ReadLine();
-            if (!int.TryParse(input, out var choice) || choice < 1 || choice > 4)
-            {
-                Console.WriteLine("Invalid choice. Please select 1, 2, 3, or 4.");
-                continue;
-            }
-
-            switch (choice)
-            {
-                case 1:
-                    // Enroll student logic here if needed
-                    Console.WriteLine("Enroll student logic not implemented.");
-                    break;
-
-                case 2:
-                    course.ListStudents();
-                    break;
-
-                case 3:
-                    course.ListGrades();
-                    break;
-
-                case 4:
-                    return;
-            }
-
-            Console.WriteLine("Would you like to perform another action? (yes/no)");
-            var continueResponse = Console.ReadLine()?.Trim().ToLower();
-            if (continueResponse != "yes") break;
-        }
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to perform actions on courses.");
     }
-    public static void DisplayCourseDetails(List<Course>? courses)
+
+    while (true)
     {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-
-        Console.WriteLine("Do you want to search by:");
-        Console.WriteLine("1. Course ID");
-        Console.WriteLine("2. Course Name");
-        Console.WriteLine("3. List all courses");
-        Console.Write("Enter your choice (1, 2, or 3): ");
-
-        if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 3)
+        var courseName = course.GetCourseName();
+        if (string.IsNullOrEmpty(courseName))
         {
-            Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
+            Console.WriteLine("Course name is invalid.");
             return;
         }
 
-        Course? course = null;
+        Console.WriteLine($"\nActions for {courseName}:");
+        Console.WriteLine("1. Enroll Students");
+        Console.WriteLine("2. List Students");
+        Console.WriteLine("3. View Grades");
+        Console.WriteLine("4. Back to Course Names");
+        Console.Write("Enter your choice (1, 2, 3, or 4): ");
+
+        var input = Console.ReadLine();
+        if (!int.TryParse(input, out var choice) || choice < 1 || choice > 4)
+        {
+            Console.WriteLine("Invalid choice. Please select 1, 2, 3, or 4.");
+            continue;
+        }
 
         switch (choice)
         {
             case 1:
-                Console.WriteLine("Enter course ID to display details:");
-                if (int.TryParse(Console.ReadLine(), out var courseId))
-                {
-                    if (courses != null) course = courses.Find(c => c.GetCourseId() == courseId);
-                }
-                else
-                    Console.WriteLine("Invalid course ID.");
+                // Enroll student logic here if needed
+                Console.WriteLine("Enroll student logic not implemented.");
                 break;
 
             case 2:
-                Console.WriteLine("Enter course name to display details:");
-                var courseName = Console.ReadLine();
-                if (courses != null)
-                    course = courses.Find(c =>
-                        c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
+                course.ListStudents();
                 break;
 
             case 3:
-                DisplayCourseNames(courses);
+                course.ListGrades();
+                break;
+
+            case 4:
                 return;
         }
 
-        if (course != null)
+        if (!AskToContinue()) break;
+    }
+}
+
+public static void DisplayCourseDetails(List<Course>? courses, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to view course details.");
+    }
+
+    Console.WriteLine("Do you want to search by:");
+    Console.WriteLine("1. Course ID");
+    Console.WriteLine("2. Course Name");
+    Console.WriteLine("3. List all courses");
+    Console.Write("Enter your choice (1, 2, or 3): ");
+
+    if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 3)
+    {
+        Console.WriteLine("Invalid choice. Please select 1, 2, or 3.");
+        return;
+    }
+
+    Course? course = null;
+
+    switch (choice)
+    {
+        case 1:
+            course = GetCourseById(courses);
+            break;
+
+        case 2:
+            course = GetCourseByName(courses);
+            break;
+
+        case 3:
+            DisplayCourseNames(courses, user);
+            return;
+    }
+
+    if (course != null)
+    {
+        DisplayCourseInfo(course);
+    }
+    else
+    {
+        Console.WriteLine("Course not found. Would you like to see the list of courses? (yes/no)");
+        if (Console.ReadLine()?.Trim().ToLower() == "yes")
         {
-            Console.WriteLine(
-                $"Course ID: {course.GetCourseId()}, Name: {course.GetCourseName()}, {course.GetAssignedTeacherName()}, Enrolled Students: {course.GetEnrolledStudents().Count}, Credits: {course.GetCredits()}");
+            DisplayCourseNames(courses, user);
+        }
+    }
+}
+private static void DisplayCourseNames(List<Course>? courses, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    while (true)
+    {
+        Console.WriteLine("Course Names:");
+        if (courses != null)
+        {
+            for (var i = 0; i < courses.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()}");
+            }
+        }
+
+        Console.WriteLine("Enter the number of the course to view details or perform actions, or type 'exit' to return to the main menu:");
+        var input = Console.ReadLine()?.Trim().ToLower();
+
+        if (input == "exit") return;
+
+        if (courses != null && int.TryParse(input, out var courseIndex) && courseIndex > 0 && courseIndex <= courses.Count)
+        {
+            var selectedCourse = courses[courseIndex - 1];
+            DisplayCourseActions(selectedCourse, user);
         }
         else
         {
-            Console.WriteLine("Course not found. Would you like to see the list of courses? (yes/no)");
-            var userResponse = Console.ReadLine()?.Trim().ToLower();
-
-            if (userResponse == "yes") DisplayCourseNames(courses);
+            Console.WriteLine("Invalid input. Please try again.");
         }
     }
-    private static void DisplayCourseNames(List<Course>? courses)
+}
+private static bool HasPermission(object user, Course? course = null)
+{
+    return user switch
     {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
+        Admin => true,
+        Teacher teacher when (course == null || teacher.GetTeacherId() == course.GetAssignedTeacher()) => true,
+        Student student when course != null &&
+                             course.GetEnrolledStudents().Any(s => s?.GetStudentId() == student.GetStudentId()) => true,
+        _ => false
+    };
+}
+private static void DisplayCourseInfo(Course course)
+{
+    Console.WriteLine($"Course ID: {course.GetCourseId()}, Name: {course.GetCourseName()}, {course.GetAssignedTeacherName()}, Enrolled Students: {course.GetEnrolledStudents().Count}, Credits: {course.GetCredits()}");
+}
 
-        while (true)
-        {
-            Console.WriteLine("Course Names:");
-            if (courses != null)
-                for (var i = 0; i < courses.Count; i++)
-                    Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()}");
+private static bool AskToContinue()
+{
+    Console.WriteLine("Would you like to perform another action? (yes/no)");
+    return Console.ReadLine()?.Trim().ToLower() == "yes";
+}
+public static void ListStudentsInCourses(List<Course>? courses, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
 
-            Console.WriteLine(
-                "Enter the number of the course to view details or perform actions, or type 'exit' to return to the main menu:");
-            var input = Console.ReadLine()?.Trim().ToLower();
-
-            if (input == "exit") return;
-
-            Debug.Assert(courses != null, nameof(courses) + " != null");
-            if (int.TryParse(input, out var courseIndex) && courseIndex > 0 && courseIndex <= courses.Count)
-            {
-                var selectedCourse = courses[courseIndex - 1];
-                DisplayCourseActions(selectedCourse);
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please try again.");
-                continue;
-            }
-
-            break;
-        }
+    if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
     }
 
-    public static void ListStudentsInCourses(List<Course>? courses)
+    while (true)
     {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-
-        while (true)
-        {
-            Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
-            var response = Console.ReadLine()?.Trim().ToLower();
-
-            if (response == "yes")
-            {
-                Console.WriteLine("Enter course name to list students:");
-                var courseName = Console.ReadLine();
-
-                if (courses != null)
-                {
-                    var course = courses.Find(c =>
-                        c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
-
-                    if (course != null)
-                        course.ListStudents();
-                    else
-                        Console.WriteLine("Course not found.");
-                }
-            }
-            else
-            {
-                Debug.Assert(courses != null, nameof(courses) + " != null");
-                foreach (var course in courses) course.ListStudents();
-            }
-
-            Console.WriteLine("Would you like to perform another action? (yes/no)");
-            var continueResponse = Console.ReadLine()?.Trim().ToLower();
-            if (continueResponse != "yes") break;
-        }
-    }
-    public static void DisplayTotalCourses(List<Course>? courses)
-    {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-
-        if (courses != null)
-        {
-            Console.WriteLine($"Total courses: {courses.Count}");
-
-            Console.WriteLine("Would you like to:");
-            Console.WriteLine("1. List all courses");
-            Console.WriteLine("2. View course details");
-            Console.Write("Enter your choice (1 or 2): ");
-
-            if (!int.TryParse(Console.ReadLine(), out var choice) || (choice != 1 && choice != 2))
-            {
-                Console.WriteLine("Invalid choice. Please select 1 or 2.");
-                return;
-            }
-
-            switch (choice)
-            {
-                case 1:
-                    DisplayCourseNames(courses);
-                    break;
-
-                case 2:
-                    DisplayCourseDetails(courses);
-                    break;
-            }
-        }
-    }
-    public static void DisplayStudents(List<Course>? courses)
-    {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-
         Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
         var response = Console.ReadLine()?.Trim().ToLower();
 
         if (response == "yes")
         {
-            Console.WriteLine("Enter course name to list students:");
-            var courseName = Console.ReadLine();
-
-            var course = courses?.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
-
+            var course = GetCourseByName(courses);
             if (course != null)
-                ShowStudents(course.GetEnrolledStudents());
-            else
-                Console.WriteLine("Course not found.");
-        }
-        else
-        {
-            if (courses == null) return;
-            foreach (var course in courses)
             {
-                Console.WriteLine($"\nCourse: {course.GetCourseName()}");
-                ShowStudents(course.GetEnrolledStudents());
-            }
-        }
-    }
-    private static void ShowStudents(List<Student?> students)
-    {
-        Exceptions.Expectations.CheckStudentsNotNull(students);
-
-        if (students.Count == 0)
-        {
-            Console.WriteLine("No students enrolled.");
-            return;
-        }
-
-        foreach (var student in students)
-            if (student != null)
-                Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
-    }
-
-    public static void DisplayCourseGrades(List<Course>? courses)
-    {
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-
-        Console.WriteLine("Do you want to search by:");
-        Console.WriteLine("1. Course ID");
-        Console.WriteLine("2. Course Name");
-        Console.Write("Enter your choice (1 or 2): ");
-
-        if (!int.TryParse(Console.ReadLine(), out var choice) || (choice != 1 && choice != 2))
-        {
-            Console.WriteLine("Invalid choice. Please select 1 or 2.");
-            return;
-        }
-
-        Course? course = null;
-
-        switch (choice)
-        {
-            case 1:
-                Console.WriteLine("Enter course ID to display the grades:");
-                if (!int.TryParse(Console.ReadLine(), out var courseId))
+                if (HasPermission(user, course))
                 {
-                    Console.WriteLine("Invalid course ID. Please try again.");
-                    return;
+                    course.ListStudents();
                 }
-
-                if (courses != null) course = courses.Find(c => c.GetCourseId() == courseId);
-                break;
-
-            case 2:
-                Console.WriteLine("Enter course name to display the grades:");
-                var courseName = Console.ReadLine();
-                Debug.Assert(courses != null, nameof(courses) + " != null");
-                course = courses.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
-                break;
-        }
-
-        if (course != null)
-        {
-            course.ListGrades();
-
-            var grades = course.GetGrades();
-            if (grades.Count > 0)
-            {
-                var averageGrade = grades.Average();
-                Console.WriteLine($"Average Grade: {averageGrade:F2}");
+                else
+                {
+                    Console.WriteLine("You do not have permission to list students in this course.");
+                }
             }
             else
             {
-                Console.WriteLine("No grades available to calculate the average.");
+                Console.WriteLine("Course not found.");
             }
-
-            Console.WriteLine($"Course Credits: {course.GetCredits()}");
         }
         else
         {
-            Console.WriteLine("Course not found. Would you like to see the list of courses? (yes/no)");
-            var userResponse = Console.ReadLine()?.Trim().ToLower();
-
-            if (userResponse == "yes") DisplayCourseNames(courses);
+            ListAllStudentsInCourses(courses, user);
         }
+
+        if (!AskToContinue()) break;
     }
-public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> students)
+}
+
+public static void DisplayTotalCourses(List<Course>? courses, object user)
 {
     Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
+    }
+
+    if (courses == null) return;
+    Console.WriteLine($"Total courses: {courses.Count}");
+
+    Console.WriteLine("Would you like to:");
+    Console.WriteLine("1. List all courses");
+    Console.WriteLine("2. View course details");
+    Console.Write("Enter your choice (1 or 2): ");
+
+    if (!int.TryParse(Console.ReadLine(), out var choice) || (choice != 1 && choice != 2))
+    {
+        Console.WriteLine("Invalid choice. Please select 1 or 2.");
+        return;
+    }
+
+    switch (choice)
+    {
+        case 1:
+            DisplayCourseNames(courses, user);
+            break;
+        case 2:
+            DisplayCourseDetails(courses, user);
+            break;
+    }
+}
+
+public static void DisplayStudents(List<Course>? courses, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
+    }
+
+    Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
+    var response = Console.ReadLine()?.Trim().ToLower();
+
+    if (response == "yes")
+    {
+        var course = GetCourseByName(courses);
+        if (course != null)
+        {
+            ShowStudents(course.GetEnrolledStudents());
+        }
+        else
+        {
+            Console.WriteLine("Course not found.");
+        }
+    }
+    else
+    {
+        ListAllStudentsInCourses(courses, user);
+    }
+}
+
+private static void ShowStudents(List<Student?> students)
+{
+    Exceptions.Expectations.CheckStudentsNotNull(students);
+
+    if (students.Count == 0)
+    {
+        Console.WriteLine("No students enrolled.");
+        return;
+    }
+
+    var sortedStudents = students
+        .Where(student => student != null)
+        .OrderBy(student => student?.GetStudentFullName())
+        .ToList();
+
+    Console.WriteLine("Enrolled Students:");
+    Console.WriteLine("------------------");
+
+    foreach (var student in sortedStudents.OfType<Student>().Where(student => !string.IsNullOrEmpty(student.GetStudentFullName())))
+    {
+        Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
+    }
+}
+
+
+private static void ListAllStudentsInCourses(List<Course>? courses, object user)
+{
+    Debug.Assert(courses != null, nameof(courses) + " != null");
+    foreach (var course in courses)
+    {
+        if (HasPermission(user, course))
+        {
+            course.ListStudents();
+        }
+        else
+        {
+            Console.WriteLine($"You do not have permission to list students in the course: {course.GetCourseName()}.");
+        }
+    }
+}
+
+public static void DisplayCourseGrades(List<Course>? courses, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+    if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to view course grades.");
+    }
+
+    var course = GetCourseFromUserInput(courses);
+    if (course != null)
+    {
+        course.ListGrades();
+        DisplayGrades(course);
+    }
+    else
+    {
+        Console.WriteLine("Course not found. Would you like to see the list of courses? (yes/no)");
+        if (Console.ReadLine()?.Trim().ToLower() == "yes")
+            DisplayCourseNames(courses, user);
+    }
+}
+
+public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> students, object user)
+{
+    Exceptions.Expectations.CheckCoursesNotNull(courses);
+
+if (!HasPermission(user, isTeacherOrAdmin: false))
+    {
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to enroll students in courses.");
+    }
 
     while (true)
     {
@@ -341,92 +361,169 @@ public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> 
 
         if (choice == 3) break;
 
-        Console.WriteLine("Enter the course ID:");
-        if (!int.TryParse(Console.ReadLine(), out var courseId))
+        var course = GetCourseById(courses);
+        if (course == null) continue;
+
+        var student = GetStudentById(students);
+        if (student == null) continue;
+
+        switch (choice)
         {
-            Console.WriteLine("Invalid course ID. Please try again.");
-            continue;
+            case 1:
+                course.EnrollStudent(student);
+                Console.WriteLine($"{student.GetStudentFullName()} has been enrolled in {course.GetCourseName()}.");
+                break;
+            case 2:
+                course.UnenrollStudent(student);
+                Console.WriteLine($"{student.GetStudentFullName()} has been unenrolled from {course.GetCourseName()}.");
+                break;
         }
 
-        if (courses != null)
-        {
-            var course = courses.Find(c => c.GetCourseId() == courseId);
-            if (course == null)
-            {
-                Console.WriteLine("Course not found. Please try again.");
-                continue;
-            }
-
-            Console.WriteLine("Enter the student ID:");
-            if (!int.TryParse(Console.ReadLine(), out var studentId))
-            {
-                Console.WriteLine("Invalid student ID. Please try again.");
-                continue;
-            }
-
-            var student = students.Find(s => s.GetStudentId() == studentId);
-            if (student == null)
-            {
-                Console.WriteLine("Student not found. Please try again.");
-                continue;
-            }
-
-            switch (choice)
-            {
-                case 1:
-                    course.EnrollStudent(student);
-                    Console.WriteLine($"{student.GetStudentFullName()} has been enrolled in {course.GetCourseName()}.");
-                    break;
-                case 2:
-                    course.UnenrollStudent(student);
-                    Console.WriteLine($"{student.GetStudentFullName()} has been unenrolled from {course.GetCourseName()}.");
-                    break;
-            }
-        }
-
-        Console.WriteLine("Would you like to perform another action? (yes/no)");
-        var continueResponse = Console.ReadLine()?.Trim().ToLower();
-        if (continueResponse != "yes") break;
+        if (!AskToContinue()) break;
     }
 }
 
-public static void RemoveStudentInteractive(List<Course>? courses)
+public static void RemoveStudentInteractive(List<Course>? courses, object user)
 {
     Exceptions.Expectations.CheckCoursesNotNull(courses);
 
-    Console.WriteLine("Enter the course ID from which you want to remove a student:");
-    if (!int.TryParse(Console.ReadLine(), out int courseId))
+    if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        Console.WriteLine("Invalid course ID.");
+        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to remove students from courses.");
+    }
+    
+
+    var course = GetCourseById(courses);
+    if (course == null) return;
+
+    var student = GetStudentFromCourse(course);
+    if (student == null) return;
+
+    student.UnenrollFromCourse(course);
+    Console.WriteLine($"{student.GetStudentFullName()} has been removed from {course.GetCourseName()}.");
+}
+
+private static bool HasPermission(object user, bool isTeacherOrAdmin = false)
+{
+    if (user is Admin) return true;
+    switch (isTeacherOrAdmin)
+    {
+        case true when user is Teacher:
+        case false when user is Student:
+            return true;
+        default:
+            return false;
+    }
+}
+
+private static Course? GetCourseFromUserInput(List<Course>? courses)
+{
+    Console.WriteLine("Do you want to search by:");
+    Console.WriteLine("1. Course ID");
+    Console.WriteLine("2. Course Name");
+    Console.Write("Enter your choice (1 or 2): ");
+
+    if (int.TryParse(Console.ReadLine(), out var choice) && choice is 1 or 2)
+    {
+        return choice switch
+        {
+            1 => GetCourseById(courses),
+            2 => GetCourseByName(courses),
+            _ => throw new ArgumentOutOfRangeException(nameof(choice), "The choice must be either 1 or 2.")
+        };
+    }
+    Console.WriteLine("Invalid choice. Please select 1 or 2.");
+    return null;
+
+}
+
+private static Course? GetCourseById(List<Course>? courses)
+{
+    Console.WriteLine("Enter course ID:");
+    if (int.TryParse(Console.ReadLine(), out var courseId)) return courses?.Find(c => c.GetCourseId() == courseId);
+    Console.WriteLine("Invalid course ID. Please try again.");
+    return null;
+
+}
+
+private static Course? GetCourseByName(List<Course>? courses)
+{
+    Console.WriteLine("Enter course name:");
+    var courseName = Console.ReadLine();
+    return courses?.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
+}
+
+private static Student? GetStudentById(List<Student> students)
+{
+    Console.WriteLine("Enter student ID:");
+    if (int.TryParse(Console.ReadLine(), out var studentId)) return students.Find(s => s.GetStudentId() == studentId);
+    Console.WriteLine("Invalid student ID. Please try again.");
+    return null;
+
+}
+
+private static Student? GetStudentFromCourse(Course course)
+{
+    Console.WriteLine("Enter the student ID to remove:");
+    if (int.TryParse(Console.ReadLine(), out var studentId))
+        return course.GetEnrolledStudents().FirstOrDefault(s => s?.GetStudentId() == studentId);
+    Console.WriteLine("Invalid student ID.");
+    return null;
+
+}
+
+private static void DisplayGrades(Course course)
+{
+    var grades = course.GetGrades();
+    if (grades.Count > 0)
+    {
+        var averageGrade = grades.Average();
+        Console.WriteLine($"Average Grade: {averageGrade:F2}");
+    }
+    else
+    {
+        Console.WriteLine("No grades available to calculate the average.");
+    }
+
+    Console.WriteLine($"Course Credits: {course.GetCredits()}");
+}
+public static void UpdateCourseId(Course course, IUser user)
+{
+    Exceptions.Expectations.CheckUserPermission(user);
+
+    Console.Write("Enter new Course ID: ");
+    var newCourseIdInput = Console.ReadLine();
+
+    if (string.IsNullOrEmpty(newCourseIdInput))
+    {
+        Console.WriteLine("Course ID cannot be empty.");
         return;
     }
 
-    if (courses != null)
+    if (!int.TryParse(newCourseIdInput, out var newCourseId))
     {
-        var course = courses.FirstOrDefault(c => c.GetCourseId() == courseId);
-        if (course == null)
-        {
-            Console.WriteLine("Course not found.");
-            return;
-        }
-
-        Console.WriteLine("Enter the student ID to remove:");
-        if (!int.TryParse(Console.ReadLine(), out int studentId))
-        {
-            Console.WriteLine("Invalid student ID.");
-            return;
-        }
-
-        var student = course.GetEnrolledStudents().FirstOrDefault(s => s?.GetStudentId() == studentId);
-        if (student == null)
-        {
-            Console.WriteLine("Student not found in this course.");
-            return;
-        }
-
-        student.UnenrollFromCourse(course);
+        Console.WriteLine("Invalid Course ID. Please enter a valid integer.");
+        return;
     }
-}
-}
-    
 
+    course.SetCourseId(newCourseId);
+    Console.WriteLine("Course ID updated successfully.");
+}
+
+public static void UpdateCourseName(Course course, IUser user)
+{
+    Exceptions.Expectations.CheckUserPermission(user);
+
+    Console.Write("Enter new Course Name: ");
+    var newCourseName = Console.ReadLine();
+
+    if (string.IsNullOrEmpty(newCourseName))
+    {
+        Console.WriteLine("Course name cannot be empty.");
+        return;
+    }
+
+    course.SetCourseName(newCourseName);
+    Console.WriteLine("Course name updated successfully.");
+}
+}

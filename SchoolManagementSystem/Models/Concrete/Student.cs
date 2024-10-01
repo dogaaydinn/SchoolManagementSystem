@@ -1,9 +1,10 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
 
 namespace SchoolManagementSystem.Models.Concrete;
 
-public class Student : SchoolMember, IStudentActions
+public class Student : SchoolMember, IStudentActions, IUser
 {
     #region Constructors
 
@@ -27,7 +28,25 @@ public class Student : SchoolMember, IStudentActions
 
     #endregion
     #region IPersonActions Members
-    
+
+    public void Communicate()
+    {
+        Console.WriteLine($"{GetFullName()} is communicating.");
+    }
+
+    public void PerformDailyRoutine()
+    {
+        Console.WriteLine($"{GetFullName()} is performing daily routine.");
+    }
+
+    public void Rest()
+    {
+        Console.WriteLine($"{GetFullName()} is resting.");
+    }
+
+    #endregion
+    #region IStudentActions Members
+
     public void AttendClass()
     {
         Console.WriteLine($"{GetStudentFullName()} is attending class.");
@@ -37,16 +56,15 @@ public class Student : SchoolMember, IStudentActions
     {
         Console.WriteLine($"{GetStudentFullName()} is doing homework.");
     }
-    
 
     public void Learn()
     {
-        Console.WriteLine($"{GetStudentFullName()} is learning.");
+        Console.WriteLine($"{GetFullName()} is learning.");
     }
 
     public void TakeTest()
     {
-        Console.WriteLine($"{GetStudentFullName()} is taking a test.");
+        Console.WriteLine($"{GetFullName()} is taking a test.");
     }
 
     public void SubmitAssignment()
@@ -64,27 +82,24 @@ public class Student : SchoolMember, IStudentActions
         Console.WriteLine($"{GetStudentFullName()} is participating in class.");
     }
 
-
     #endregion
     #region Methods
-    
 
     public int GetAssignedGrades(Course course)
     {
         return _courseGrades.GetValueOrDefault(course, -1);
     }
+
     public IReadOnlyList<Course> GetEnrolledCourses()
     {
         return EnrolledCourses.AsReadOnly();
     }
-    
 
     public bool MeetsEnrollmentCriteria(Course course)
     {
         return !course.IsStudentEnrolled(this);
     }
 
-    
     public string GetStudentFullName()
     {
         return GetFullName();
@@ -98,8 +113,7 @@ public class Student : SchoolMember, IStudentActions
 
     public override string ToString()
     {
-        return
-            $"{StudentId}: {GetFullName()}, GPA: {Gpa:F2}, Age: {GetAge()}, Assigned Courses: {EnrolledCourses.Count}, Date of Birth: {GetDateOfBirth():d}";
+        return $"{StudentId}: {GetFullName()}, GPA: {Gpa:F2}, Age: {GetAge()}, Assigned Courses: {EnrolledCourses.Count}, Date of Birth: {GetDateOfBirth():d}";
     }
 
     public void CalculateGpa()
@@ -123,12 +137,11 @@ public class Student : SchoolMember, IStudentActions
         Console.WriteLine($"GPA calculated: {Gpa:F2}");
     }
 
-
     public double GetGpa()
     {
         return Gpa;
     }
-    
+
     public int GetStudentId()
     {
         return StudentId;
@@ -138,7 +151,11 @@ public class Student : SchoolMember, IStudentActions
     {
         StudentId = studentId;
     }
-
+    public void UpdateStudentId(int newStudentId)
+    {
+        StudentId = newStudentId;
+        Console.WriteLine($"Student ID updated to {newStudentId}.");
+    }
     public void SetGpa(double gpa)
     {
         Gpa = gpa;
@@ -171,11 +188,18 @@ public class Student : SchoolMember, IStudentActions
             Console.WriteLine($"{GetStudentFullName()} is not enrolled in {course.GetCourseName()}.");
         }
     }
-    
+
     public bool IsEnrolledInCourse(int courseId)
     {
         return EnrolledCourses.Any(c => c.GetCourseId() == courseId);
     }
 
+
     #endregion
+
+    public int Id { get; set; }
+    public void DisplayUserInfo()
+    {
+        throw new NotImplementedException();
+    }
 }

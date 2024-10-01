@@ -1,3 +1,5 @@
+using SchoolManagementSystem.Interfaces.User;
+using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
@@ -5,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu;
 
 public static class TeacherMenu
 {
-    public static void DisplayTeacherMenu(List<Teacher> teachers, List<Student> students)
+    public static void DisplayTeacherMenu(List<Teacher> teachers, List<Student> students, object user)
     {
         while (true)
         {
@@ -28,48 +30,89 @@ public static class TeacherMenu
 
             var choice = Console.ReadLine();
 
+            if (string.IsNullOrEmpty(choice))
+            {
+                Console.WriteLine("Input cannot be empty. Please try again.");
+                continue;
+            }
+
             switch (choice)
             {
                 case "1":
-                    SchoolHandler.DemonstrateActions(teachers[0]);
+                    SchoolHandler.DemonstrateActions(teachers, user);
                     break;
                 case "2":
-                    SchoolHandler.EnrollStudentInCourse(teachers, students);
+                    List<Course> courses = SchoolHandler.SelectCourse();
+                    if (user is IUser iUser2)
+                    {
+                        var nullableStudents = students.Cast<Student?>().ToList();
+                        SchoolHandler.EnrollStudentInCourse(nullableStudents, courses, iUser2);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid user type. Operation not permitted.");
+                    }
+                    break;
                 case "3":
-                    SchoolHandler.AssignCoursesToStudents(teachers, students);
+                    if (user is IUser iUser3)
+                    {
+                        SchoolHandler.AssignCoursesToStudents(teachers, students, iUser3);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid user type. Operation not permitted.");
+                    }
                     break;
                 case "4":
-                    SchoolHandler.RecordGradesForStudents(teachers, students);
+                    SchoolHandler.RecordGradesForStudents(course, students);
                     break;
                 case "5":
-                    SchoolHandler.DisplayAllDetails(teachers, students);
+                    SchoolHandler.DisplayAllDetails(courses, students, teachers, user);
                     break;
                 case "6":
-                    StudentHandler.AssignGradeToStudent(teachers, students);
+                    StudentHandler.AssignGradeToStudent(courses, students, user);
                     break;
                 case "7":
-                    .UpdateStudentGPA(students);
+                    StudentHandler.UpdateStudentGPA(students, user);
                     break;
                 case "8":
                     TeacherHandler.DisplayStudentNames(students);
                     break;
                 case "9":
-                    TeacherHandler.DisplayTeacherDetails(teachers);
+                    TeacherHandler.DisplayCourseNames();
                     break;
                 case "10":
                     TeacherHandler.DisplayTeacherNames(teachers);
                     break;
                 case "11":
-                    TeacherHandler.UpdateTeacherDetails(teachers);
+                    TeacherHandler.UpdateTeacherDetails(teachers, user);
                     break;
                 case "12":
-                    TeacherHandler.ListStudentsInCourses(teachers);
+                    List<Course>? courses = SchoolHandler.SelectCourse();
+                    if (courses == null)
+                    {
+                        Console.WriteLine("Courses list is null. Cannot list students in courses.");
+                    }
+                    else
+                    {
+                        CourseHandler.ListStudentsInCourses(courses, students);
+                    }
                     break;
                 case "13":
-                    TeacherHandler.DemonstrateTeacherMethods(teachers);
+                    if (user is Teacher teacher)
+                    {
+                        TeacherHandler.DemonstrateTeacherMethods(teacher, teachers);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid user type. Operation not permitted.");
+                    }
                     break;
                 case "14":
                     return;
+                case "15":
+                    StudentHandler.UpdateStudentId(students, user);
+                    break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
                     break;

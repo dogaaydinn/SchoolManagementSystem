@@ -1,3 +1,4 @@
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
@@ -6,70 +7,92 @@ namespace SchoolManagementSystem.PresentationLayer.Menu;
 
 public static class CourseMenu
 {
-    public static void DisplayCourseMenu(List<Course>? courses, List<Student> students)
+    public static void DisplayCourseMenu(List<Course>? courses, List<Student?> students, object user)
     {
         while (true)
         {
-            Console.WriteLine("\nCourse Operations:");
+            Console.WriteLine("\nCourse Menu:");
             Console.WriteLine("1. Display Course Details");
-            Console.WriteLine("2. List Students in Courses");
-            Console.WriteLine("3. Assign Grade to Student");
-            Console.WriteLine("4. Display Total Courses");
-            Console.WriteLine("5. Display Students");
-            Console.WriteLine("6. Display Course Grades");
-            Console.WriteLine("7. Enroll Students in Courses");
-            Console.WriteLine("8. Remove Student Interactive");
-            Console.WriteLine("9. Check Student Enrollment");
-            Console.WriteLine("10. Display Student Grade");
-            Console.WriteLine("11. Update Course Credits");
-            Console.WriteLine("12. Back to Main Menu");
-            Console.Write("Enter your choice (1-12): ");
+            Console.WriteLine("2. Update Course ID");
+            Console.WriteLine("3. Update Course Name");
+            Console.WriteLine("4. Exit");
+            Console.Write("Enter your choice: ");
+
             var choice = Console.ReadLine();
 
-            if (!int.TryParse(choice, out int selectedOption) || selectedOption < 1 || selectedOption > 12)
+            if (string.IsNullOrEmpty(choice))
             {
-                Console.WriteLine("Invalid choice. Please enter a number between 1 and 12.");
+                Console.WriteLine("Input cannot be empty. Please try again.");
                 continue;
             }
 
-            switch (selectedOption)
+            switch (choice)
             {
-                case 1:
-                    CourseHandler.DisplayCourseDetails(courses);
+                case "1":
+                    var course = SelectCourse(courses);
+                    if (course != null)
+                    {
+                        CourseHandler.DisplayCourseDetails(new List<Course> { course }, user);
+                    }
                     break;
-                case 2:
-                    CourseHandler.ListStudentsInCourses(courses);
+                case "2":
+                    course = SelectCourse(courses);
+                    if (course != null)
+                    {
+                        if (user is IUser iUser)
+                        {
+                            CourseHandler.UpdateCourseId(course, iUser);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid user type. Operation not permitted.");
+                        }
+                    }
                     break;
-                case 3:
-                    StudentHandler.AssignGradeToStudent(courses, students);
+                case "3":
+                    course = SelectCourse(courses);
+                    if (course != null)
+                    {
+                        if (user is IUser iUser)
+                        {
+                            CourseHandler.UpdateCourseName(course, iUser);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid user type. Operation not permitted.");
+                        }
+                    }
                     break;
-                case 4:
-                    CourseHandler.DisplayTotalCourses(courses);
+                case "4":
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
-                case 5:
-                    CourseHandler.DisplayStudents(courses);
-                    break;
-                case 6:
-                    CourseHandler.DisplayCourseGrades(courses);
-                    break;
-                case 7:
-                    CourseHandler.EnrollStudentsInCourses(courses, students);
-                    break;
-                case 8:
-                    CourseHandler.RemoveStudentInteractive(students, courses);
-                    break;
-                case 9:
-                    CourseHandler.CheckStudentEnrollment(courses, students);
-                    break;
-                case 10:
-                    CourseHandler.DisplayStudentGrade(courses, students);
-                    break;
-                case 11:
-                    CourseHandler.UpdateCourseCredits(courses);
-                    break;
-                case 12:
-                    return; // Return to Main Menu
             }
         }
+    }
+
+    private static Course? SelectCourse(List<Course>? courses)
+    {
+        if (courses == null || courses.Count == 0)
+        {
+            Console.WriteLine("No courses available.");
+            return null;
+        }
+
+        Console.WriteLine("Select a course:");
+        for (var i = 0; i < courses.Count; i++)
+        {
+            var course = courses[i];
+            Console.WriteLine($"{i + 1}. {course.GetCourseName()} (ID: {course.GetCourseId()})");
+        }
+
+        if (int.TryParse(Console.ReadLine(), out var courseIndex) && courseIndex >= 1 && courseIndex <= courses.Count)
+        {
+            return courses[courseIndex - 1];
+        }
+
+        Console.WriteLine("Invalid course selection.");
+        return null;
     }
 }

@@ -19,6 +19,9 @@ internal static class Program
         // Display the main menu
         MenuHandler.DisplayMainMenu(students, courses, teachers);
         
+        Admin admin = new Admin("John", "Doe", new DateTime(1980, 1, 1), 12345);
+        admin.DisplayUserInfo();
+        
         // Demonstrate school actions
         ISchoolActions school = new School(); // Assuming you have a School class that implements ISchoolActions
         Course course = courses[0]; // Example course

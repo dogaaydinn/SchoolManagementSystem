@@ -1,22 +1,31 @@
 using SchoolManagementSystem.Interfaces.User;
+using SchoolManagementSystem.Models.Abstract;
 
-namespace SchoolManagementSystem.Models.Concrete
+namespace SchoolManagementSystem.Models.Concrete;
+
+public class Admin : Person, IUser
 {
-    public class Admin : IUser
+    public Admin(string firstName, string lastName, DateTime dateOfBirth, int adminId)
+        : base(firstName, lastName, dateOfBirth)
     {
-        private readonly int _ıd;
-        private readonly string _name;
-        
+        AdminId = adminId;
+    }
 
-        public Admin(int adminId, string fullName)
-        {
-            _ıd = adminId;
-            _name = fullName;
-        }
+    public int AdminId { get; private set; }
 
-        public int GetUserId() => _ıd;
-        public string GetFullName() => _name;
-        public string Id { get; }
-        public string Name { get; }
+    public int Id
+    {
+        get => AdminId;
+        set => AdminId = value;
+    }
+
+    public override void DisplayDetails()
+    {
+        Console.WriteLine($"Admin ID: {AdminId}, Name: {GetFullName()}, Date of Birth: {GetDateOfBirth():d}");
+    }
+
+    public void DisplayUserInfo()
+    {
+        DisplayDetails();
     }
 }

@@ -1,9 +1,16 @@
-using SchoolManagementSystem.Interfaces;
-
 namespace SchoolManagementSystem.Models.Abstract;
 
-public abstract class Person : IPersonActions
+public abstract class Person
 {
+    #region Properties
+
+    private string FirstName { get; set; }
+    private string LastName { get; set; }
+    private DateTime DateOfBirth { get; set; }
+
+    #endregion
+    #region Constructors
+
     protected Person(string firstName, string lastName, DateTime dateOfBirth)
     {
         FirstName = firstName;
@@ -11,37 +18,20 @@ public abstract class Person : IPersonActions
         DateOfBirth = dateOfBirth;
     }
 
-    private string FirstName { get; }
-    private string LastName { get; }
-    private DateTime DateOfBirth { get; }
+    #endregion
+    #region Methods
 
-    public void PerformDailyRoutine()
-    {
-        Console.WriteLine($"{GetFullName()} is performing daily routine.");
-    }
-    
-    public void Communicate()
-    {
-        Console.WriteLine($"{GetFullName()} is communicating.");
-    }
-    
-    public void Rest()
-    {
-        Console.WriteLine($"{GetFullName()} is resting.");
-    }
-
-    protected string GetFullName()
+    public string GetFullName()
     {
         return $"{FirstName} {LastName}";
-    }
-
-    public override string ToString()
-    {
-        return GetFullName();
     }
 
     protected DateTime GetDateOfBirth()
     {
         return DateOfBirth;
     }
+
+    public abstract void DisplayDetails();
+
+    #endregion
 }

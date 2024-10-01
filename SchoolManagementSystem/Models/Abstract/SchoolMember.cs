@@ -1,3 +1,4 @@
+
 namespace SchoolManagementSystem.Models.Abstract;
 
 public abstract class SchoolMember : Person
@@ -21,5 +22,4 @@ public abstract class SchoolMember : Person
     }
 
     #endregion
-    public abstract void DisplayDetails();
 }

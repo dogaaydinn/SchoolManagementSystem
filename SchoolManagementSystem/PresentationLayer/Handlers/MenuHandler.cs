@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class MenuHandler
 {
-    public static void DisplayMainMenu(List<Student> students, List<Course>? courses, List<Teacher> teachers, List<Admin> admins)
+    public static void DisplayMainMenu(List<Student?> students, List<Course>? courses, List<Teacher> teachers, List<Admin> admins, object user)
     {
         while (true)
         {
@@ -28,23 +28,43 @@ public static class MenuHandler
             switch (choice)
             {
                 case "1":
-                    StudentMenu.DisplayStudentMenu(students, courses);
-                    break;
-                case "2":
-                    TeacherMenu.DisplayTeacherMenu(teachers, students);
-                    break;
-                case "3":
-                    CourseMenu.DisplayCourseMenu(courses, students);
-                    break;
-                case "4":
-                    Admin admin = admins.FirstOrDefault();
-                    if (admin != null)
+                    if (courses == null)
                     {
-                        SchoolMenu.DisplaySchoolMenu(courses, students, teachers, admin);
+                        Console.WriteLine("Courses list is null. Cannot display student menu.");
                     }
                     else
                     {
-                        Console.WriteLine("No admin available.");
+                        StudentMenu.DisplayStudentMenu(students, courses, user);
+                    }
+                    break;
+                case "2":
+                    TeacherMenu.DisplayTeacherMenu(teachers, students.Cast<Student>().ToList(), user);
+                    break;
+                case "3":
+                    if (courses == null)
+                    {
+                        Console.WriteLine("Courses list is null. Cannot display course menu.");
+                    }
+                    else
+                    {
+                        CourseMenu.DisplayCourseMenu(courses, students.Cast<Student>().ToList(), user);
+                    }
+                    break;
+                case "4":
+                    var admin = admins.FirstOrDefault();
+                    if (admin == null)
+                    {
+                        Console.WriteLine("No admin found. Cannot display school menu.");
+                        break;
+                    }
+
+                    if (user is Interfaces.User.IUser validUser)
+                    {
+                        SchoolMenu.DisplaySchoolMenu(courses, students.Cast<Student>().ToList(), teachers, admin);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid user type.");
                     }
                     break;
                 case "5":

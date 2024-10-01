@@ -7,50 +7,178 @@ namespace SchoolManagementSystem.PresentationLayer.Menu;
 
 public static class SchoolMenu
 {
-    public static void DisplaySchoolMenu(List<Course>? courses, List<Student> students, List<Teacher> teachers, IUser user)
+    public static void DisplaySchoolMenu(List<Course>? courses, List<Student?> students, List<Teacher> teachers, IUser user)
     {
         while (true)
         {
             Console.WriteLine("\nSchool Operations:");
-            
-            if (user is Student)
+
+            switch (user)
             {
-                StudentMenu.DisplayStudentMenu();
-            }
-            else if (user is Teacher)
-            {
-                TeacherMenu.DisplayTeacherMenu();
-            }
-            else if (user is Admin)
-            {
-                DisplayAdminMenu(); 
-            }
-            else
-            {
-                Console.WriteLine("Unknown user type.");
-                return; 
+                case Student student:
+                    if (courses == null)
+                    {
+                        Console.WriteLine("Courses list is null. Cannot display student menu.");
+                        return;
+                    }
+                    StudentMenu.DisplayStudentMenu(students, courses, student);
+                    break;
+                case Teacher teacher:
+                    TeacherMenu.DisplayTeacherMenu(new List<Teacher> { teacher }, students.OfType<Student>().ToList(), teacher);
+                    break;
+                case Admin:
+                    DisplayAdminMenu();
+                    break;
+                default:
+                    Console.WriteLine("Unknown user type.");
+                    return;
             }
 
             Console.Write("Enter your choice: ");
             var choice = Console.ReadLine();
 
+            if (string.IsNullOrEmpty(choice))
+            {
+                Console.WriteLine("Choice cannot be null or empty.");
+                continue;
+            }
+
             switch (user)
             {
-                case Student:
-                    HandleStudentMenu(choice, courses, students);
+                case Student student:
+                    HandleStudentMenu(choice, courses, students, student);
                     break;
 
-                case Teacher:
-                    HandleTeacherMenu(choice, courses, students);
+                case Teacher teacher:
+                    HandleTeacherMenu(choice, courses, teachers, teacher);
                     break;
 
                 case Admin:
-                    HandleAdminMenu(choice, courses, students, teachers);
+                    HandleAdminMenu(choice, courses, students, teachers, user);
                     break;
             }
         }
     }
+    private static void HandleCourseMenu(string choice, List<Course>? courses, Course course, IUser user)
+    {
+        if (courses == null)
+        {
+            Console.WriteLine("Courses list is null. Cannot proceed.");
+            return;
+        }
 
+        switch (choice)
+        {
+            case "1":
+                CourseHandler.DisplayCourseDetails(new List<Course> { course }, user);
+                break;
+            case "2":
+                CourseHandler.UpdateCourseId(course, user);
+                break;
+            case "3":
+                CourseHandler.UpdateCourseName(course, user);
+                break;
+            case "4":
+                return; 
+            default:
+                Console.WriteLine("Invalid choice.");
+                break;
+        }
+    }
+    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student?> students, Student student)
+    {
+        switch (choice)
+        {
+            case "1":
+                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher>(), student);
+                break;
+            case "2":
+                if (courses == null)
+                {
+                    Console.WriteLine("Courses list is null. Cannot enroll student in course.");
+                }
+                else
+                {
+                    SchoolHandler.EnrollStudentInCourse(students.ToList(), courses, student);
+                }
+                break;
+            case "3":
+                // Add code for viewing grades here
+                break;
+            case "4":
+                return; 
+            default:
+                Console.WriteLine("Invalid choice.");
+                break;
+        }
+    }
+
+    private static void HandleAdminMenu(string choice, List<Course>? courses, List<Student?> students, List<Teacher> teachers, IUser user)
+    {
+        switch (choice)
+        {
+            case "1":
+                SchoolHandler.DisplayAllDetails(courses, students.ToList(), teachers, user);
+                break;
+            case "2":
+                // Add code for course management here
+                break;
+            case "3":
+                // Add code for student and teacher management here
+                break;
+            case "4":
+                if (courses == null)
+                {
+                    Console.WriteLine("Courses list is null. Cannot record grades for students.");
+                }
+                else
+                {
+                    SchoolHandler.RecordGradesForStudents(courses, teachers);
+                }
+                break;
+            case "5":
+                return; 
+            default:
+                Console.WriteLine("Invalid choice.");
+                break;
+        }
+    }
+    
+    private static void HandleTeacherMenu(string choice, List<Course>? courses, List<Teacher> teachers, Teacher teacher)
+    {
+        switch (choice)
+        {
+            case "1":
+                TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, teachers);
+                break;
+            case "2":
+                TeacherHandler.UpdateTeacherId(teachers, teacher);
+                break;
+            case "3":
+                return; 
+            default:
+                Console.WriteLine("Invalid choice.");
+                break;
+        }
+    }
+
+    private static void DisplayStudentMenu()
+    {
+        Console.WriteLine("1. View All Details");
+        Console.WriteLine("2. Enroll in Course");
+        Console.WriteLine("3. View Grades");
+        Console.WriteLine("4. Back to Main Menu");
+    }
+
+    private static void DisplayTeacherMenu()
+    {
+        Console.WriteLine("1. View All Details");
+        Console.WriteLine("2. View Student Details");
+        Console.WriteLine("3. Assign Courses to Students");
+        Console.WriteLine("4. Record Grades for Students");
+        Console.WriteLine("5. Back to Main Menu");
+    }
+    
     private static void DisplayAdminMenu()
     {
         Console.WriteLine("1. View All Details");
@@ -58,117 +186,5 @@ public static class SchoolMenu
         Console.WriteLine("3. Manage Students and Teachers");
         Console.WriteLine("4. Record Grades for Students");
         Console.WriteLine("5. Back to Main Menu");
-    }
-
-    private static void HandleAdminMenu(string choice, List<Course>? courses, List<Student> students, List<Teacher> teachers)
-    {
-        switch (choice)
-        {
-            case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, teachers);
-                break;
-            case "2":
-                // Kurs yönetimi işlemleri için gerekli kod buraya eklenmeli
-                break;
-            case "3":
-                // Öğrenci ve öğretmen yönetimi işlemleri için gerekli kod buraya eklenmeli
-                break;
-            case "4":
-                SchoolHandler.RecordGradesForStudents(courses);
-                break;
-            case "5":
-                return; // Ana Menüye Dön
-            default:
-                Console.WriteLine("Invalid choice.");
-                break;
-        }
-    }
-
-    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student> students)
-    {
-        switch (choice)
-        {
-            case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, null);
-                break;
-            case "2":
-                SchoolHandler.EnrollStudentInCourse(students, courses);
-                break;
-            case "3":
-                // Not görüntüleme işlemi için gerekli kod buraya eklenmeli
-                break;
-            case "4":
-                return; // Ana Menüye Dön
-            default:
-                Console.WriteLine("Invalid choice.");
-                break;
-        }
-    }
-
-    private static void HandleTeacherMenu(string choice, List<Course>? courses, List<Student> students)
-    {
-        switch (choice)
-        {
-            case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, null);
-                break;
-            case "2":
-                SchoolHandler.DisplayStudentDetails(students, courses);
-                break;
-            case "3":
-                SchoolHandler.AssignCoursesToStudents(courses, students);
-                break;
-            case "4":
-                SchoolHandler.RecordGradesForStudents(courses);
-                break;
-            case "5":
-                return; // Ana Menüye Dön
-            default:
-                Console.WriteLine("Invalid choice.");
-                break;
-        }
-    }
-
-    private static void DemonstratePersonActions(List<Student> students, List<Teacher> teachers, List<Course>? courses)
-    {
-        Console.WriteLine("Enter the person type (student/teacher/course):");
-        var personType = Console.ReadLine()?.ToLower();
-
-        switch (personType)
-        {
-            case "student":
-                if (students.Count > 0)
-                {
-                    SchoolHandler.DemonstrateActions(students[0]);
-                }
-                else
-                {
-                    Console.WriteLine("No students available.");
-                }
-                break;
-            case "teacher":
-                if (teachers.Count > 0)
-                {
-                    SchoolHandler.DemonstrateActions(teachers[0]);
-                }
-                else
-                {
-                    Console.WriteLine("No teachers available.");
-                }
-                break;
-            case "course":
-                if (courses != null && courses.Count > 0)
-                {
-                    SchoolHandler.DemonstrateActions(courses[0]);
-                }
-                else
-                {
-                    Console.WriteLine("No courses available.");
-                }
-                break;
-            default:
-                Console.WriteLine("Invalid person type.");
-                break;
-        }
     }
 }

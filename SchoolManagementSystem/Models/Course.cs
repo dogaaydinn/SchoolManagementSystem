@@ -22,8 +22,8 @@ public class Course : ISchoolActions
 
     private const int MaxStudents = 30;
 
-    private readonly int _courseId;
-    private readonly string _courseName;
+    private int _courseId;
+    private string _courseName;
     private readonly List<Student?> _enrolledStudents;
     private readonly Dictionary<int, Grade> _studentGrades;
     private readonly Teacher _assignedTeacher;
@@ -46,7 +46,11 @@ public class Course : ISchoolActions
     {
         return _credits;
     }
-
+    
+    public void SetCourseId(int newCourseId)
+    {
+        _courseId = newCourseId;
+    }
     public List<double> GetGrades()
     {
         return _studentGrades.Values.Select(grade => grade.GetGradeValue()).ToList();
@@ -55,6 +59,11 @@ public class Course : ISchoolActions
     public string GetAssignedTeacherName()
     {
         return $"Teacher: {_assignedTeacher.GetTeacherFullName()}";
+    }
+    
+    public int GetAssignedTeacher()
+    {
+        return _assignedTeacher.GetTeacherId();
     }
 
     public void EnrollStudent(Student student)
@@ -97,7 +106,10 @@ public class Course : ISchoolActions
     {
         return _courseName;
     }
-
+    public void SetCourseName(string newCourseName)
+    {
+        _courseName = newCourseName;
+    }
     public List<Student?> GetEnrolledStudents()
     {
         return _enrolledStudents;
@@ -126,7 +138,6 @@ public class Course : ISchoolActions
 
         Console.WriteLine($"Assigned/Updated grade for {student.GetStudentFullName()} in course {_courseName}.");
 
-        // Update the student's GPA after assigning the grade
         student.CalculateGpa();
     }
 
