@@ -1,6 +1,6 @@
 namespace SchoolManagementSystem.Interfaces;
 
-public interface IStudentActions : IPersonActions
+public interface IStudentActions : ISchoolMemberActions
 {
     void Learn();
     void TakeTest();
@@ -9,6 +9,5 @@ public interface IStudentActions : IPersonActions
     void ParticipateInClass();
     void AttendClass();
     void DoHomework();
-    
     string GetFullName();
 }

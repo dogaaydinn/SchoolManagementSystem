@@ -3,11 +3,11 @@ using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
-namespace SchoolManagementSystem.PresentationLayer.Menu;
+namespace SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
 
 public static class StudentMenu
 {
-    public static void DisplayStudentMenu(List<Student?> students, List<Course> courses, object user)
+    public static void DisplayStudentMenu(List<Student?>? students, List<Course>? courses, object? user)
     {
         while (true)
         {
@@ -65,19 +65,26 @@ public static class StudentMenu
         }
     }
 
-    private static Student? SelectStudent(List<Student?> students)
+    private static Student? SelectStudent(List<Student?>? students)
     {
         Console.WriteLine("Select a student:");
-        for (var i = 0; i < students.Count; i++)
+        if (students != null)
         {
-            var student = students[i];
-            if (student != null)
+            for (var i = 0; i < students.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+                var student = students[i];
+                if (student != null)
+                {
+                    Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+                }
             }
         }
+        else
+        {
+            Console.WriteLine("No students available.");
+        }
 
-        if (int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
+        if (students != null && int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
         {
             var selectedStudent = students[studentIndex - 1];
             if (selectedStudent != null)
@@ -88,5 +95,41 @@ public static class StudentMenu
 
         Console.WriteLine("Invalid student selection.");
         return null;
+    }
+
+    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student?>? students, Student? student, object? user)
+    {
+        switch (choice)
+        {
+            case "1":
+                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher?>(), student);
+                break;
+            case "2":
+                if (courses == null)
+                {
+                    Console.WriteLine("Courses list is null. Cannot enroll student in course.");
+                }
+                else
+                {
+                    if (students != null)
+                    {
+                        SchoolHandler.EnrollStudentInCourse(students.ToList(), courses, student);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Students list is null. Cannot enroll student in course.");
+                    }
+                }
+                break;
+            case "3":
+                PersonHandler.DemonstrateActions(student, student);
+                break;
+            case "4":
+                StudentHandler.DisplayStudentActions(student, user);
+                break;
+            default:
+                Console.WriteLine("Invalid choice.");
+                break;
+        }
     }
 }

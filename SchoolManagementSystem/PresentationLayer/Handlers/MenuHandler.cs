@@ -1,12 +1,15 @@
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Menu;
+using SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
+using SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
+using SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class MenuHandler
 {
-    public static void DisplayMainMenu(List<Student?> students, List<Course>? courses, List<Teacher> teachers, List<Admin> admins, object user)
+    public static void DisplayMainMenu(List<Student?>? students, List<Course>? courses, List<Teacher?>? teachers, List<Admin> admins, object? user)
     {
         while (true)
         {
@@ -38,7 +41,7 @@ public static class MenuHandler
                     }
                     break;
                 case "2":
-                    TeacherMenu.DisplayTeacherMenu(teachers, students.Cast<Student>().ToList(), user);
+                    TeacherMenu.DisplayTeacherMenu(teachers, students.Cast<Student>().ToList(), courses, user);
                     break;
                 case "3":
                     if (courses == null)

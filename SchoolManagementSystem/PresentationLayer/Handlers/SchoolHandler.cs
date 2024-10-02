@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
@@ -6,31 +7,35 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class SchoolHandler
 {
-    public static void DisplayAllDetails(List<Course>? courses, List<Student?> students, List<Teacher> teachers, object user)
+    public static void DisplayAllDetails(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
     {
-        Exceptions.Expectations.CheckHasPermission(user, isAdmin: true);
-        Exceptions.Expectations.CheckCoursesNotNull(courses);
-        Exceptions.Expectations.CheckStudentsNotNull(students);
-        Exceptions.Expectations.CheckTeachersNotNull(teachers);
+        Exceptions.CheckHasPermission(user, isAdmin: true);
+        Exceptions.CheckCoursesNotNull(courses);
+        Exceptions.CheckStudentsNotNull(students);
+        Exceptions.CheckTeachersNotNull(teachers);
 
         Console.WriteLine("Courses:");
         CourseHandler.DisplayCourseDetails(courses, user);
 
         Console.WriteLine("\nStudents:");
-        foreach (var student in students.OfType<Student>())
+        if (students != null)
         {
-            StudentHandler.DisplayStudentDetails(student);
+            foreach (var student in students.OfType<Student>())
+            {
+                StudentHandler.DisplayStudentDetails(student);
+            }
         }
 
         Console.WriteLine("\nTeachers:");
-        foreach (var teacher in teachers)
+        Debug.Assert(teachers != null, nameof(teachers) + " != null");
+        foreach (var teacher in teachers.OfType<Teacher>())
         {
             Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
         }
     }
-    public static void AssignCoursesToStudents(List<Course> courses, List<Student?> students, object user)
+    public static void AssignCoursesToStudents(List<Course>? courses, List<Student?> students, object? user)
     {
-        Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: true);
+        Exceptions.CheckHasPermission(user, isTeacherOrAdmin: true);
 
         foreach (var student in students)
         {
@@ -52,17 +57,30 @@ public static class SchoolHandler
             }
         }
     }
-public static void RecordGradesForStudents(List<Course> courses, object user)
+public static void RecordGradesForStudents(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: true);
+    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: true);
 
     Console.WriteLine($"User {user.GetType().Name} is recording grades.");
+
+    if (courses == null)
+    {
+        Console.WriteLine("Courses list is null.");
+        return;
+    }
 
     foreach (var course in courses)
     {
         Console.WriteLine($"Recording grades for course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
 
-        foreach (var student in course.GetEnrolledStudents().OfType<Student>())
+        var enrolledStudents = course.GetEnrolledStudents();
+        if (enrolledStudents == null)
+        {
+            Console.WriteLine("No students enrolled in this course.");
+            continue;
+        }
+
+        foreach (var student in enrolledStudents.OfType<Student>())
         {
             Console.WriteLine($"Enter the grade for {student.GetStudentFullName()} (ID: {student.GetStudentId()}):");
 
@@ -79,7 +97,7 @@ public static void RecordGradesForStudents(List<Course> courses, object user)
         }
     }
 }
-private static Course? GetCourseFromUserInput(List<Course> courses)
+private static Course? GetCourseFromUserInput(List<Course>? courses)
 {
     Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
     var input = Console.ReadLine()?.Trim();
@@ -92,6 +110,12 @@ private static Course? GetCourseFromUserInput(List<Course> courses)
         return null;
     }
 
+    if (courses == null)
+    {
+        Console.WriteLine("Courses list is null.");
+        return null;
+    }
+
     var course = courses.Find(c => c.GetCourseId() == courseId);
     if (course == null)
     {
@@ -100,9 +124,9 @@ private static Course? GetCourseFromUserInput(List<Course> courses)
 
     return course;
 }
-public static void DemonstrateActions(object person, object user)
+public static void DemonstrateActions(object? person, object? user)
 {
-    Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: false);
+    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
 
     switch (person)
     {
@@ -117,9 +141,9 @@ public static void DemonstrateActions(object person, object user)
             break;
     }
 }
-private static void DemonstrateTeacherActions(Teacher teacher, object user)
+private static void DemonstrateTeacherActions(Teacher teacher, object? user)
 {
-    Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: false);
+    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
 
     Console.WriteLine($"Demonstrating actions for teacher: {teacher.GetTeacherFullName()} (ID: {teacher.GetTeacherId()})");
     
@@ -127,12 +151,19 @@ private static void DemonstrateTeacherActions(Teacher teacher, object user)
     teacher.CheckAttendance();
 
 }
-private static void DemonstrateStudentActions(Student student, object user)
+
+public static void DemonstrateStudentActions(Student? student, object? user)
 {
-    Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: false);
+    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
+
+    if (student == null)
+    {
+        Console.WriteLine("Student is null. Cannot demonstrate actions.");
+        return;
+    }
 
     Console.WriteLine($"Demonstrating actions for student: {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
-    
+
     student.Learn();
     student.TakeTest();
     student.SubmitAssignment();
@@ -141,11 +172,17 @@ private static void DemonstrateStudentActions(Student student, object user)
     student.AttendClass();
     student.DoHomework();
 }
-public static void EnrollStudentInCourse(List<Student?> students, List<Course> courses, object user)
+public static void EnrollStudentInCourse(List<Student?>? students, List<Course> courses, object? user)
 {
-    Exceptions.Expectations.CheckHasPermission(user, isTeacherOrAdmin: false);
-    Exceptions.Expectations.CheckStudentsNotNull(students);
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
+    Exceptions.CheckStudentsNotNull(students);
+    Exceptions.CheckCoursesNotNull(courses);
+
+    if (students == null)
+    {
+        Console.WriteLine("Students list is null.");
+        return;
+    }
 
     try
     {
@@ -163,9 +200,8 @@ public static void EnrollStudentInCourse(List<Student?> students, List<Course> c
         Console.WriteLine($"An error occurred: {ex.Message}");
     }
 }
-private static Student? SelectStudent(List<Student?> students)
+public static Student? SelectStudent(List<Student?> students)
 {
-    Console.WriteLine("Select a student to enroll:");
     for (var i = 0; i < students.Count; i++)
     {
         var student = students[i];
@@ -188,7 +224,7 @@ private static Student? SelectStudent(List<Student?> students)
     return null;
 }
 
-private static Course? SelectCourse(List<Course> courses)
+public static Course? SelectCourse(List<Course> courses)
 {
     Console.WriteLine("Select a course to enroll in:");
     for (var i = 0; i < courses.Count; i++)
@@ -199,6 +235,30 @@ private static Course? SelectCourse(List<Course> courses)
     if (int.TryParse(Console.ReadLine(), out var courseIndex) && courseIndex >= 1 && courseIndex <= courses.Count)
         return courses[courseIndex - 1];
     Console.WriteLine("Invalid course selection.");
+    return null;
+}
+
+public static Teacher? SelectTeacher(List<Teacher?>? teachers)
+{
+    if (teachers == null || teachers.Count == 0)
+    {
+        Console.WriteLine("No teachers available.");
+        return null;
+    }
+
+    Console.WriteLine("Select a teacher:");
+    for (var i = 0; i < teachers.Count; i++)
+    {
+        var teacher = teachers[i];
+        Console.WriteLine($"{i + 1}. {teacher?.GetTeacherFullName()} (ID: {teacher?.GetTeacherId()})");
+    }
+
+    if (int.TryParse(Console.ReadLine(), out var teacherIndex) && teacherIndex >= 1 && teacherIndex <= teachers.Count)
+    {
+        return teachers[teacherIndex - 1];
+    }
+
+    Console.WriteLine("Invalid teacher selection.");
     return null;
 }
 }

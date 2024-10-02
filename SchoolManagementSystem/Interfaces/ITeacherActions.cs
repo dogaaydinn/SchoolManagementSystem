@@ -1,7 +1,7 @@
 
 namespace SchoolManagementSystem.Interfaces;
 
-public interface ITeacherActions : IPersonActions
+public interface ITeacherActions : ISchoolMemberActions
 {
     void Teach();
     void CheckAttendance();

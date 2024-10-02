@@ -8,13 +8,13 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class CourseHandler
 {
-private static void DisplayCourseActions(Course course, object user)
+public static void DisplayCourseActions(Course course, object? user)
 {
-    Exceptions.Expectations.CheckCourseNotNull(course);
+    Exceptions.CheckCourseNotNull(course);
 
     if (!HasPermission(user, course))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to perform actions on courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to perform actions on courses.");
     }
 
     while (true)
@@ -62,14 +62,13 @@ private static void DisplayCourseActions(Course course, object user)
         if (!AskToContinue()) break;
     }
 }
-
-public static void DisplayCourseDetails(List<Course>? courses, object user)
+public static void DisplayCourseDetails(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to view course details.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to view course details.");
     }
 
     Console.WriteLine("Do you want to search by:");
@@ -114,9 +113,9 @@ public static void DisplayCourseDetails(List<Course>? courses, object user)
         }
     }
 }
-private static void DisplayCourseNames(List<Course>? courses, object user)
+public static void DisplayCourseNames(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     while (true)
     {
@@ -145,34 +144,45 @@ private static void DisplayCourseNames(List<Course>? courses, object user)
         }
     }
 }
-private static bool HasPermission(object user, Course? course = null)
+private static bool HasPermission(object? user, Course? course = null)
 {
     return user switch
     {
         Admin => true,
         Teacher teacher when (course == null || teacher.GetTeacherId() == course.GetAssignedTeacher()) => true,
-        Student student when course != null &&
-                             course.GetEnrolledStudents().Any(s => s?.GetStudentId() == student.GetStudentId()) => true,
+        Student student when course?.GetEnrolledStudents() != null &&
+                             (course.GetEnrolledStudents() ?? throw new InvalidOperationException()).Any(s => s?.GetStudentId() == student.GetStudentId()) => true,
         _ => false
     };
 }
 private static void DisplayCourseInfo(Course course)
 {
-    Console.WriteLine($"Course ID: {course.GetCourseId()}, Name: {course.GetCourseName()}, {course.GetAssignedTeacherName()}, Enrolled Students: {course.GetEnrolledStudents().Count}, Credits: {course.GetCredits()}");
-}
+    var courseId = course.GetCourseId();
+    var courseName = course.GetCourseName();
+    var assignedTeacherName = course.GetAssignedTeacherName();
+    var enrolledStudents = course.GetEnrolledStudents();
+    var credits = course.GetCredits();
 
+    if (enrolledStudents == null)
+    {
+        Console.WriteLine("Course information is incomplete.");
+        return;
+    }
+
+    Console.WriteLine($"Course ID: {courseId}, Name: {courseName}, Teacher: {assignedTeacherName}, Enrolled Students: {enrolledStudents.Count}, Credits: {credits}");
+}
 private static bool AskToContinue()
 {
     Console.WriteLine("Would you like to perform another action? (yes/no)");
     return Console.ReadLine()?.Trim().ToLower() == "yes";
 }
-public static void ListStudentsInCourses(List<Course>? courses, object user)
+public static void ListStudentsInCourses(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to list students in courses.");
     }
 
     while (true)
@@ -207,14 +217,13 @@ public static void ListStudentsInCourses(List<Course>? courses, object user)
         if (!AskToContinue()) break;
     }
 }
-
-public static void DisplayTotalCourses(List<Course>? courses, object user)
+public static void DisplayTotalCourses(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to list students in courses.");
     }
 
     if (courses == null) return;
@@ -241,14 +250,13 @@ public static void DisplayTotalCourses(List<Course>? courses, object user)
             break;
     }
 }
-
-public static void DisplayStudents(List<Course>? courses, object user)
+public static void DisplayStudents(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to list students in courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to list students in courses.");
     }
 
     Console.WriteLine("Do you want to list students in a specific course? (yes/no)");
@@ -272,11 +280,11 @@ public static void DisplayStudents(List<Course>? courses, object user)
     }
 }
 
-private static void ShowStudents(List<Student?> students)
+private static void ShowStudents(List<Student?>? students)
 {
-    Exceptions.Expectations.CheckStudentsNotNull(students);
+    Exceptions.CheckStudentsNotNull(students);
 
-    if (students.Count == 0)
+    if (students == null || students.Count == 0)
     {
         Console.WriteLine("No students enrolled.");
         return;
@@ -295,9 +303,7 @@ private static void ShowStudents(List<Student?> students)
         Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
     }
 }
-
-
-private static void ListAllStudentsInCourses(List<Course>? courses, object user)
+public static void ListAllStudentsInCourses(List<Course>? courses, object? user)
 {
     Debug.Assert(courses != null, nameof(courses) + " != null");
     foreach (var course in courses)
@@ -312,14 +318,13 @@ private static void ListAllStudentsInCourses(List<Course>? courses, object user)
         }
     }
 }
-
-public static void DisplayCourseGrades(List<Course>? courses, object user)
+public static void DisplayCourseGrades(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to view course grades.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to view course grades.");
     }
 
     var course = GetCourseFromUserInput(courses);
@@ -335,14 +340,13 @@ public static void DisplayCourseGrades(List<Course>? courses, object user)
             DisplayCourseNames(courses, user);
     }
 }
-
-public static void EnrollStudentsInCourses(List<Course>? courses, List<Student> students, object user)
+public static void EnrollStudentsInCourses(List<Course>? courses, List<Student?> students, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
 if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to enroll students in courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to enroll students in courses.");
     }
 
     while (true)
@@ -364,7 +368,8 @@ if (!HasPermission(user, isTeacherOrAdmin: false))
         var course = GetCourseById(courses);
         if (course == null) continue;
 
-        var student = GetStudentById(students);
+        var nonNullStudents = students.OfType<Student>().ToList();
+        var student = GetStudentById(nonNullStudents);
         if (student == null) continue;
 
         switch (choice)
@@ -382,14 +387,13 @@ if (!HasPermission(user, isTeacherOrAdmin: false))
         if (!AskToContinue()) break;
     }
 }
-
-public static void RemoveStudentInteractive(List<Course>? courses, object user)
+public static void RemoveStudentInteractive(List<Course>? courses, object? user)
 {
-    Exceptions.Expectations.CheckCoursesNotNull(courses);
+    Exceptions.CheckCoursesNotNull(courses);
 
     if (!HasPermission(user, isTeacherOrAdmin: false))
     {
-        throw new Exceptions.Expectations.PermissionDeniedException("You do not have permission to remove students from courses.");
+        throw new Exceptions.PermissionDeniedException("You do not have permission to remove students from courses.");
     }
     
 
@@ -402,8 +406,7 @@ public static void RemoveStudentInteractive(List<Course>? courses, object user)
     student.UnenrollFromCourse(course);
     Console.WriteLine($"{student.GetStudentFullName()} has been removed from {course.GetCourseName()}.");
 }
-
-private static bool HasPermission(object user, bool isTeacherOrAdmin = false)
+private static bool HasPermission(object? user, bool isTeacherOrAdmin = false)
 {
     if (user is Admin) return true;
     switch (isTeacherOrAdmin)
@@ -415,8 +418,7 @@ private static bool HasPermission(object user, bool isTeacherOrAdmin = false)
             return false;
     }
 }
-
-private static Course? GetCourseFromUserInput(List<Course>? courses)
+public static Course? GetCourseFromUserInput(List<Course>? courses)
 {
     Console.WriteLine("Do you want to search by:");
     Console.WriteLine("1. Course ID");
@@ -436,8 +438,7 @@ private static Course? GetCourseFromUserInput(List<Course>? courses)
     return null;
 
 }
-
-private static Course? GetCourseById(List<Course>? courses)
+public static Course? GetCourseById(List<Course>? courses)
 {
     Console.WriteLine("Enter course ID:");
     if (int.TryParse(Console.ReadLine(), out var courseId)) return courses?.Find(c => c.GetCourseId() == courseId);
@@ -445,34 +446,28 @@ private static Course? GetCourseById(List<Course>? courses)
     return null;
 
 }
-
 private static Course? GetCourseByName(List<Course>? courses)
 {
     Console.WriteLine("Enter course name:");
     var courseName = Console.ReadLine();
     return courses?.Find(c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
 }
-
 private static Student? GetStudentById(List<Student> students)
 {
     Console.WriteLine("Enter student ID:");
     if (int.TryParse(Console.ReadLine(), out var studentId)) return students.Find(s => s.GetStudentId() == studentId);
     Console.WriteLine("Invalid student ID. Please try again.");
     return null;
-
 }
-
-private static Student? GetStudentFromCourse(Course course)
+public static Student? GetStudentFromCourse(Course course)
 {
     Console.WriteLine("Enter the student ID to remove:");
     if (int.TryParse(Console.ReadLine(), out var studentId))
-        return course.GetEnrolledStudents().FirstOrDefault(s => s?.GetStudentId() == studentId);
+        return (course.GetEnrolledStudents() ?? throw new InvalidOperationException()).FirstOrDefault(s => s?.GetStudentId() == studentId);
     Console.WriteLine("Invalid student ID.");
     return null;
-
 }
-
-private static void DisplayGrades(Course course)
+public static void DisplayGrades(Course course)
 {
     var grades = course.GetGrades();
     if (grades.Count > 0)
@@ -487,9 +482,9 @@ private static void DisplayGrades(Course course)
 
     Console.WriteLine($"Course Credits: {course.GetCredits()}");
 }
-public static void UpdateCourseId(Course course, IUser user)
+public static void UpdateCourseId(Course course, IUser? user)
 {
-    Exceptions.Expectations.CheckUserPermission(user);
+    Exceptions.CheckUserPermission(user);
 
     Console.Write("Enter new Course ID: ");
     var newCourseIdInput = Console.ReadLine();
@@ -509,10 +504,9 @@ public static void UpdateCourseId(Course course, IUser user)
     course.SetCourseId(newCourseId);
     Console.WriteLine("Course ID updated successfully.");
 }
-
-public static void UpdateCourseName(Course course, IUser user)
+public static void UpdateCourseName(Course course, IUser? user)
 {
-    Exceptions.Expectations.CheckUserPermission(user);
+    Exceptions.CheckUserPermission(user);
 
     Console.Write("Enter new Course Name: ");
     var newCourseName = Console.ReadLine();

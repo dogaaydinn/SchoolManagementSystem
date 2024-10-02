@@ -20,6 +20,6 @@ public abstract class SchoolMember : Person
         if (GetDateOfBirth().Date > today.AddYears(-age)) age--;
         return age;
     }
-
+    public abstract override void DisplayDetails();
     #endregion
 }

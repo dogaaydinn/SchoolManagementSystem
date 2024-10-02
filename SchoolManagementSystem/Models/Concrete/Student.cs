@@ -8,10 +8,11 @@ public class Student : SchoolMember, IStudentActions, IUser
 {
     #region Constructors
 
-    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa)
+    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa, string studentName)
         : base(firstName, lastName, dateOfBirth)
     {
         StudentId = studentId;
+        StudentName = studentName;
         Gpa = gpa;
         EnrolledCourses = new List<Course>();
         _courseGrades = new Dictionary<Course, int>();
@@ -21,6 +22,7 @@ public class Student : SchoolMember, IStudentActions, IUser
     #region Properties
 
     private int StudentId { get; set; }
+    private string StudentName { get; set; }
     private double Gpa { get; set; }
     private List<Course> EnrolledCourses { get; }
 
@@ -105,6 +107,11 @@ public class Student : SchoolMember, IStudentActions, IUser
         return GetFullName();
     }
 
+    public void SetStudentName(string newName)
+    {
+        StudentName = newName;
+    }
+
     public override void DisplayDetails()
     {
         Console.WriteLine($"{GetFullName()} (Age: {GetAge()}), Student ID: {GetStudentId()}, " +
@@ -151,11 +158,13 @@ public class Student : SchoolMember, IStudentActions, IUser
     {
         StudentId = studentId;
     }
+
     public void UpdateStudentId(int newStudentId)
     {
         StudentId = newStudentId;
         Console.WriteLine($"Student ID updated to {newStudentId}.");
     }
+
     public void SetGpa(double gpa)
     {
         Gpa = gpa;
@@ -194,12 +203,12 @@ public class Student : SchoolMember, IStudentActions, IUser
         return EnrolledCourses.Any(c => c.GetCourseId() == courseId);
     }
 
-
+    public new void DisplayUserInfo()
+    {
+        DisplayDetails();
+    }
     #endregion
 
     public int Id { get; set; }
-    public void DisplayUserInfo()
-    {
-        throw new NotImplementedException();
-    }
+
 }

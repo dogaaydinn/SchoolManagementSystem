@@ -3,11 +3,11 @@ using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
-namespace SchoolManagementSystem.PresentationLayer.Menu;
+namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class CourseMenu
 {
-    public static void DisplayCourseMenu(List<Course>? courses, List<Student?> students, object user)
+    public static void DisplayCourseMenu(List<Course>? courses, List<Student?> students, object? user)
     {
         while (true)
         {
@@ -29,14 +29,14 @@ public static class CourseMenu
             switch (choice)
             {
                 case "1":
-                    var course = SelectCourse(courses);
+                    var course = SchoolHandler.SelectCourse(courses);
                     if (course != null)
                     {
                         CourseHandler.DisplayCourseDetails(new List<Course> { course }, user);
                     }
                     break;
                 case "2":
-                    course = SelectCourse(courses);
+                    course = SchoolHandler.SelectCourse(courses);
                     if (course != null)
                     {
                         if (user is IUser iUser)
@@ -50,7 +50,7 @@ public static class CourseMenu
                     }
                     break;
                 case "3":
-                    course = SelectCourse(courses);
+                    course = SchoolHandler.SelectCourse(courses);
                     if (course != null)
                     {
                         if (user is IUser iUser)
@@ -70,29 +70,5 @@ public static class CourseMenu
                     break;
             }
         }
-    }
-
-    private static Course? SelectCourse(List<Course>? courses)
-    {
-        if (courses == null || courses.Count == 0)
-        {
-            Console.WriteLine("No courses available.");
-            return null;
-        }
-
-        Console.WriteLine("Select a course:");
-        for (var i = 0; i < courses.Count; i++)
-        {
-            var course = courses[i];
-            Console.WriteLine($"{i + 1}. {course.GetCourseName()} (ID: {course.GetCourseId()})");
-        }
-
-        if (int.TryParse(Console.ReadLine(), out var courseIndex) && courseIndex >= 1 && courseIndex <= courses.Count)
-        {
-            return courses[courseIndex - 1];
-        }
-
-        Console.WriteLine("Invalid course selection.");
-        return null;
     }
 }

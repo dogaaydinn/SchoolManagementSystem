@@ -1,6 +1,6 @@
 namespace SchoolManagementSystem.Interfaces;
 
-public interface IPersonActions
+public interface ISchoolMemberActions
 {
     void PerformDailyRoutine(); 
     void Communicate();

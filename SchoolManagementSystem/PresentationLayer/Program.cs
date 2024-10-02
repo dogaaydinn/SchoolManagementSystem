@@ -1,9 +1,9 @@
 ﻿using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces;
-using SchoolManagementSystem.Interfaces.ActionHandler;
 using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
 namespace SchoolManagementSystem.PresentationLayer;
 
@@ -12,7 +12,7 @@ internal static class Program
     private static void Main(string[] args)
     {
         // Initialize data with required parameters
-        List<Teacher> teachers = DataProvider.GetTeachers(10, "example");
+        List<Teacher?>? teachers = DataProvider.GetTeachers(10, "example");
         List<Student> students = DataProvider.GetStudents(20, "example");
         List<Course>? courses = DataProvider.GetCourses(teachers, "example");
 

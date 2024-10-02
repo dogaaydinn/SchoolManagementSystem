@@ -6,15 +6,10 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class PersonHandler
 {
-    public static void DemonstrateActions(IPersonActions? person, object user)
+    public static void DemonstrateActions(ISchoolMemberActions? person, object? user)
     {
-        Exceptions.Expectations.CheckPersonNotNull(person);
-
-        if (!HasPermission(user))
-        {
-            Console.WriteLine("You do not have permission to demonstrate actions.");
-            return;
-        }
+        Exceptions.CheckPersonNotNull(person);
+        Exceptions.CheckPermission(user);
 
         Console.WriteLine("Demonstrating common actions:");
         if (person == null) return;
@@ -25,9 +20,9 @@ public static class PersonHandler
         DemonstrateSpecificActions(person, user);
     }
 
-    private static void DemonstrateSpecificActions(IPersonActions person, object user)
+    private static void DemonstrateSpecificActions(ISchoolMemberActions schoolMember, object? user)
     {
-        switch (person)
+        switch (schoolMember)
         {
             case ITeacherActions teacher:
                 if (HasPermission(user, isTeacherOrAdmin: true))
@@ -50,12 +45,12 @@ public static class PersonHandler
                 }
                 break;
             default:
-                Console.WriteLine($"Unknown person type: {person.GetType().Name}.");
+                Console.WriteLine($"Unknown person type: {schoolMember.GetType().Name}.");
                 break;
         }
     }
 
-    private static bool HasPermission(object user, bool isTeacherOrAdmin = false)
+    private static bool HasPermission(object? user, bool isTeacherOrAdmin = false)
     {
         if (user is Admin) return true;
         switch (isTeacherOrAdmin)

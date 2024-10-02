@@ -11,9 +11,9 @@ public class Admin : Person, IUser
         AdminId = adminId;
     }
 
-    public int AdminId { get; private set; }
+    private int AdminId { get; set; }
 
-    public int Id
+    public new int Id
     {
         get => AdminId;
         set => AdminId = value;
@@ -24,7 +24,7 @@ public class Admin : Person, IUser
         Console.WriteLine($"Admin ID: {AdminId}, Name: {GetFullName()}, Date of Birth: {GetDateOfBirth():d}");
     }
 
-    public void DisplayUserInfo()
+    public new void DisplayUserInfo()
     {
         DisplayDetails();
     }

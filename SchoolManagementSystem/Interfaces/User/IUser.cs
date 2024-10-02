@@ -4,5 +4,6 @@ namespace SchoolManagementSystem.Interfaces.User
     {
         int Id { get; set; }
         void DisplayUserInfo();
+        string GetFullName();
     }
 }

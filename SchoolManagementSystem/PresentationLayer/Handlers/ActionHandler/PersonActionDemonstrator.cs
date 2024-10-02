@@ -1,10 +1,12 @@
-namespace SchoolManagementSystem.Interfaces.ActionHandler;
+using SchoolManagementSystem.Interfaces;
 
-public static class ActionDemonstrator
+namespace SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
+
+public static class PersonActionDemonstrator
 {
-    public static void DemonstrateActions(IPersonActions person)
+    public static void DemonstrateActions(ISchoolMemberActions schoolMember)
     {
-        switch (person)
+        switch (schoolMember)
         {
             case ITeacherActions teacher:
                 DemonstrateTeacherActions(teacher);
@@ -13,7 +15,7 @@ public static class ActionDemonstrator
                 DemonstrateStudentActions(student);
                 break;
             default:
-                Console.WriteLine("Unknown person actions.");
+                Console.WriteLine("Unknown school member actions.");
                 break;
         }
     }

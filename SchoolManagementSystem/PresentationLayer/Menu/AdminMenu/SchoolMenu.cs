@@ -3,11 +3,11 @@ using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
-namespace SchoolManagementSystem.PresentationLayer.Menu;
+namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class SchoolMenu
 {
-    public static void DisplaySchoolMenu(List<Course>? courses, List<Student?> students, List<Teacher> teachers, IUser user)
+    public static void DisplaySchoolMenu(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, IUser? user)
     {
         while (true)
         {
@@ -21,13 +21,13 @@ public static class SchoolMenu
                         Console.WriteLine("Courses list is null. Cannot display student menu.");
                         return;
                     }
-                    StudentMenu.DisplayStudentMenu(students, courses, student);
+                    StudentMenu.StudentMenu.DisplayStudentMenu(students, courses, student);
                     break;
                 case Teacher teacher:
-                    TeacherMenu.DisplayTeacherMenu(new List<Teacher> { teacher }, students.OfType<Student>().ToList(), teacher);
+                    TeacherMenu.TeacherMenu.DisplayTeacherMenu(teachers, students.Cast<Student>().ToList(), courses, teacher);
                     break;
                 case Admin:
-                    DisplayAdminMenu();
+                    AdminMenu.DisplayAdminMenu(courses, students, teachers, user);
                     break;
                 default:
                     Console.WriteLine("Unknown user type.");
@@ -59,7 +59,7 @@ public static class SchoolMenu
             }
         }
     }
-    private static void HandleCourseMenu(string choice, List<Course>? courses, Course course, IUser user)
+    private static void HandleCourseMenu(string choice, List<Course>? courses, Course course, IUser? user)
     {
         if (courses == null)
         {
@@ -85,12 +85,12 @@ public static class SchoolMenu
                 break;
         }
     }
-    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student?> students, Student student)
+    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student?>? students, Student? student)
     {
         switch (choice)
         {
             case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher>(), student);
+                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher?>(), student);
                 break;
             case "2":
                 if (courses == null)
@@ -113,7 +113,7 @@ public static class SchoolMenu
         }
     }
 
-    private static void HandleAdminMenu(string choice, List<Course>? courses, List<Student?> students, List<Teacher> teachers, IUser user)
+    private static void HandleAdminMenu(string choice, List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, IUser? user)
     {
         switch (choice)
         {
@@ -144,12 +144,12 @@ public static class SchoolMenu
         }
     }
     
-    private static void HandleTeacherMenu(string choice, List<Course>? courses, List<Teacher> teachers, Teacher teacher)
+    private static void HandleTeacherMenu(string choice, List<Course>? courses, List<Teacher?>? teachers, Teacher? teacher)
     {
         switch (choice)
         {
             case "1":
-                TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, teachers);
+                TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, teachers);
                 break;
             case "2":
                 TeacherHandler.UpdateTeacherId(teachers, teacher);
@@ -179,12 +179,4 @@ public static class SchoolMenu
         Console.WriteLine("5. Back to Main Menu");
     }
     
-    private static void DisplayAdminMenu()
-    {
-        Console.WriteLine("1. View All Details");
-        Console.WriteLine("2. Manage Courses");
-        Console.WriteLine("3. Manage Students and Teachers");
-        Console.WriteLine("4. Record Grades for Students");
-        Console.WriteLine("5. Back to Main Menu");
-    }
 }

@@ -13,6 +13,7 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         TeacherId = teacherId;
         Subject = subject;
+        FullName = $"{firstName} {lastName}";
     }
 
     #endregion
@@ -20,6 +21,8 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
 
     private int TeacherId { get; set; }
     private string Subject { get; set; }
+
+    private string FullName { get; set; }
 
     #endregion
     #region ITeacherActions
@@ -81,6 +84,14 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
             $"{GetFullName()} (Age: {GetAge()}), Subject: {Subject}, Teacher ID: {TeacherId}, (Date of Birth: {GetDateOfBirth():d})");
     }
 
+    public new void DisplayUserInfo()
+    {
+        DisplayDetails();
+    }
+    public void SetTeacherFullName(string fullName)
+    {
+        FullName = fullName;
+    }
     public string GetTeacherFullName()
     {
         return GetFullName();
@@ -105,9 +116,6 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
     #endregion
 
-    public int Id { get; set; }
-    public void DisplayUserInfo()
-    {
-        throw new NotImplementedException();
-    }
+    public new int Id { get; set; }
+
 }

@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Models;
+using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.Interfaces;
 

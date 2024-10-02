@@ -1,13 +1,12 @@
 using SchoolManagementSystem.Interfaces;
-using SchoolManagementSystem.Models.Concrete;
 
-namespace SchoolManagementSystem.Models;
+namespace SchoolManagementSystem.Models.Concrete;
 
 public class Course : ISchoolActions
 {
     #region Constructors
 
-    public Course(int courseId, string courseName, Teacher teacher, int credits)
+    public Course(int courseId, string courseName, Teacher? teacher, int credits)
     {
         _courseId = courseId;
         _courseName = courseName;
@@ -24,9 +23,9 @@ public class Course : ISchoolActions
 
     private int _courseId;
     private string _courseName;
-    private readonly List<Student?> _enrolledStudents;
+    private readonly List<Student?>? _enrolledStudents;
     private readonly Dictionary<int, Grade> _studentGrades;
-    private readonly Teacher _assignedTeacher;
+    private readonly Teacher? _assignedTeacher;
     private int _credits;
 
     #endregion
@@ -58,19 +57,24 @@ public class Course : ISchoolActions
 
     public string GetAssignedTeacherName()
     {
-        return $"Teacher: {_assignedTeacher.GetTeacherFullName()}";
+        return _assignedTeacher != null ? $"Teacher: {_assignedTeacher.GetTeacherFullName()}" : "No assigned teacher";
     }
     
     public int GetAssignedTeacher()
     {
-        return _assignedTeacher.GetTeacherId();
+        return _assignedTeacher?.GetTeacherId() ?? -1;
     }
-
-    public void EnrollStudent(Student student)
+    public void EnrollStudent(Student? student)
     {
-        if (_enrolledStudents.Count == MaxStudents)
+        if (student == null)
         {
-            Console.WriteLine($"Course {_courseName} is full. Cannot enroll more students.");
+            Console.WriteLine("Cannot enroll a null student.");
+            return;
+        }
+
+        if (_enrolledStudents == null || _enrolledStudents.Count == MaxStudents)
+        {
+            Console.WriteLine($"Course {_courseName} is full or the enrolled students list is null. Cannot enroll more students.");
             return;
         }
 
@@ -87,19 +91,25 @@ public class Course : ISchoolActions
 
     public void UnenrollStudent(Student? student)
     {
+        if (student == null)
+        {
+            Console.WriteLine("Cannot check enrollment status for a null student.");
+            return;
+        }
+
         if (!IsStudentEnrolled(student))
         {
             Console.WriteLine($"Student {student.GetStudentFullName()} is not enrolled in {GetCourseName()}.");
             return;
         }
 
-        _enrolledStudents.Remove(student);
+        _enrolledStudents?.Remove(student);
         Console.WriteLine($"Unenrolled {student.GetStudentFullName()} from {GetCourseName()}.");
     }
 
     public bool IsStudentEnrolled(Student? student)
     {
-        return _enrolledStudents.Contains(student);
+        return _enrolledStudents != null && _enrolledStudents.Contains(student);
     }
 
     public string GetCourseName()
@@ -110,7 +120,7 @@ public class Course : ISchoolActions
     {
         _courseName = newCourseName;
     }
-    public List<Student?> GetEnrolledStudents()
+    public List<Student?>? GetEnrolledStudents()
     {
         return _enrolledStudents;
     }
@@ -118,9 +128,16 @@ public class Course : ISchoolActions
     public void ListStudents()
     {
         Console.WriteLine($"Course {_courseName} has the following students:");
-        foreach (var student in _enrolledStudents)
+        if (_enrolledStudents != null)
         {
-            Console.WriteLine(student!.GetStudentFullName());
+            foreach (var student in _enrolledStudents)
+            {
+                Console.WriteLine(student?.GetStudentFullName());
+            }
+        }
+        else
+        {
+            Console.WriteLine("No students are enrolled in this course.");
         }
     }
 
@@ -128,27 +145,31 @@ public class Course : ISchoolActions
     {
         if (!IsStudentEnrolled(student))
         {
-            Console.WriteLine($"Student {student!.GetStudentFullName()} is not enrolled in {GetCourseName()}.");
+            if (student != null)
+                Console.WriteLine($"Student {student.GetStudentFullName()} is not enrolled in {GetCourseName()}.");
             return;
         }
 
-        var gradeObj = _studentGrades.GetValueOrDefault(student!.GetStudentId(), new Grade(student.GetStudentId(), _courseId, grade));
-        gradeObj.UpdateValue(grade);
-        _studentGrades[student.GetStudentId()] = gradeObj;
+        if (student != null)
+        {
+            var gradeObj = _studentGrades.GetValueOrDefault(student.GetStudentId(), new Grade(student.GetStudentId(), _courseId, grade));
+            gradeObj.UpdateValue(grade);
+            _studentGrades[student.GetStudentId()] = gradeObj;
+        }
 
-        Console.WriteLine($"Assigned/Updated grade for {student.GetStudentFullName()} in course {_courseName}.");
+        Console.WriteLine($"Assigned/Updated grade for {student?.GetStudentFullName()} in course {_courseName}.");
 
-        student.CalculateGpa();
+        student?.CalculateGpa();
     }
 
     public double GetAssignedGrades(Student? student)
     {
-        return _studentGrades.TryGetValue(student!.GetStudentId(), out var grade) ? grade.GetGradeValue() : -1.0;
+        return student != null && _studentGrades.TryGetValue(student.GetStudentId(), out var grade) ? grade.GetGradeValue() : -1.0;
     }
 
-    public override string ToString()
+    public override string? ToString()
     {
-        return $"{_courseId}: {_courseName}, Teacher: {_assignedTeacher.GetTeacherFullName()}";
+        return _assignedTeacher != null ? $"{_courseId}: {_courseName}, Teacher: {_assignedTeacher.GetTeacherFullName()}" : null;
     }
 
     public void ListGrades()
@@ -170,14 +191,15 @@ public class Course : ISchoolActions
     {
         if (!IsStudentEnrolled(student))
         {
-            Console.WriteLine($"Student {student!.GetStudentFullName()} is not enrolled in {GetCourseName()}.");
+            if (student != null)
+                Console.WriteLine($"Student {student.GetStudentFullName()} is not enrolled in {GetCourseName()}.");
             return;
         }
 
         try
         {
-            student.SetGpa(newGpa);
-            Console.WriteLine($"Updated GPA for {student.GetStudentFullName()} in course {_courseName}.");
+            student?.SetGpa(newGpa);
+            Console.WriteLine($"Updated GPA for {student?.GetStudentFullName()} in course {_courseName}.");
         }
         catch (ArgumentOutOfRangeException ex)
         {
