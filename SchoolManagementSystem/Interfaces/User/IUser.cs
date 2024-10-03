@@ -1,9 +1,9 @@
-namespace SchoolManagementSystem.Interfaces.User
+namespace SchoolManagementSystem.Interfaces.User;
+
+public interface IUser
 {
-    public interface IUser
-    {
-        int Id { get; set; }
-        void DisplayUserInfo();
-        string GetFullName();
-    }
+    int Id { get; set; }
+    bool IsAdmin { get; }
+    void DisplayUserInfo();
+    string GetFullName();
 }

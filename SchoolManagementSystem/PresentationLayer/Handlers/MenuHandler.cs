@@ -1,6 +1,4 @@
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
-using SchoolManagementSystem.PresentationLayer.Menu;
 using SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 using SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
 using SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
@@ -28,6 +26,12 @@ public static class MenuHandler
                 continue;
             }
 
+            if (user is not Interfaces.User.IUser validUser)
+            {
+                Console.WriteLine("Invalid user type.");
+                continue;
+            }
+
             switch (choice)
             {
                 case "1":
@@ -37,11 +41,11 @@ public static class MenuHandler
                     }
                     else
                     {
-                        StudentMenu.DisplayStudentMenu(students, courses, user);
+                        StudentMenu.DisplayStudentMenu(students, courses, validUser);
                     }
                     break;
                 case "2":
-                    TeacherMenu.DisplayTeacherMenu(teachers, students.Cast<Student>().ToList(), courses, user);
+                    TeacherMenu.DisplayTeacherMenu(teachers, students?.Where(s => s != null).Cast<Student>().ToList(), courses, validUser);
                     break;
                 case "3":
                     if (courses == null)
@@ -50,7 +54,7 @@ public static class MenuHandler
                     }
                     else
                     {
-                        CourseMenu.DisplayCourseMenu(courses, students.Cast<Student>().ToList(), user);
+                        CourseMenu.DisplayCourseMenu(courses, students?.Where(s => s != null).Cast<Student>().ToList(), validUser);
                     }
                     break;
                 case "4":
@@ -61,14 +65,7 @@ public static class MenuHandler
                         break;
                     }
 
-                    if (user is Interfaces.User.IUser validUser)
-                    {
-                        SchoolMenu.DisplaySchoolMenu(courses, students.Cast<Student>().ToList(), teachers, admin);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid user type.");
-                    }
+                    SchoolMenu.DisplaySchoolMenu(courses, students?.Where(s => s != null).Cast<Student>().ToList(), teachers, admin);
                     break;
                 case "5":
                     Console.Write("Are you sure you want to exit? (y/n): ");

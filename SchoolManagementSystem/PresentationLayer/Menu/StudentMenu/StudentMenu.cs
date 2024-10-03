@@ -12,11 +12,7 @@ public static class StudentMenu
         while (true)
         {
             Console.WriteLine("\nStudent Menu:");
-            Console.WriteLine("1. Display Student Details");
-            Console.WriteLine("2. Display Student Grades");
-            Console.WriteLine("3. Update Student ID");
-            Console.WriteLine("4. Exit");
-            Console.Write("Enter your choice: ");
+            DisplayMenuOptions();
 
             var choice = Console.ReadLine();
 
@@ -26,110 +22,79 @@ public static class StudentMenu
                 continue;
             }
 
-            switch (choice)
+            if (!HandleMenuChoice(choice, students, courses, user))
             {
-                case "1":
-                    var student = SelectStudent(students);
-                    if (student != null)
-                    {
-                        StudentHandler.DisplayStudentDetails(student);
-                    }
-                    break;
-                case "2":
-                    student = SelectStudent(students);
-                    if (student != null)
-                    {
-                        StudentHandler.DisplayStudentGrades(student, courses, user);
-                    }
-                    break;
-                case "3":
-                    student = SelectStudent(students);
-                    if (student != null)
-                    {
-                        if (user is IUser iUser)
-                        {
-                            StudentHandler.UpdateStudentId(new List<Student> { student }, iUser);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid user type. Operation not permitted.");
-                        }
-                    }
-                    break;
-                case "4":
-                    return;
-                default:
-                    Console.WriteLine("Invalid choice. Please try again.");
-                    break;
+                return; // Exit option selected
             }
         }
+    }
+
+    private static void DisplayMenuOptions()
+    {
+        Console.WriteLine("1. Display Student Details");
+        Console.WriteLine("2. Display Student Grades");
+        Console.WriteLine("3. Update Student ID");
+        Console.WriteLine("4. Exit");
+        Console.Write("Enter your choice: ");
+    }
+
+    private static bool HandleMenuChoice(string choice, List<Student?>? students, List<Course>? courses, object? user)
+    {
+        var student = SelectStudent(students);
+        if (student == null) return true; // If no student is selected, return to the menu
+
+        switch (choice)
+        {
+            case "1":
+                StudentHandler.DisplayStudentDetails(student);
+                break;
+            case "2":
+                StudentHandler.DisplayStudentGrades(student, courses, user);
+                break;
+            case "3":
+                if (user is IUser iUser)
+                {
+                    StudentHandler.UpdateStudentId(new List<Student> { student }, iUser);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid user type. Operation not permitted.");
+                }
+                break;
+            case "4":
+                return false; // Exit option selected
+            default:
+                Console.WriteLine("Invalid choice. Please try again.");
+                break;
+        }
+
+        return true; // Continue the menu loop
     }
 
     private static Student? SelectStudent(List<Student?>? students)
     {
         Console.WriteLine("Select a student:");
-        if (students != null)
-        {
-            for (var i = 0; i < students.Count; i++)
-            {
-                var student = students[i];
-                if (student != null)
-                {
-                    Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
-                }
-            }
-        }
-        else
+        if (students == null || students.Count == 0)
         {
             Console.WriteLine("No students available.");
+            return null;
         }
 
-        if (students != null && int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
+        for (var i = 0; i < students.Count; i++)
         {
-            var selectedStudent = students[studentIndex - 1];
-            if (selectedStudent != null)
+            var student = students[i];
+            if (student != null)
             {
-                return selectedStudent;
+                Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
             }
+        }
+
+        if (int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
+        {
+            return students[studentIndex - 1];
         }
 
         Console.WriteLine("Invalid student selection.");
         return null;
-    }
-
-    private static void HandleStudentMenu(string choice, List<Course>? courses, List<Student?>? students, Student? student, object? user)
-    {
-        switch (choice)
-        {
-            case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher?>(), student);
-                break;
-            case "2":
-                if (courses == null)
-                {
-                    Console.WriteLine("Courses list is null. Cannot enroll student in course.");
-                }
-                else
-                {
-                    if (students != null)
-                    {
-                        SchoolHandler.EnrollStudentInCourse(students.ToList(), courses, student);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Students list is null. Cannot enroll student in course.");
-                    }
-                }
-                break;
-            case "3":
-                PersonHandler.DemonstrateActions(student, student);
-                break;
-            case "4":
-                StudentHandler.DisplayStudentActions(student, user);
-                break;
-            default:
-                Console.WriteLine("Invalid choice.");
-                break;
-        }
     }
 }

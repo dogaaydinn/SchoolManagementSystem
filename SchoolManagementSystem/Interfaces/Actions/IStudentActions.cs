@@ -1,4 +1,4 @@
-namespace SchoolManagementSystem.Interfaces;
+namespace SchoolManagementSystem.Interfaces.Actions;
 
 public interface IStudentActions : ISchoolMemberActions
 {

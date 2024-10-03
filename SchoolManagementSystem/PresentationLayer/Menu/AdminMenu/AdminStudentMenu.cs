@@ -1,5 +1,5 @@
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
@@ -27,7 +27,7 @@ public static class AdminStudentMenu
             Console.WriteLine("13. Assign Courses To Students");
             Console.WriteLine("14. Record Grades For Students");
             Console.WriteLine("15. Exit");
-            
+
             Console.Write("Enter your choice: ");
             var choice = Console.ReadLine();
 
@@ -40,153 +40,73 @@ public static class AdminStudentMenu
             switch (choice)
             {
                 case "1":
-                    var student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
-                        StudentHandler.DisplayStudentDetails(student);
-                    }
+                    var student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null) StudentHandler.DisplayStudentDetails(student);
                     break;
                 case "2":
-                    if (students != null)
-                    {
-                        var nonNullableStudents = students.OfType<Student>().ToList();
-                        StudentHandler.UpdateStudentId(nonNullableStudents, (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Students list is null.");
-                    }
+                    if (ValidationHelper.ValidateStudentList(students) && ValidationHelper.ValidateUser(user))
+                        StudentHandler.UpdateStudentId(students.OfType<Student>().ToList(), (IUser)user);
                     break;
                 case "3":
-                    student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
-                        StudentHandler.UpdateStudentName(student, (IUser)user);
-                    }
+                    student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null && ValidationHelper.ValidateUser(user))
+                        StudentHandler.UpdateStudentName(new List<Student?> { student }, (IUser)user);
                     break;
                 case "4":
-                    StudentHandler.AddNewStudent(students.OfType<Student>().ToList(), (IUser)user);
+                    if (ValidationHelper.ValidateStudentList(students) && ValidationHelper.ValidateUser(user))
+                        StudentHandler.AddNewStudent(students.OfType<Student>().ToList(), (IUser)user);
                     break;
                 case "5":
-                    student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
+                    student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null && ValidationHelper.ValidateUser(user))
                         StudentHandler.RemoveStudent(students.OfType<Student>().ToList(), student, (IUser)user);
-                    }
                     break;
                 case "6":
-                    student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
-                        StudentHandler.DisplayStudentGrades(student, new List<Course>(), (IUser)user);
-                    }
+                    student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null && ValidationHelper.ValidateUser(user))
+                        StudentHelper.DisplayGrades(student);
                     break;
                 case "7":
-                    student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
-                        if (user != null)
-                        {
-                            StudentHandler.UpdateStudentGpa(student, (IUser)user);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Error: User is null.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Student is null.");
-                    }
+                    student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null && ValidationHelper.ValidateUser(user))
+                        StudentHandler.UpdateStudentGpa(student, (IUser)user);
                     break;
-
                 case "8":
-                    if (students == null) return;
-                    student = SchoolHandler.SelectStudent(students);
+                    student = ValidationHelper.SelectAndValidateStudent(students);
                     if (student != null)
-                    {
-                        var validStudents = students.Where(s => s != null).Cast<Student>().ToList();
-                        StudentHandler.GetStudentById(validStudents);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Student is null.");
-                    }
+                        StudentHelper.GetStudentById(students.OfType<Student>().ToList());
                     break;
                 case "9":
-                    if (user != null)
-                    {
+                    if (ValidationHelper.ValidateUser(user))
                         CourseHandler.ListStudentsInCourses(new List<Course>(), (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
-                    }
                     break;
-
                 case "10":
-                    student = SchoolHandler.SelectStudent(students);
-                    if (student != null)
-                    {
-                        if (user != null)
-                        {
-                            StudentHandler.DisplayStudentActions(student, (IUser)user);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Error: User is null.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Student is null.");
-                    }
+                    student = ValidationHelper.SelectAndValidateStudent(students);
+                    if (student != null && ValidationHelper.ValidateUser(user))
+                        SchoolHandler.DemonstrateActions(student, user);
                     break;
-
                 case "11":
-                    if (user != null)
+                    if (ValidationHelper.ValidateUser(user))
                     {
-                        CourseHandler.EnrollStudentsInCourses(new List<Course>(), new List<Student?>(), (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
+                        var studentsToEnroll = students?.OfType<Student?>().ToList();
+                        SchoolHandler.EnrollStudentInCourse(studentsToEnroll, new List<Course>(), (IUser)user);
                     }
                     break;
-
                 case "12":
-                    if (user != null)
+                    var studentToRemove = ValidationHelper.SelectAndValidateStudent(students);
+                    if (studentToRemove != null && ValidationHelper.ValidateUser(user))
                     {
-                        CourseHandler.RemoveStudentInteractive(new List<Course>(), (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
+                        StudentHelper.RemoveStudent(students, studentToRemove);
                     }
                     break;
-
                 case "13":
-                    if (user != null)
-                    {
+                    if (ValidationHelper.ValidateUser(user))
                         SchoolHandler.AssignCoursesToStudents(new List<Course>(), new List<Student?>(), (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
-                    }
                     break;
-
                 case "14":
-                    if (user != null)
-                    {
+                    if (ValidationHelper.ValidateUser(user))
                         SchoolHandler.RecordGradesForStudents(new List<Course>(), (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
-                    }
                     break;
-
                 case "15":
                     return;
                 default:

@@ -1,51 +1,16 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 
 public static class Exceptions
 {
-    public static void CheckTeacherNotNull(Teacher? teacher)
-    {
-        if (teacher == null) throw new ArgumentNullException(nameof(teacher), "Teacher cannot be null.");
-    }
-
-    public static void CheckHasTeacherPermission(object? user, bool isAdmin, bool isTeacherOrAdmin,
-        List<Teacher>? teachers)
-    {
-        if (!HasTeacherPermission(user, isAdmin, isTeacherOrAdmin, teachers))
-            throw new PermissionDeniedException("You do not have permission to demonstrate teacher methods.");
-    }
-
-    public static void CheckHasPermissionToViewGrades(object? user, Student? student)
-    {
-        if (!HasPermissionToViewGrades(user, student))
-            throw new PermissionDeniedException("You do not have permission to view grades.");
-    }
-
-    private static bool HasPermissionToViewGrades(object? user, Student? student)
-    {
-        return user is Admin ||
-               (user is Teacher teacher && student?.GetEnrolledCourses()
-                   .Any(course => course.GetAssignedTeacher() == teacher.GetTeacherId()) == true) ||
-               (user is Student studentUser && studentUser.GetStudentId() == student?.GetStudentId());
-    }
-
-    private static bool HasTeacherPermission(object? user, bool isAdmin = false, bool isTeacherOrAdmin = false,
-        List<Teacher>? teachers = null)
-    {
-        if (isAdmin && user is Admin) return true;
-        return isTeacherOrAdmin && user is Teacher teacherUser && teachers != null &&
-               teachers.Any(t => t.GetTeacherId() == teacherUser.GetTeacherId());
-    }
-
     public static void CheckPersonNotNull(ISchoolMemberActions? person)
     {
         if (person == null) throw new ArgumentNullException(nameof(person), "Person cannot be null.");
     }
-
 
     public static void CheckCourseNotNull(Course? course)
     {
@@ -92,7 +57,6 @@ public static class Exceptions
         if (student == null) throw new ArgumentNullException(nameof(student), "Student cannot be null.");
     }
 
-
     public static void CheckHasPermission(object? user, bool isAdmin = false, bool isTeacherOrAdmin = false)
     {
         if (!HasPermission(user, isAdmin, isTeacherOrAdmin))
@@ -120,34 +84,16 @@ public static class Exceptions
     private static bool HasPermission(object? user)
     {
         if (user is Admin) return true;
-        return user is Teacher || user is Student;
-    }
-    public class NullStudentsListException : Exception
-    {
-        public NullStudentsListException(string message) : base(message) { }
+        return user is Teacher or Student;
     }
 
-    public class NullStudentException : Exception
-    {
-        public NullStudentException(string message) : base(message) { }
-    }
-
-    public class NullUserException : Exception
-    {
-        public NullUserException(string message) : base(message) { }
-    }
-
-    public static void GradeNotFoundException(string studentId, string courseId)
-    {
-        throw new Exception($"Grade not found for student ID {studentId} in course ID {courseId}.");
-    }
-
-    public class PermissionDeniedException : Exception
+    private class PermissionDeniedException : Exception
     {
         public PermissionDeniedException(string message) : base(message)
         {
         }
     }
+
     public class InvalidNameException : Exception
     {
         public InvalidNameException(string message) : base(message) { }

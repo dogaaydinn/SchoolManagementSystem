@@ -1,5 +1,4 @@
-using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
@@ -8,8 +7,72 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 public static class AdminTeacherMenu
 {
     public static void DisplayTeacherMenu(List<Teacher?>? teachers, List<Course> courses, object? user)
-{
-    while (true)
+    {
+        while (true)
+        {
+            DisplayMenuOptions();
+            var choice = Console.ReadLine();
+
+            if (!ValidationHelper.ValidateUserInput(choice, out int validChoice)) continue;
+            Teacher? teacher = null;
+
+            switch (validChoice)
+            {
+                case 1:
+                    if (teacher != null)
+                    {
+                        TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No teacher selected. Please select a teacher first.");
+                    }
+                    break;
+                case 2:
+                    TeacherHandler.DisplayTeacherNames(teachers);
+                    break;
+                case 3:
+                    TeacherHandler.GetTeacherById(teachers);
+                    break;
+                case 4:
+                    TeacherHandler.GetTeacherByName(teachers);
+                    break;
+                case 5:
+                    TeacherHandler.DisplayTeachersBySubject(teachers);
+                    break;
+                case 6:
+                    TeacherHandler.DisplayAllTeachers(teachers);
+                    break;
+                case 7:
+                    TeacherHandler.UpdateTeacherSubject(teachers, user);
+                    break;
+                case 8:
+                    teacher = TeacherHandler.GetTeacherById(teachers);
+                    if (teacher != null)
+                    {
+                        TeacherHandler.UpdateTeacherName(teacher, user);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Teacher not found.");
+                    }
+                    break;
+                case 9:
+                    TeacherHandler.AddNewTeacher(teachers, user);
+                    break;
+                case 10:
+                    TeacherHandler.RemoveTeacher(teachers, user);
+                    break;
+                case 11:
+                    return; 
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
+            }
+        }
+    }
+    
+    private static void DisplayMenuOptions()
     {
         Console.WriteLine("\nAdmin Teacher Menu:");
         Console.WriteLine("1. Display Teacher Details");
@@ -24,109 +87,5 @@ public static class AdminTeacherMenu
         Console.WriteLine("10. Remove Teacher");
         Console.WriteLine("11. Exit");
         Console.Write("Enter your choice: ");
-
-        var choice = Console.ReadLine();
-
-        if (string.IsNullOrEmpty(choice))
-        {
-            Console.WriteLine("Input cannot be empty. Please try again.");
-            continue;
-        }
-        Teacher? teacher = null;
-
-        switch (choice)
-        {
-            case "1":
-                if (teacher != null)
-                {
-                    TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
-                }
-                break;
-            case "2":
-                TeacherHandler.DisplayTeacherNames(teachers);
-                break;
-            case "3":
-                teacher = SchoolHandler.SelectTeacher(teachers);
-                if (teacher != null)
-                {
-                    TeacherHandler.GetTeacherById(teachers);
-                }
-                break;
-            case "4":
-                teacher = SchoolHandler.SelectTeacher(teachers);
-                if (teacher != null)
-                {
-                    TeacherHandler.GetTeacherByName(teachers);
-                }
-                break;
-            case "5":
-                TeacherHandler.DisplayTeachersBySubject(teachers);
-                break;
-            case "6":
-                TeacherHandler.DisplayAllTeachers(teachers);
-                break;
-            case "7":
-                if (user != null)
-                {
-                    TeacherHandler.UpdateTeacherSubject(teachers, user);
-                }
-                else
-                {
-                    Console.WriteLine("Error: User is null.");
-                }
-                break;
-            case "8":
-                teacher = SchoolHandler.SelectTeacher(teachers);
-                if (teacher != null)
-                {
-                    if (user != null)
-                    {
-                        TeacherHandler.UpdateTeacherName(teacher, (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error: Teacher is null.");
-                }
-                break;
-            case "9":
-                if (user != null)
-                {
-                    TeacherHandler.AddNewTeacher(teachers, (IUser)user);
-                }
-                else
-                {
-                    Console.WriteLine("Error: User is null.");
-                }
-                break;
-            case "10":
-                teacher = SchoolHandler.SelectTeacher(teachers);
-                if (teacher != null)
-                {
-                    if (user != null)
-                    {
-                        TeacherHandler.RemoveTeacher(teachers, teacher, (IUser)user);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: User is null.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error: Teacher is null.");
-                }
-                break;
-            case "11":
-                return;
-            default:
-                Console.WriteLine("Invalid choice. Please try again.");
-                break;
-        }
     }
-}
 }

@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.Actions;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
@@ -20,37 +21,30 @@ public static class PersonActionDemonstrator
         }
     }
 
-    private static void DemonstrateTeacherActions(ITeacherActions teacher)
+   public static void DemonstrateTeacherActions(ITeacherActions teacher)
     {
-        try
+        ActionDemonstrator.DemonstrateActions("teacher-specific", new []
         {
-            teacher.Teach();
-            teacher.CheckAttendance();
-            teacher.GradePapers();
-            teacher.PrepareLesson();
-            teacher.AttendMeeting();
-            Console.WriteLine($"{teacher.GetFullName()} has completed teaching and attendance check.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occurred while demonstrating teacher actions: {ex.Message}");
-        }
+            teacher.Teach,
+            teacher.CheckAttendance,
+            teacher.GradePapers,
+            teacher.PrepareLesson,
+            teacher.AttendMeeting
+        });
     }
 
-    private static void DemonstrateStudentActions(IStudentActions student)
+    public static void DemonstrateStudentActions(IStudentActions student)
     {
-        try
+        ActionDemonstrator.DemonstrateActions("student-specific", new[]
         {
-            student.Learn();
-            student.TakeTest();
-            student.SubmitAssignment();
-            student.Study();
-            student.ParticipateInClass();
-            Console.WriteLine($"{student.GetFullName()} has completed learning and participation in class.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occurred while demonstrating student actions: {ex.Message}");
-        }
+            student.Learn,
+            student.TakeTest,
+            student.SubmitAssignment,
+            student.Study,
+            student.ParticipateInClass,
+            student.AttendClass,
+            student.DoHomework
+            
+        });
     }
 }

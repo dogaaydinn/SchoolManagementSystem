@@ -1,253 +1,104 @@
-using System.Globalization;
-using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
+using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class StudentHandler
 {
+    private static readonly IStudentHelper StudentHelper = new StudentHelper();
+    
     public static void DisplayStudentDetails(Student student)
     {
-        Console.WriteLine($"Student ID: {student.GetStudentId()}");
-        Console.WriteLine($"Name: {student.GetStudentFullName()}");
-        Console.WriteLine($"GPA: {student.GetGpa()}");
-
-        Console.WriteLine("Courses:");
-        foreach (var course in student.GetEnrolledCourses())
+        if (student == null) 
         {
-            Console.WriteLine(course.GetCourseName());
-        }
-
-        Console.WriteLine("Grades:");
-        foreach (var course in student.GetEnrolledCourses())
-        {
-            var grade = student.GetAssignedGrades(course);
-            Console.WriteLine(grade.ToString());
-        }
-    }
-    public static void DisplayStudentGrades(Student? student, List<Course>? courses, object? user)
-    {
-        Exceptions.CheckHasPermissionToViewGrades(user, student);
-
-        if (student == null || courses == null) return;
-        Console.WriteLine($"Grades for {student.GetStudentFullName()}:");
-        foreach (var course in courses)
-        {
-            var grade = course.GetAssignedGrades(student);
-            Console.WriteLine($"{course.GetCourseName()}: {grade.ToString(CultureInfo.InvariantCulture)}");
-        }
-    }
-    public static void UpdateStudentId(List<Student>? students, object? user)
-    {
-        Exceptions.CheckHasPermission(user, isAdmin: true);
-
-        var student = GetStudentById(students);
-        if (student == null) return;
-
-        Console.WriteLine("Enter the new Student ID:");
-        if (!int.TryParse(Console.ReadLine(), out var newStudentId))
-        {
-            Console.WriteLine("Invalid new Student ID.");
+            Console.WriteLine("Student not found.");
             return;
         }
-
-        student.UpdateStudentId(newStudentId);
-        Console.WriteLine($"Student ID updated to {newStudentId} for {student.GetStudentFullName()}.");
+        
+        StudentHelper.DisplayStudentInfo(student);
     }
-    public static void DisplayStudentActions(Student? student, object? user)
+    
+    public static void UpdateStudentId(List<Student>? students, object? user)
     {
-        Exceptions.CheckStudentNotNull(student);
-        if (student == null) return;
-
-        Exceptions.CheckHasPermission(user, student);
-
-        Console.WriteLine($"Actions for {student.GetStudentFullName()} (ID: {student.GetStudentId()}):");
-        Console.WriteLine("1. View grades");
-        Console.WriteLine("2. Update GPA");
-        Console.WriteLine("3. Exit");
-        Console.Write("Enter your choice: ");
-
-        if (int.TryParse(Console.ReadLine(), out var choice))
+        ValidationHelper.ValidateAdminAccess(user);
+        
+        var student = StudentHelper.GetStudentById(students);
+        if (student != null)
         {
-            switch (choice)
-            {
-                case 1:
-                    DisplayStudentGrades(student, user);
-                    break;
-                case 2:
-                    UpdateStudentGpa(student, user);
-                    break;
-                case 3:
-                    return;
-                default:
-                    Console.WriteLine("Invalid choice. Please try again.");
-                    break;
-            }
-        }
-        else
-        {
-            Console.WriteLine("Invalid input. Please try again.");
+            StudentHelper.UpdateStudentId(student);
         }
     }
 
-    private static void DisplayStudentGrades(Student? student, object? user)
-    {
-        Exceptions.CheckHasPermissionToViewGrades(user, student);
-
-        if (student == null) return;
-        Console.WriteLine($"Grades for {student.GetStudentFullName()}:");
-        foreach (var course in student.GetEnrolledCourses())
-        {
-            var grade = student.GetAssignedGrades(course);
-            Console.WriteLine($"Course: {course.GetCourseName()}, Grade: {grade}");
-        }
-    }
     public static void UpdateStudentGpa(Student? student, object? user)
     {
-        Exceptions.CheckHasPermission(user, isTeacherOrAdmin: true);
-        Exceptions.CheckStudentNotNull(student);
+        ValidationHelper.ValidateTeacherOrAdminAccess(user);
+        ValidationHelper.ValidateStudentNotNull(student);
 
         if (student != null)
         {
-            Console.WriteLine($"Current GPA: {student.GetGpa()}");
-            Console.WriteLine("Enter new GPA (or type 'exit' to cancel):");
-        }
-        var input = Console.ReadLine()?.Trim().ToLower();
-        if (input == "exit") return;
-
-        if (student == null) return;
-        if (double.TryParse(input, out var newGpa) && newGpa is >= 0 and <= 4)
-        {
-            student.SetGpa(newGpa);
-            Console.WriteLine($"Updated GPA for {student.GetStudentFullName()} to: {newGpa}");
-        }
-        else
-        {
-            Console.WriteLine("Invalid GPA. Please enter a value between 0 and 4.");
+            StudentHelper.UpdateStudentGpa(student);
         }
     }
-    public static Student? GetStudentById(List<Student>? students)
+    
+    public static void UpdateStudentName(List<Student?>? students, object? user)
     {
-        Console.WriteLine("Enter the Student ID:");
-        if (!int.TryParse(Console.ReadLine(), out var studentId))
+        ValidationHelper.ValidateUser(user);
+        var nonNullStudents = students?.OfType<Student>().ToList();
+        ValidationHelper.ValidateList(nonNullStudents, "Student list cannot be null or empty.");
+
+        Console.Write("Enter Student ID: ");
+        var idInput = Console.ReadLine();
+        if (!int.TryParse(idInput, out int id))
         {
             Console.WriteLine("Invalid Student ID.");
-            return null;
+            return;
         }
 
-        if (students == null)
-        {
-            Console.WriteLine("Students list is null.");
-            return null;
-        }
-
-        var student = students.FirstOrDefault(s => s.GetStudentId() == studentId);
+        var student = nonNullStudents.FirstOrDefault(s => s.GetStudentId() == id);
         if (student == null)
         {
             Console.WriteLine("Student not found.");
+            return;
         }
 
-        return student;
-    }
-    public static void UpdateStudentName(Student? student, IUser user)
-    {
-        if (student == null)
-        {
-            throw new Exceptions.NullStudentException("Student is null.");
-        }
-
-        if (user == null)
-        {
-            throw new Exceptions.NullUserException("User is null.");
-        }
-
-        Console.Write("Enter new student name: ");
+        Console.Write("Enter new Student Name: ");
         var newName = Console.ReadLine();
-
-        if (string.IsNullOrEmpty(newName))
+        ValidationHelper.ValidateNotEmpty(newName, "New Student Name cannot be empty.");
+        var names = newName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (names.Length >= 2)
         {
-            throw new Exceptions.InvalidNameException("Name cannot be empty.");
+            student.SetFirstName(names[0]);
+            student.SetLastName(names[1]);
+            Console.WriteLine("Student Name updated successfully.");
         }
-
-        student.SetStudentName(newName);
-        Console.WriteLine("Student name updated successfully.");
+        else
+        {
+            Console.WriteLine("Please enter both first and last names.");
+        }
     }
+    
     public static void AddNewStudent(List<Student>? students, IUser? user)
     {
-        if (students == null)
-        {
-            throw new Exceptions.NullStudentsListException("Students list is null.");
-        }
+        ValidationHelper.ValidateStudentListNotNull(students);
+        ValidationHelper.ValidateUserNotNull(user);
 
-        if (user == null)
-        {
-            throw new Exceptions.NullUserException("User is null.");
-        }
-
-        Console.Write("Enter first name: ");
-        var firstName = Console.ReadLine();
-
-        Console.Write("Enter last name: ");
-        var lastName = Console.ReadLine();
-
-        Console.Write("Enter date of birth (yyyy-MM-dd): ");
-        if (!DateTime.TryParse(Console.ReadLine(), out var dateOfBirth))
-        {
-            Console.WriteLine("Invalid date of birth.");
-            return;
-        }
-
-        Console.Write("Enter student ID: ");
-        if (!int.TryParse(Console.ReadLine(), out var studentId))
-        {
-            Console.WriteLine("Invalid student ID.");
-            return;
-        }
-
-        Console.Write("Enter GPA: ");
-        if (!double.TryParse(Console.ReadLine(), out var gpa))
-        {
-            Console.WriteLine("Invalid GPA.");
-            return;
-        }
-
-        Console.Write("Enter student name: ");
-        var name = Console.ReadLine();
-
-        if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName) || string.IsNullOrEmpty(name))
-        {
-            Console.WriteLine("Invalid input. All fields are required.");
-            return;
-        }
-
-        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa, name);
-
-        students.Add(newStudent);
-        Console.WriteLine("New student added successfully.");
+        StudentHelper.AddNewStudent(students);
     }
-    public static void RemoveStudent(List<Student?>? students, Student? student, IUser? user)
+    
+    public static void RemoveStudent(List<Student>? students, Student? student, IUser? user)
     {
-        if (students == null)
-        {
-            throw new Exceptions.NullStudentsListException("Students list is null.");
-        }
+        ValidationHelper.ValidateStudentListNotNull(students);
+        ValidationHelper.ValidateStudentNotNull(student);
+        ValidationHelper.ValidateUserNotNull(user);
 
-        if (student == null)
+        if (student != null)
         {
-            throw new Exceptions.NullStudentException("Student is null.");
+            StudentHelper.RemoveStudent(students, student);
         }
-
-        if (user == null)
-        {
-            throw new Exceptions.NullUserException("User is null.");
-        }
-
-        Console.WriteLine(students.Remove(student)
-            ? "Student removed successfully."
-            : "Error: Student could not be removed.");
     }
+
     public static void DisplayAllStudents(List<Student?>? students)
     {
         if (students == null || students.Count == 0)
@@ -258,7 +109,10 @@ public static class StudentHandler
 
         foreach (var student in students)
         {
-            Console.WriteLine($"Student ID: {student?.GetStudentId()}, Name: {student?.GetStudentFullName()}, GPA: {student?.GetGpa()}");
+            if (student != null)
+            {
+                Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+            }
         }
     }
 }

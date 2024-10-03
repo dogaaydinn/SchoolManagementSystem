@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
 
@@ -25,8 +26,10 @@ public class Student : SchoolMember, IStudentActions, IUser
     private string StudentName { get; set; }
     private double Gpa { get; set; }
     private List<Course> EnrolledCourses { get; }
-
     private readonly Dictionary<Course, int> _courseGrades;
+
+    private string FirstName { get; set; }
+    private string LastName { get; set; }
 
     #endregion
     #region IPersonActions Members
@@ -110,6 +113,16 @@ public class Student : SchoolMember, IStudentActions, IUser
     public void SetStudentName(string newName)
     {
         StudentName = newName;
+    }
+
+    public void SetFirstName(string firstName)
+    {
+        FirstName = firstName;
+    }
+
+    public void SetLastName(string lastName)
+    {
+        LastName = lastName;
     }
 
     public override void DisplayDetails()

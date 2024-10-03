@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.Actions;
 
 namespace SchoolManagementSystem.Models.Concrete;
 
@@ -59,6 +60,7 @@ public class Course : ISchoolActions
     {
         return _assignedTeacher != null ? $"Teacher: {_assignedTeacher.GetTeacherFullName()}" : "No assigned teacher";
     }
+    
     
     public int GetAssignedTeacher()
     {

@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Models.Concrete;
 public class Admin : Person, IUser
 {
     public Admin(string firstName, string lastName, DateTime dateOfBirth, int adminId)
-        : base(firstName, lastName, dateOfBirth)
+        : base(firstName, lastName, dateOfBirth, true)
     {
         AdminId = adminId;
     }

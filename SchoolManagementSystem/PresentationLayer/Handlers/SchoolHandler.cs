@@ -1,264 +1,151 @@
-using System.Diagnostics;
-using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
-using SchoolManagementSystem.Models;
+using SchoolManagementSystem.Interfaces.Helper;
+using SchoolManagementSystem.Interfaces.User;
+using SchoolManagementSystem.Interfaces.Validation;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
-public static class SchoolHandler
+public class SchoolHandler
 {
+    private static ISchoolHelper _schoolHelper;
+    private static IValidationHelper _validationHelper;
+
+    public SchoolHandler(ISchoolHelper schoolHelper, IValidationHelper validationHelper)
+    {
+        _schoolHelper = schoolHelper;
+        _validationHelper = validationHelper;
+    }
+
     public static void DisplayAllDetails(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
     {
-        Exceptions.CheckHasPermission(user, isAdmin: true);
-        Exceptions.CheckCoursesNotNull(courses);
-        Exceptions.CheckStudentsNotNull(students);
-        Exceptions.CheckTeachersNotNull(teachers);
-
+        ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
         Console.WriteLine("Courses:");
-        CourseHandler.DisplayCourseDetails(courses, user);
+        _schoolHelper.DisplayCourses(courses ?? new List<Course>());
 
         Console.WriteLine("\nStudents:");
-        if (students != null)
-        {
-            foreach (var student in students.OfType<Student>())
-            {
-                StudentHandler.DisplayStudentDetails(student);
-            }
-        }
+        _schoolHelper.DisplayStudents(students ?? new List<Student?>());
 
         Console.WriteLine("\nTeachers:");
-        Debug.Assert(teachers != null, nameof(teachers) + " != null");
-        foreach (var teacher in teachers.OfType<Teacher>())
-        {
-            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+        DisplayTeacherDetails(teachers ?? new List<Teacher?>());
     }
+
     public static void AssignCoursesToStudents(List<Course>? courses, List<Student?> students, object? user)
     {
-        Exceptions.CheckHasPermission(user, isTeacherOrAdmin: true);
+        ValidateUserAndEntities(user as IUser, true, courses, students);
 
-        foreach (var student in students)
+        foreach (var student in students.OfType<Student>())
         {
-            if (student == null)
-            {
-                Console.WriteLine("Encountered a null student. Skipping...");
-                continue;
-            }
-
-            Console.WriteLine($"Assigning courses to {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
-
-            while (true)
-            {
-                var course = GetCourseFromUserInput(courses);
-                if (course == null) break;
-
-                course.EnrollStudent(student);
-                Console.WriteLine($"Assigned {course.GetCourseName()} to {student.GetStudentFullName()}.");
-            }
+            AssignCoursesToStudent(student, courses);
         }
     }
-public static void RecordGradesForStudents(List<Course>? courses, object? user)
-{
-    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: true);
 
-    Console.WriteLine($"User {user.GetType().Name} is recording grades.");
-
-    if (courses == null)
+    public static void RecordGradesForStudents(List<Course>? courses, object? user)
     {
-        Console.WriteLine("Courses list is null.");
-        return;
-    }
+        ValidateUserAndEntities(user as IUser, true, courses);
 
-    foreach (var course in courses)
-    {
-        Console.WriteLine($"Recording grades for course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
-
-        var enrolledStudents = course.GetEnrolledStudents();
-        if (enrolledStudents == null)
+        foreach (var course in courses ?? Enumerable.Empty<Course>())
         {
-            Console.WriteLine("No students enrolled in this course.");
-            continue;
-        }
-
-        foreach (var student in enrolledStudents.OfType<Student>())
-        {
-            Console.WriteLine($"Enter the grade for {student.GetStudentFullName()} (ID: {student.GetStudentId()}):");
-
-            var input = Console.ReadLine();
-
-            if (!double.TryParse(input, out var grade) || grade < 0 || grade > 100)
-            {
-                Console.WriteLine("Invalid grade. Please enter a value between 0 and 100.");
-                continue;
-            }
-
-            course.AssignGrade(student, grade);
-            Console.WriteLine($"Recorded grade {grade} for {student.GetStudentFullName()} in {course.GetCourseName()}.");
+            RecordGradesForCourse(course);
         }
     }
-}
-private static Course? GetCourseFromUserInput(List<Course>? courses)
-{
-    Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
-    var input = Console.ReadLine()?.Trim();
 
-    if (string.IsNullOrEmpty(input) || input.ToLower() == "done") return null;
-
-    if (!int.TryParse(input, out var courseId))
+    public static void EnrollStudentInCourse(List<Student?>? students, List<Course>? courses, object? user)
     {
-        Console.WriteLine("Invalid course ID. Please try again.");
-        return null;
-    }
+        ValidateUserAndEntities(user as IUser, false, students, courses);
 
-    if (courses == null)
-    {
-        Console.WriteLine("Courses list is null.");
-        return null;
-    }
-
-    var course = courses.Find(c => c.GetCourseId() == courseId);
-    if (course == null)
-    {
-        Console.WriteLine("Course not found. Please try again.");
-    }
-
-    return course;
-}
-public static void DemonstrateActions(object? person, object? user)
-{
-    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
-
-    switch (person)
-    {
-        case Teacher teacher:
-            DemonstrateTeacherActions(teacher, user);
-            break;
-        case Student student:
-            DemonstrateStudentActions(student, user);
-            break;
-        default:
-            Console.WriteLine("Unknown person actions.");
-            break;
-    }
-}
-private static void DemonstrateTeacherActions(Teacher teacher, object? user)
-{
-    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
-
-    Console.WriteLine($"Demonstrating actions for teacher: {teacher.GetTeacherFullName()} (ID: {teacher.GetTeacherId()})");
-    
-    teacher.Teach();
-    teacher.CheckAttendance();
-
-}
-
-public static void DemonstrateStudentActions(Student? student, object? user)
-{
-    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
-
-    if (student == null)
-    {
-        Console.WriteLine("Student is null. Cannot demonstrate actions.");
-        return;
-    }
-
-    Console.WriteLine($"Demonstrating actions for student: {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
-
-    student.Learn();
-    student.TakeTest();
-    student.SubmitAssignment();
-    student.Study();
-    student.ParticipateInClass();
-    student.AttendClass();
-    student.DoHomework();
-}
-public static void EnrollStudentInCourse(List<Student?>? students, List<Course> courses, object? user)
-{
-    Exceptions.CheckHasPermission(user, isTeacherOrAdmin: false);
-    Exceptions.CheckStudentsNotNull(students);
-    Exceptions.CheckCoursesNotNull(courses);
-
-    if (students == null)
-    {
-        Console.WriteLine("Students list is null.");
-        return;
-    }
-
-    try
-    {
-        var student = SelectStudent(students);
+        var student = _schoolHelper.SelectStudent(students);
         if (student == null) return;
 
-        var course = SelectCourse(courses);
+        var course = _schoolHelper.SelectCourse(courses);
         if (course == null) return;
 
         student.EnrollInCourse(course);
         Console.WriteLine($"{student.GetStudentFullName()} has been enrolled in {course.GetCourseName()}.");
     }
-    catch (Exception ex)
+
+    public static void DemonstrateActions(object? person, object? user)
     {
-        Console.WriteLine($"An error occurred: {ex.Message}");
-    }
-}
-public static Student? SelectStudent(List<Student?> students)
-{
-    for (var i = 0; i < students.Count; i++)
-    {
-        var student = students[i];
-        if (student != null)
+        _validationHelper.CheckHasPermission(user as IUser, true);
+        switch (person)
         {
-            Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+            case Teacher teacher:
+                PersonActionDemonstrator.DemonstrateTeacherActions(teacher);
+                break;
+            case Student student:
+                PersonActionDemonstrator.DemonstrateStudentActions(student);
+                break;
+            default:
+                Console.WriteLine("Unknown person actions.");
+                break;
         }
     }
 
-    if (int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
+    private static void ValidateUserAndEntities(IUser? user, bool isAdmin, params object?[] entities)
     {
-        var selectedStudent = students[studentIndex - 1];
-        if (selectedStudent != null)
+        _validationHelper.CheckHasPermission(user, isAdmin);
+        foreach (var entity in entities)
         {
-            return selectedStudent;
+            switch (entity)
+            {
+                case List<object> entityList:
+                    _validationHelper.ValidateNotNull(entityList, entity != null ? $"{entity.GetType().Name} cannot be null." : "Entity cannot be null.");
+                    break;
+                case List<Course> courseList:
+                    _validationHelper.ValidateNotNull(courseList, "Course list cannot be null.");
+                    break;
+                case List<Student?> studentList:
+                    _validationHelper.ValidateNotNull(studentList, "Student list cannot be null.");
+                    break;
+                case List<Teacher?> teacherList:
+                    _validationHelper.ValidateNotNull(teacherList, "Teacher list cannot be null.");
+                    break;
+                default:
+                    throw new ArgumentException("Entity is not a valid list.");
+            }
         }
     }
 
-    Console.WriteLine("Invalid student selection.");
-    return null;
-}
-
-public static Course? SelectCourse(List<Course> courses)
-{
-    Console.WriteLine("Select a course to enroll in:");
-    for (var i = 0; i < courses.Count; i++)
+    private static void AssignCoursesToStudent(Student student, List<Course>? courses)
     {
-        Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()} (ID: {courses[i].GetCourseId()})");
+        Console.WriteLine($"Assigning courses to {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+
+        while (true)
+        {
+            var course = _schoolHelper.GetCourseFromUserInput(courses);
+            if (course == null) break;
+
+            course.EnrollStudent(student);
+            Console.WriteLine($"Assigned {course.GetCourseName()} to {student.GetStudentFullName()}.");
+        }
     }
 
-    if (int.TryParse(Console.ReadLine(), out var courseIndex) && courseIndex >= 1 && courseIndex <= courses.Count)
-        return courses[courseIndex - 1];
-    Console.WriteLine("Invalid course selection.");
-    return null;
-}
-
-public static Teacher? SelectTeacher(List<Teacher?>? teachers)
-{
-    if (teachers == null || teachers.Count == 0)
+    private static void RecordGradesForCourse(Course course)
     {
-        Console.WriteLine("No teachers available.");
-        return null;
+        Console.WriteLine($"Recording grades for course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
+
+        var enrolledStudents = course.GetEnrolledStudents();
+        if (enrolledStudents == null || !enrolledStudents.Any())
+        {
+            Console.WriteLine("No students enrolled in this course.");
+            return;
+        }
+
+        foreach (var student in enrolledStudents.OfType<Student>())
+        {
+            var grade = _schoolHelper.GetValidGrade(student);
+            if (grade == null) continue;
+            course.AssignGrade(student, grade.Value);
+            Console.WriteLine($"Recorded grade {grade} for {student.GetStudentFullName()} in {course.GetCourseName()}.");
+        }
     }
 
-    Console.WriteLine("Select a teacher:");
-    for (var i = 0; i < teachers.Count; i++)
+    private static void DisplayTeacherDetails(List<Teacher?> teachers)
     {
-        var teacher = teachers[i];
-        Console.WriteLine($"{i + 1}. {teacher?.GetTeacherFullName()} (ID: {teacher?.GetTeacherId()})");
+        foreach (var teacher in teachers.OfType<Teacher>())
+        {
+            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
+        }
     }
-
-    if (int.TryParse(Console.ReadLine(), out var teacherIndex) && teacherIndex >= 1 && teacherIndex <= teachers.Count)
-    {
-        return teachers[teacherIndex - 1];
-    }
-
-    Console.WriteLine("Invalid teacher selection.");
-    return null;
-}
+    
 }

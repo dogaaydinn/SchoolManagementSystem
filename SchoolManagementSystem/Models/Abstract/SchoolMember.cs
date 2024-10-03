@@ -6,7 +6,7 @@ public abstract class SchoolMember : Person
     #region Constructors
 
     protected SchoolMember(string firstName, string lastName, DateTime dateOfBirth)
-        : base(firstName, lastName, dateOfBirth)
+        : base(firstName, lastName, dateOfBirth, false)
     {
     }
 

@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Interfaces;
+using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
 
@@ -114,6 +115,17 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         TeacherId = newTeacherId;
     }
+    
+    public void SetFirstName(string firstName)
+    {
+        // Implementation for setting the first name
+    }
+
+    public void SetLastName(string lastName)
+    {
+        // Implementation for setting the last name
+    }
+    
     #endregion
 
     public new int Id { get; set; }
