@@ -74,7 +74,7 @@ public static class CourseHandler
     {
         var schoolHelper = new SchoolHelper();
         
-        schoolHelper.DisplayCourses(courses);
+        SchoolHelper.DisplayCourses(courses);
 
         foreach (var course in courses)
         {

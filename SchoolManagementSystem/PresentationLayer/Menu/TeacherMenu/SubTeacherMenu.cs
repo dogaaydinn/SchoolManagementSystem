@@ -4,7 +4,7 @@ using SchoolManagementSystem.Interfaces.User;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
-public class SubTeacherMenu
+public static class SubTeacherMenu
 {
     public static void DisplaySubTeacherMenu(List<Teacher?>? teachers, object? user)
     {

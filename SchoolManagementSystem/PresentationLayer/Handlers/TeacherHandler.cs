@@ -205,9 +205,9 @@ public static class TeacherHandler
     
     public static void AddNewTeacher(List<Teacher?>? teachers, object? user)
     {
-        ValidateUserPermissions(user);
-        var nonNullTeachers = ValidateTeacherList(teachers);
-
+        ValidateUser(user);
+        var nonNullTeachers = GetNonNullTeachers(teachers);
+        
         var id = GetValidatedTeacherId(nonNullTeachers);
         if (id == null) return;
 

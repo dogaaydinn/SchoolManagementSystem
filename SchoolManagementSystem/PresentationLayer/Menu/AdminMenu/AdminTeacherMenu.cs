@@ -13,7 +13,7 @@ public static class AdminTeacherMenu
             DisplayMenuOptions();
             var choice = Console.ReadLine();
 
-            if (!ValidationHelper.ValidateUserInput(choice, out int validChoice)) continue;
+            if (!ValidationHelper.ValidateUserInput(choice, out var validChoice)) continue;
             Teacher? teacher = null;
 
             switch (validChoice)

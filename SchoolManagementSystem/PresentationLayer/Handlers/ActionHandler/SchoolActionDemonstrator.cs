@@ -12,4 +12,11 @@ public static class SchoolActionDemonstrator
         schoolActions.AssignCourse(course);
         schoolActions.RemoveCourse(course);
     }
+
+    public static void DemonstrateCourseActions(ICourseActions courseActions, Course course)
+    {
+        Console.WriteLine("Demonstrating course-specific actions:");
+        courseActions.StartCourse(course);
+        courseActions.EndCourse(course);
+    }
 }

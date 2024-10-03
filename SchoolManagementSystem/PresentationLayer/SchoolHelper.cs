@@ -5,7 +5,7 @@ namespace SchoolManagementSystem.PresentationLayer;
 
 public class SchoolHelper : ISchoolHelper
 {
-    public Course? GetCourseFromUserInput(List<Course>? courses)
+    public static Course? GetCourseFromUserInput(List<Course>? courses)
     {
         Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
         var input = Console.ReadLine()?.Trim();
@@ -53,7 +53,7 @@ public class SchoolHelper : ISchoolHelper
         }
     }
 
-    public void DisplayCourses(List<Course>? courses)
+    public static void DisplayCourses(List<Course>? courses)
     {
         if (courses == null || !courses.Any())
         {
@@ -71,7 +71,7 @@ public class SchoolHelper : ISchoolHelper
         return GetUserSelection(students);
     }
 
-    public Course? SelectCourse(List<Course>? courses)
+    public static Course? SelectCourse(List<Course>? courses)
     {
         DisplayCourses(courses);
         return GetUserSelection(courses);

@@ -55,14 +55,14 @@ private static void HandleMenuChoice(string choice, List<Course>? courses, List<
     switch (choice)
     {
         case "1":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.DisplayCourseActions(selectedCourse, user);
             }
             break;
         case "2":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.DisplayCourseDetails(new List<Course> { selectedCourse }, user);
@@ -96,28 +96,28 @@ private static void HandleMenuChoice(string choice, List<Course>? courses, List<
             CourseHandler.GetCourseById(courses);
             break;
         case "12":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.GetStudentFromCourse(selectedCourse);
             }
             break;
         case "13":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.DisplayGrades(selectedCourse);
             }
             break;
         case "14":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.UpdateCourseId(selectedCourse, user);
             }
             break;
         case "15":
-            selectedCourse = schoolHelper.SelectCourse(courses);
+            selectedCourse = SchoolHelper.SelectCourse(courses);
             if (selectedCourse != null)
             {
                 CourseHandler.UpdateCourseName(selectedCourse, user);

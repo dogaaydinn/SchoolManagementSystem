@@ -24,7 +24,7 @@ public static class StudentMenu
 
             if (!HandleMenuChoice(choice, students, courses, user))
             {
-                return; // Exit option selected
+                return; 
             }
         }
     }
@@ -40,8 +40,8 @@ public static class StudentMenu
 
     private static bool HandleMenuChoice(string choice, List<Student?>? students, List<Course>? courses, object? user)
     {
-        var student = SelectStudent(students);
-        if (student == null) return true; // If no student is selected, return to the menu
+        var student = SchoolHelper.SelectStudent(students);
+        if (student == null) return true; 
 
         switch (choice)
         {
@@ -62,39 +62,12 @@ public static class StudentMenu
                 }
                 break;
             case "4":
-                return false; // Exit option selected
+                return false; 
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
 
-        return true; // Continue the menu loop
-    }
-
-    private static Student? SelectStudent(List<Student?>? students)
-    {
-        Console.WriteLine("Select a student:");
-        if (students == null || students.Count == 0)
-        {
-            Console.WriteLine("No students available.");
-            return null;
-        }
-
-        for (var i = 0; i < students.Count; i++)
-        {
-            var student = students[i];
-            if (student != null)
-            {
-                Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
-            }
-        }
-
-        if (int.TryParse(Console.ReadLine(), out var studentIndex) && studentIndex >= 1 && studentIndex <= students.Count)
-        {
-            return students[studentIndex - 1];
-        }
-
-        Console.WriteLine("Invalid student selection.");
-        return null;
+        return true; 
     }
 }

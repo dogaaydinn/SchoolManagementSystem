@@ -35,7 +35,7 @@ public class StudentHelper : IStudentHelper
         }
     }
 
-    public static Student? GetStudentById(List<Student>? students)
+    public Student? GetStudentById(List<Student>? students)
     {
         var studentId = InputHelper.GetValidatedIntInput("Enter the Student ID:");
 
@@ -84,7 +84,7 @@ public class StudentHelper : IStudentHelper
         Console.WriteLine("New student added successfully.");
     }
 
-    public static void RemoveStudent(List<Student> students, Student student)
+    public  void RemoveStudent(List<Student> students, Student student)
     {
         Console.WriteLine(students.Remove(student)
             ? "Student removed successfully."

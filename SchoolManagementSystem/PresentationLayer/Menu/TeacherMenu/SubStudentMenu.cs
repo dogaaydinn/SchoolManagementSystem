@@ -10,7 +10,7 @@ public static class SubStudentMenu
     public static void DisplayStudentMenu(List<Student>? students, object? user)
     {
         var nullableStudents = students.Cast<Student?>().ToList();
-        IUser? userToValidate = user as IUser;
+        var userToValidate = user as IUser;
         while (true)
         {
             Console.WriteLine("\nStudent Menu:");

@@ -24,7 +24,7 @@ public static class CourseMenu
 
             if (!HandleMenuChoice(choice, courses, user))
             {
-                return; // Exit the menu if the choice was to exit
+                return; 
             }
         }
     }

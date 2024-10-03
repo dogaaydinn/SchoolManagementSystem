@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 

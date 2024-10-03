@@ -24,7 +24,7 @@ public static class AdminMenu
 
             if (!HandleMenuChoice(choice, courses, students, teachers, user))
             {
-                return; // Exit the menu if the choice was to exit
+                return; 
             }
         }
     }

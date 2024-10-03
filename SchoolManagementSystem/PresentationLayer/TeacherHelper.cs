@@ -173,7 +173,7 @@ public class TeacherHelper : ITeacherHelper
         }
     }
 
-    public Teacher? GetTeacherById(List<Teacher?>? teachers)
+    private static Teacher? GetTeacherById(List<Teacher?>? teachers)
     {
         Console.Write("Enter Teacher ID: ");
         var id = Console.ReadLine();
@@ -183,7 +183,7 @@ public class TeacherHelper : ITeacherHelper
         return teacher;
     }
 
-    public Teacher? GetTeacherByName(List<Teacher?>? teachers)
+    private static Teacher? GetTeacherByName(List<Teacher?>? teachers)
     {
         Console.Write("Enter Teacher Name: ");
         var name = Console.ReadLine();
@@ -203,7 +203,7 @@ public class TeacherHelper : ITeacherHelper
         DisplayTeacherNames(filteredTeachers);
     }
 
-    public void UpdateTeacherId(List<Teacher?>? teachers, object? user)
+    private static void UpdateTeacherId(List<Teacher?>? teachers, object? user)
     {
         var teacher = GetTeacherById(teachers);
         if (teacher == null) return;
@@ -214,7 +214,7 @@ public class TeacherHelper : ITeacherHelper
         Console.WriteLine("Teacher ID updated successfully.");
     }
 
-    public void UpdateTeacherSubject(List<Teacher?>? teachers, object? user)
+    private static void UpdateTeacherSubject(List<Teacher?>? teachers, object? user)
     {
         var teacher = GetTeacherById(teachers);
         if (teacher == null) return;
@@ -225,7 +225,7 @@ public class TeacherHelper : ITeacherHelper
         Console.WriteLine("Teacher Subject updated successfully.");
     }
 
-    public void UpdateTeacherName(Teacher teacher, object? user)
+    private static void UpdateTeacherName(Teacher teacher, object? user)
     {
         Console.Write("Enter new Teacher Name: ");
         var newName = Console.ReadLine();

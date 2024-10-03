@@ -9,5 +9,5 @@ public interface IStudentActions : ISchoolMemberActions
     void ParticipateInClass();
     void AttendClass();
     void DoHomework();
-    string GetFullName();
+
 }

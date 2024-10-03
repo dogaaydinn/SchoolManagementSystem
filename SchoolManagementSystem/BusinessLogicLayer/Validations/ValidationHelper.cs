@@ -100,14 +100,6 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateUserPermissions(object user, bool isAdmin)
-    {
-        if (!isAdmin)
-        {
-            throw new UnauthorizedAccessException("User does not have the required permissions.");
-        }
-    }
-
     public static bool ValidateUserInput(string? input, out int validChoice, int min = 1, int max = 11)
     {
         validChoice = 0;
@@ -122,15 +114,7 @@ public static class ValidationHelper
         return false;
     }
 
-    public static List<Teacher> ValidateTeacherList(List<Teacher?>? teachers)
-    {
-        if (teachers == null || !teachers.Any())
-        {
-            throw new ArgumentException("Teacher list cannot be null or empty.", nameof(teachers));
-        }
 
-        return teachers.OfType<Teacher>().ToList();
-    }
 
     public static Student? SelectAndValidateStudent(List<Student?>? students)
     {
@@ -149,32 +133,70 @@ public static class ValidationHelper
         }
 
         var student = students.FirstOrDefault(s => s?.GetStudentId() == id);
-        if (student == null)
-        {
-            Console.WriteLine("Student not found.");
-            return null;
-        }
+        if (student != null) return student;
+        Console.WriteLine("Student not found.");
+        return null;
 
-        return student;
     }
 
     public static bool ValidateStudentList(List<Student?>? students)
     {
-        if (students == null || !students.Any())
-        {
-            Console.WriteLine("Student list cannot be null or empty.");
-            return false;
-        }
-        return true;
+        if (students != null && students.Any()) return true;
+        Console.WriteLine("Student list cannot be null or empty.");
+        return false;
+
     }
 
     public static bool ValidateUser(object? user)
     {
+        if (user != null) return true;
+        Console.WriteLine("User is not authenticated.");
+        return false;
+
+    }
+    public static void ValidateUserPermissions(object user, bool isAdmin)
+    {
+        if (!isAdmin)
+        {
+            throw new UnauthorizedAccessException("User does not have the required permissions.");
+        }
+    }
+
+    public static void ValidateAdminPermissions(object? user, bool isAdmin = false)
+    {
         if (user == null)
         {
-            Console.WriteLine("User is not authenticated.");
-            return false;
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
         }
-        return true;
+
+        if (isAdmin && !(user is Admin))
+        {
+            throw new UnauthorizedAccessException("User does not have admin permissions.");
+        }
+    }
+    public static List<Teacher> ValidateTeacherList(List<Teacher?>? teachers)
+    {
+        if (teachers == null || !teachers.Any())
+        {
+            throw new ArgumentException("Teacher list cannot be null or empty.", nameof(teachers));
+        }
+
+        return teachers.OfType<Teacher>().ToList();
+    }
+
+    public static List<Teacher> ValidateAndFilterTeacherList(List<Teacher?>? teachers)
+    {
+        if (teachers == null || !teachers.Any())
+        {
+            throw new ArgumentException("Teacher list cannot be null or empty.", nameof(teachers));
+        }
+
+        var nonNullTeachers = teachers.OfType<Teacher>().ToList();
+        if (!nonNullTeachers.Any())
+        {
+            throw new ArgumentException("Teacher list contains no valid teachers.", nameof(teachers));
+        }
+
+        return nonNullTeachers;
     }
 }

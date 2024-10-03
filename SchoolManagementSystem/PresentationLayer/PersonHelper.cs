@@ -32,7 +32,7 @@ public class PersonHelper : IPersonHelper
         }
     }
 
-    private void DemonstrateActions(ISchoolMemberActions schoolMember)
+    private static void DemonstrateActions(ISchoolMemberActions schoolMember)
     {
         switch (schoolMember)
         {

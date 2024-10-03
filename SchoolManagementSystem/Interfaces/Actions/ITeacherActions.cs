@@ -8,6 +8,5 @@ public interface ITeacherActions : ISchoolMemberActions
     void GradePapers();
     void PrepareLesson();
     void AttendMeeting();
-    string GetFullName();
     
 }

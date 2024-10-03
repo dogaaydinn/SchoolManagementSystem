@@ -1,3 +1,4 @@
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.Models.Concrete;
 
@@ -76,11 +77,11 @@ public static class SubCourseMenu
                 break;
 
             case "4":
-                CourseHandler.ListStudentsInCourses(courses, user);
+                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
                 break;
 
             case "5":
-                CourseHandler.EnrollStudentsInCourses(courses, nullableStudents, user);
+                SchoolHandler.EnrollStudentInCourse(
                 break;
 
             case "6":
@@ -88,31 +89,23 @@ public static class SubCourseMenu
                 break;
 
             case "7":
-                CourseHandler.DisplayTotalCourses(courses, user);
+                SchoolHelper.DisplayCourses(courses);
                 break;
 
             case "8":
-                CourseHandler.ListStudentsInCourses(courses, user);
+                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
                 break;
 
             case "9":
-                CourseHandler.GetCourseFromUserInput(courses);
+                SchoolHelper.GetCourseFromUserInput(courses);
                 break;
 
             case "10":
-                CourseHandler.DemonstrateCourseMethods(courses, user);
+                CourseHandler.DemonstrateCourseActions(courses, user);
                 break;
 
             case "11":
-                course = SchoolHelper.SelectCourse(courses);
-                if (course != null)
-                {
-                    CourseHandler.GetStudentFromCourse(course);
-                }
-                else
-                {
-                    Console.WriteLine("Error: No course selected.");
-                }
+                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
                 break;
 
             case "12":
