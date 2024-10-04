@@ -23,7 +23,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateNotNull(object? entity, string entityName)
+    public static void ValidateNotNull(object entity, string entityName)
     {
         if (entity == null)
         {
@@ -31,7 +31,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateUserPermission(object? user, bool requireTeacherOrAdmin = false)
+    public static void ValidateUserPermission(object user, bool requireTeacherOrAdmin = false)
     {
         if (user == null)
         {
@@ -60,7 +60,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateTeacherOrAdminAccess(object? user)
+    public static void ValidateTeacherOrAdminAccess(object user)
     {
         if (user is not (Teacher or Admin))
         {
@@ -84,7 +84,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateUserNotNull(object? user)
+    public static void ValidateUserNotNull(object user)
     {
         if (user == null)
         {
@@ -92,7 +92,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateList<T>(List<T>? list, string errorMessage)
+    public static void ValidateList<T>(List<T> list, string errorMessage)
     {
         if (list == null || list.Count == 0)
         {
@@ -116,7 +116,7 @@ public static class ValidationHelper
 
 
 
-    public static Student? SelectAndValidateStudent(List<Student?>? students)
+    public static Student? SelectAndValidateStudent(List<Student?> students)
     {
         if (students == null || !students.Any())
         {
@@ -139,7 +139,7 @@ public static class ValidationHelper
 
     }
 
-    public static bool ValidateStudentList(List<Student?>? students)
+    public static bool ValidateStudentList(List<Student?> students)
     {
         if (students != null && students.Any()) return true;
         Console.WriteLine("Student list cannot be null or empty.");
@@ -147,7 +147,7 @@ public static class ValidationHelper
 
     }
 
-    public static bool ValidateUser(object? user)
+    public static bool ValidateUser(object user)
     {
         if (user != null) return true;
         Console.WriteLine("User is not authenticated.");
@@ -199,4 +199,13 @@ public static class ValidationHelper
 
         return nonNullTeachers;
     }
+
+        public static void Validate(object parameter)
+        {
+            if (parameter == null)
+            {
+                throw new ArgumentNullException(nameof(parameter), "Parameter cannot be null.");
+            }
+        }
+    
 }

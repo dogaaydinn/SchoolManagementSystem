@@ -1,5 +1,7 @@
 using System.Globalization;
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.Helper;
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.PresentationLayer;
@@ -14,6 +16,11 @@ public class StudentHelper : IStudentHelper
         
         DisplayCourses(student);
         DisplayGrades(student);
+    }
+
+    Student? IStudentHelper.GetStudentById(List<Student> students)
+    {
+        return GetStudentById(students);
     }
 
     private static void DisplayCourses(Student student)
@@ -35,7 +42,7 @@ public class StudentHelper : IStudentHelper
         }
     }
 
-    public Student? GetStudentById(List<Student>? students)
+    public static Student? GetStudentById(List<Student> students)
     {
         var studentId = InputHelper.GetValidatedIntInput("Enter the Student ID:");
 
@@ -70,6 +77,21 @@ public class StudentHelper : IStudentHelper
         Console.WriteLine($"Updated GPA for {student.GetStudentFullName()} to: {newGpa}");
     }
     
+    public static void DisplayGrades(Course course)
+    {
+        var enrolledStudents = course.GetEnrolledStudents();
+        if (enrolledStudents == null || !enrolledStudents.Any())
+        {
+            Console.WriteLine("No students enrolled in this course.");
+            return;
+        }
+
+        Console.WriteLine($"Grades for {course.GetCourseName()}:");
+        foreach (var student in enrolledStudents.OfType<Student>())
+        {
+            Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, Grade: {student.GetAssignedGrades(course)}");
+        }
+    }
     public void AddNewStudent(List<Student> students)
     {
         var firstName = InputHelper.GetValidatedStringInput("Enter first name:");
@@ -78,16 +100,28 @@ public class StudentHelper : IStudentHelper
         var studentId = InputHelper.GetValidatedIntInput("Enter student ID:");
         var gpa = InputHelper.GetValidatedDoubleInput("Enter GPA:", 0, 4);
 
-        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa);
+        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa, studentName: firstName + " " + lastName);
         students.Add(newStudent);
-
-        Console.WriteLine("New student added successfully.");
+        Console.WriteLine($"New student added: {newStudent.GetStudentFullName()} (ID: {newStudent.GetStudentId()})");
+        
     }
 
-    public  void RemoveStudent(List<Student> students, Student student)
+    public void RemoveStudent(List<Student?> students, IUser user)
     {
-        Console.WriteLine(students.Remove(student)
-            ? "Student removed successfully."
-            : "Error: Student could not be removed.");
+        ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
+        ValidationHelper.ValidateNotNull(user, "User cannot be null.");
+
+        Console.WriteLine("Enter the ID of the student to remove:");
+        var studentId = InputHelper.GetValidatedIntInput("Student ID:");
+
+        var studentToRemove = students?.FirstOrDefault(s => s?.GetStudentId() == studentId);
+        if (studentToRemove == null)
+        {
+            Console.WriteLine($"No student found with ID: {studentId}");
+            return;
+        }
+
+        students?.Remove(studentToRemove);
+        Console.WriteLine($"Student ID: {studentId} has been removed successfully.");
     }
 }

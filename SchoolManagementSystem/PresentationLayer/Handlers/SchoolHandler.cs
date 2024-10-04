@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Interfaces.Validation;
@@ -17,7 +18,7 @@ public class SchoolHandler
         _validationHelper = validationHelper;
     }
 
-    public static void DisplayAllDetails(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
+    public static void DisplayAllDetails(List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
     {
         ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
         Console.WriteLine("Courses:");
@@ -30,7 +31,7 @@ public class SchoolHandler
         DisplayTeacherDetails(teachers ?? new List<Teacher?>());
     }
 
-    public static void AssignCoursesToStudents(List<Course>? courses, List<Student?> students, object? user)
+    public static void AssignCoursesToStudents(List<Course> courses, List<Student?> students, object user)
     {
         ValidateUserAndEntities(user as IUser, true, courses, students);
 
@@ -40,7 +41,7 @@ public class SchoolHandler
         }
     }
 
-    public static void RecordGradesForStudents(List<Course>? courses, object? user)
+    public static void RecordGradesForStudents(List<Course> courses, object user)
     {
         ValidateUserAndEntities(user as IUser, true, courses);
 
@@ -50,21 +51,34 @@ public class SchoolHandler
         }
     }
 
-    public static void EnrollStudentInCourse(List<Student?>? students, List<Course>? courses, object? user)
+    public static void EnrollStudentInCourse(List<Student?> courses, List<Course?> students, IUser user)
     {
-        ValidateUserAndEntities(user as IUser, false, students, courses);
+        ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
+        ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
+        ValidationHelper.ValidateNotNull(user, "User cannot be null.");
 
-        var student = _schoolHelper.SelectStudent(students);
-        if (student == null) return;
+        foreach (var course in courses)
+        {
+            if (course == null)
+            {
+                throw new InvalidOperationException("Course cannot be null.");
+            }
 
-        var course = _schoolHelper.SelectCourse(courses);
-        if (course == null) return;
+            Console.WriteLine($"Enrolling students in course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
+            foreach (var student in students.OfType<Student>())
+            {
+                if (student == null)
+                {
+                    throw new InvalidOperationException("Student cannot be null.");
+                }
 
-        student.EnrollInCourse(course);
-        Console.WriteLine($"{student.GetStudentFullName()} has been enrolled in {course.GetCourseName()}.");
+                course.EnrollStudent(student);
+                Console.WriteLine($"  Enrolled Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
+            }
+        }
     }
 
-    public static void DemonstrateActions(object? person, object? user)
+    public static void DemonstrateActions(object person, object user)
     {
         _validationHelper.CheckHasPermission(user as IUser, true);
         switch (person)
@@ -81,7 +95,7 @@ public class SchoolHandler
         }
     }
 
-    private static void ValidateUserAndEntities(IUser? user, bool isAdmin, params object?[] entities)
+    private static void ValidateUserAndEntities(IUser? user, bool isAdmin, params object[] entities)
     {
         _validationHelper.CheckHasPermission(user, isAdmin);
         foreach (var entity in entities)
@@ -106,7 +120,7 @@ public class SchoolHandler
         }
     }
 
-    private static void AssignCoursesToStudent(Student student, List<Course>? courses)
+    private static void AssignCoursesToStudent(Student student, List<Course> courses)
     {
         Console.WriteLine($"Assigning courses to {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
 

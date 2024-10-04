@@ -6,13 +6,13 @@ namespace SchoolManagementSystem.PresentationLayer;
 
 public class TeacherHelper : ITeacherHelper
 {
-    private static void ValidateUserPermissions(object? user)
+    private static void ValidateUserPermissions(object user)
     {
         ValidationHelper.ValidateNotNull(user, "User cannot be null.");
         ValidationHelper.ValidateUserPermissions(user, isAdmin: true);
     }
 
-    public static void AddNewTeacher(List<Teacher?>? teachers, object? user)
+    public static void AddNewTeacher(List<Teacher?> teachers, object user)
     {
         ValidateUserPermissions(user);
         var nonNullTeachers = ValidateTeacherList(teachers);
@@ -26,7 +26,9 @@ public class TeacherHelper : ITeacherHelper
         var subject = GetValidatedTeacherSubject();
         if (string.IsNullOrEmpty(subject)) return;
 
-        var newTeacher = new Teacher(id.Value, names[0], names[1], subject );
+        var hireDate = DateTime.Now;
+        const int teacherId = 0;
+        var newTeacher = new Teacher(id.Value.ToString(), names[0], hireDate, teacherId, subject);
         nonNullTeachers.Add(newTeacher);
         Console.WriteLine("Teacher added successfully.");
     }
@@ -70,7 +72,7 @@ public class TeacherHelper : ITeacherHelper
         ValidationHelper.ValidateNotEmpty(subject, "Teacher Subject cannot be empty.");
         return subject;
     }
-    private static List<Teacher> ValidateTeacherList(List<Teacher?>? teachers)
+    private static List<Teacher> ValidateTeacherList(List<Teacher?> teachers)
     {
         var nonNullTeachers = teachers?.OfType<Teacher>().ToList();
         ValidationHelper.ValidateList(nonNullTeachers, "Teacher list cannot be null or empty.");
@@ -99,7 +101,7 @@ public class TeacherHelper : ITeacherHelper
         return choice;
     }
 
-    public void DisplayTeacherDetails(List<Teacher?>? teachers, object? user)
+    public void DisplayTeacherDetails(List<Teacher?> teachers, object user)
     {
         ValidateUserPermissions(user);
         var nonNullTeachers = ValidateTeacherList(teachers);
@@ -108,7 +110,7 @@ public class TeacherHelper : ITeacherHelper
         DisplayMenuOptions(new[] { "Teacher ID", "Teacher Name", "List all teachers", "Teachers by subject" });
 
         var choice = GetValidatedUserChoice(4);
-        Teacher? teacher = null;
+        Teacher teacher = null;
 
         switch (choice)
         {
@@ -139,7 +141,7 @@ public class TeacherHelper : ITeacherHelper
         }
     }
 
-    public void UpdateTeacherDetails(List<Teacher?>? teachers, object? user)
+    public void UpdateTeacherDetails(List<Teacher?> teachers, object user)
     {
         ValidateUserPermissions(user);
         var nonNullTeachers = ValidateTeacherList(teachers);
@@ -173,7 +175,7 @@ public class TeacherHelper : ITeacherHelper
         }
     }
 
-    private static Teacher? GetTeacherById(List<Teacher?>? teachers)
+    private static Teacher GetTeacherById(List<Teacher>? teachers)
     {
         Console.Write("Enter Teacher ID: ");
         var id = Console.ReadLine();
@@ -183,7 +185,7 @@ public class TeacherHelper : ITeacherHelper
         return teacher;
     }
 
-    private static Teacher? GetTeacherByName(List<Teacher?>? teachers)
+    private static Teacher GetTeacherByName(List<Teacher>? teachers)
     {
         Console.Write("Enter Teacher Name: ");
         var name = Console.ReadLine();
@@ -193,7 +195,7 @@ public class TeacherHelper : ITeacherHelper
         return teacher;
     }
 
-    public static void DisplayTeachersBySubject(List<Teacher?>? teachers)
+    public static void DisplayTeachersBySubject(List<Teacher?> teachers)
     {
         Console.Write("Enter Subject Name: ");
         var subject = Console.ReadLine();
@@ -203,7 +205,7 @@ public class TeacherHelper : ITeacherHelper
         DisplayTeacherNames(filteredTeachers);
     }
 
-    private static void UpdateTeacherId(List<Teacher?>? teachers, object? user)
+    private static void UpdateTeacherId(List<Teacher>? teachers, object user)
     {
         var teacher = GetTeacherById(teachers);
         if (teacher == null) return;
@@ -214,7 +216,7 @@ public class TeacherHelper : ITeacherHelper
         Console.WriteLine("Teacher ID updated successfully.");
     }
 
-    private static void UpdateTeacherSubject(List<Teacher?>? teachers, object? user)
+    private static void UpdateTeacherSubject(List<Teacher>? teachers, object user)
     {
         var teacher = GetTeacherById(teachers);
         if (teacher == null) return;
@@ -225,7 +227,7 @@ public class TeacherHelper : ITeacherHelper
         Console.WriteLine("Teacher Subject updated successfully.");
     }
 
-    private static void UpdateTeacherName(Teacher teacher, object? user)
+    private static void UpdateTeacherName(Teacher teacher, object user)
     {
         Console.Write("Enter new Teacher Name: ");
         var newName = Console.ReadLine();
@@ -243,7 +245,7 @@ public class TeacherHelper : ITeacherHelper
         }
     }
 
-    private static void DisplayTeacherNames(List<Teacher?>? teachers)
+    private static void DisplayTeacherNames(List<Teacher?> teachers)
     {
         ValidationHelper.ValidateNotNull(teachers, "Teacher list cannot be null or empty.");
         Console.WriteLine("Teacher Names:");
@@ -253,7 +255,7 @@ public class TeacherHelper : ITeacherHelper
         }
     }
 
-    public static void PromptToDisplayAllTeachers(List<Teacher?>? teachers)
+    public static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
     {
         Console.WriteLine("Teacher not found. Would you like to see the list of teachers? (yes/no)");
         if (Console.ReadLine()?.Trim().ToLower() == "yes")

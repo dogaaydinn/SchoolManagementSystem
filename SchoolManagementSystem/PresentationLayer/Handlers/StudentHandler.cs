@@ -20,7 +20,7 @@ public static class StudentHandler
         StudentHelper.DisplayStudentInfo(student);
     }
     
-    public static void UpdateStudentId(List<Student>? students, object? user)
+    public static void UpdateStudentId(List<Student> students, object? user)
     {
         ValidationHelper.ValidateAdminAccess(user);
         
@@ -31,7 +31,7 @@ public static class StudentHandler
         }
     }
 
-    public static void UpdateStudentGpa(Student? student, object? user)
+    public static void UpdateStudentGpa(Student? student, object user)
     {
         ValidationHelper.ValidateTeacherOrAdminAccess(user);
         ValidationHelper.ValidateStudentNotNull(student);
@@ -42,7 +42,7 @@ public static class StudentHandler
         }
     }
     
-    public static void UpdateStudentName(List<Student?>? students, object? user)
+    public static void UpdateStudentName(List<Student?>? students, object user)
     {
         ValidationHelper.ValidateUser(user);
         var nonNullStudents = students?.OfType<Student>().ToList();
@@ -50,7 +50,7 @@ public static class StudentHandler
 
         Console.Write("Enter Student ID: ");
         var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out int id))
+        if (!int.TryParse(idInput, out var id))
         {
             Console.WriteLine("Invalid Student ID.");
             return;
@@ -79,7 +79,7 @@ public static class StudentHandler
         }
     }
     
-    public static void AddNewStudent(List<Student>? students, IUser? user)
+    public static void AddNewStudent(List<Student> students, IUser user)
     {
         ValidationHelper.ValidateStudentListNotNull(students);
         ValidationHelper.ValidateUserNotNull(user);
@@ -87,7 +87,7 @@ public static class StudentHandler
         StudentHelper.AddNewStudent(students);
     }
     
-    public static void RemoveStudent(List<Student>? students, Student? student, IUser? user)
+    public static void RemoveStudent(List<Student>? students, Student? student, IUser user)
     {
         ValidationHelper.ValidateStudentListNotNull(students);
         ValidationHelper.ValidateStudentNotNull(student);
@@ -107,12 +107,9 @@ public static class StudentHandler
             return;
         }
 
-        foreach (var student in students)
+        foreach (var student in students.OfType<Student>())
         {
-            if (student != null)
-            {
-                Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
-            }
+            Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
         }
     }
 }

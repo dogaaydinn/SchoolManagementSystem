@@ -34,7 +34,7 @@ public static class DataProvider
 
         foreach (var teacher in teacherList)
         {
-            var assignedCourses = courses.Where(c => c.GetAssignedTeacherName().Contains(teacher.GetTeacherFullName())).ToList();
+            var assignedCourses = courses.Where(c => Course.GetAssignedTeacherName().Contains(teacher.GetTeacherFullName())).ToList();
             var averageGpa = assignedCourses.Any() ? assignedCourses.Average(c => c.GetEnrolledStudents().Average(s =>
             {
                 Debug.Assert(s != null, nameof(s) + " != null");

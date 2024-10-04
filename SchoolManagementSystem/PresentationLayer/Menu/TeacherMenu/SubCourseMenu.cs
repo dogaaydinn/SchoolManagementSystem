@@ -1,14 +1,17 @@
+using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 public static class SubCourseMenu
 {
-    public static void DisplayCourseMenu(List<Course> courses, List<Student>? students, object? user)
+    public static void DisplayCourseMenu(List<Course?> courses, List<Student>? students, object user)
     {
         var nullableStudents = students.Cast<Student?>().ToList();
+        var schoolHelper = new SchoolHelper(); 
 
         while (true)
         {
@@ -22,9 +25,9 @@ public static class SubCourseMenu
                 continue;
             }
 
-            if (!HandleCourseMenuChoice(choice, courses, nullableStudents, user))
+            if (!HandleCourseMenuChoice(choice, courses, nullableStudents, user, schoolHelper))
             {
-                return; 
+                return;
             }
         }
     }
@@ -41,19 +44,18 @@ public static class SubCourseMenu
         Console.WriteLine("8. Display Course Students");
         Console.WriteLine("9. Get Course From User Input");
         Console.WriteLine("10. Demonstrate Course Methods");
-        Console.WriteLine("11. Get Student From Course");
-        Console.WriteLine("12. Exit");
+        Console.WriteLine("11. Exit");
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleCourseMenuChoice(string choice, List<Course> courses, List<Student?> nullableStudents, object? user)
+    private static bool HandleCourseMenuChoice(string choice, List<Course?> courses, List<Student?> nullableStudents, object user, SchoolHelper schoolHelper)
     {
-        Course? course = null;
+        Course? course;
 
         switch (choice)
         {
             case "1":
-                course = SchoolHelper.SelectCourse(courses);
+                course = schoolHelper.SelectCourse(courses);
                 if (course != null)
                 {
                     CourseHandler.DisplayCourseActions(course, user);
@@ -63,59 +65,51 @@ public static class SubCourseMenu
                     Console.WriteLine("Error: No course selected.");
                 }
                 break;
-
             case "2":
-                course = SchoolHelper.SelectCourse(courses);
+                course = schoolHelper.SelectCourse(courses);
                 if (course != null)
                 {
-                    CourseHandler.DisplayCourseDetails(new List<Course> { course }, user);
+                    CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
                 }
                 break;
-
             case "3":
                 CourseHandler.DisplayCourseNames(courses, user);
                 break;
-
             case "4":
-                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
+                CourseHandler.ListStudentsInCourses(courses, nullableStudents, (IUser)user);
                 break;
-
             case "5":
-                SchoolHandler.EnrollStudentInCourse(
+                SchoolHandler.EnrollStudentInCourse(nullableStudents, courses, (IUser)user); 
                 break;
-
             case "6":
-                SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, user);
+                SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, (IUser)user); 
                 break;
-
             case "7":
-                SchoolHelper.DisplayCourses(courses);
+                schoolHelper.DisplayCourses(courses);
                 break;
-
             case "8":
-                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
+                if (user != null)
+                {
+                    CourseHandler.ListStudentsInCourses(courses, nullableStudents, (IUser)user); 
+                }
+                else
+                {
+                    Console.WriteLine("Error: User is null.");
+                }
                 break;
-
             case "9":
-                SchoolHelper.GetCourseFromUserInput(courses);
+                schoolHelper.GetCourseFromUserInput(courses);
                 break;
-
             case "10":
-                CourseHandler.DemonstrateCourseActions(courses, user);
+                SchoolActionDemonstrator.DemonstrateCourseActions(new List<ICourseActions>(), courses, (IUser)user); 
                 break;
-
             case "11":
-                CourseHandler.ListStudentsInCourses(courses, (IUser)user);
-                break;
-
-            case "12":
                 return false;
-
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
 
-        return true; 
+        return true;
     }
 }

@@ -4,6 +4,6 @@ namespace SchoolManagementSystem.Interfaces.Helper;
 
 public interface ICourseHelper
 {
-    Course? GetCourseById(IEnumerable<Course> courses);
-    Course? GetCourseByName(IEnumerable<Course> courses);
+    Course? GetCourseById(IEnumerable<Course?> courses);
+    Course? GetCourseByName(IEnumerable<Course?> courses);
 }

@@ -1,16 +1,17 @@
 using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer;
 using SchoolManagementSystem.PresentationLayer.Handlers;
-
-namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 public static class SubStudentMenu
 {
-    public static void DisplayStudentMenu(List<Student>? students, object? user)
+    public static void DisplayStudentMenu(List<Student>? students, object user)
     {
         var nullableStudents = students.Cast<Student?>().ToList();
         var userToValidate = user as IUser;
+        var schoolHelper = new SchoolHelper(); // Create an instance of SchoolHelper
+
         while (true)
         {
             Console.WriteLine("\nStudent Menu:");
@@ -24,9 +25,9 @@ public static class SubStudentMenu
                 continue;
             }
 
-            if (!HandleMenuChoice(choice, students, nullableStudents, userToValidate))
+            if (!HandleMenuChoice(choice, students, nullableStudents, userToValidate, schoolHelper))
             {
-                return; 
+                return;
             }
         }
     }
@@ -50,22 +51,21 @@ public static class SubStudentMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Student>? students, List<Student?> nullableStudents, IUser? userToValidate)
+    private static bool HandleMenuChoice(string choice, List<Student> students, List<Student?> nullableStudents, IUser userToValidate, SchoolHelper schoolHelper)
     {
         Student? selectedStudent = null;
 
         switch (choice)
         {
             case "1":
-                selectedStudent = SchoolHelper.SelectStudent(students);
+                selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
                 if (selectedStudent != null)
                 {
                     StudentHandler.DisplayStudentDetails(selectedStudent);
                 }
                 break;
-
             case "2":
-                selectedStudent = SchoolHelper.SelectStudent(students);
+                selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
                 if (selectedStudent != null)
                 {
                     StudentHelper.DisplayGrades(selectedStudent);
@@ -75,14 +75,14 @@ public static class SubStudentMenu
                 SchoolHandler.DemonstrateActions(students, userToValidate);
                 break;
             case "4":
-                selectedStudent = SchoolHelper.SelectStudent(students);
+                selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
                 if (selectedStudent != null)
                 {
                     StudentHandler.UpdateStudentGpa(selectedStudent, userToValidate);
                 }
                 break;
             case "5":
-                var studentById = SchoolHelper.SelectStudent(students);
+                var studentById = schoolHelper.SelectStudent(students); // Use the instance method
                 if (studentById != null)
                 {
                     StudentHelper.GetStudentById(students);
@@ -103,9 +103,9 @@ public static class SubStudentMenu
                 TeacherHandler.DisplayAllTeachers(teachers);
                 break;
             case "11":
-                if (userToValidate is IUser iUser)
+                if (userToValidate != null)
                 {
-                    StudentHandler.AddNewStudent(students, iUser);
+                    StudentHandler.AddNewStudent(students, userToValidate);
                 }
                 else
                 {
@@ -113,7 +113,7 @@ public static class SubStudentMenu
                 }
                 break;
             case "12":
-                selectedStudent = SchoolHelper.SelectStudent(students);
+                selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
                 if (selectedStudent != null)
                 {
                     if (userToValidate != null)
@@ -130,11 +130,10 @@ public static class SubStudentMenu
                     Console.WriteLine("Error: Student is null.");
                 }
                 break;
-
             case "13":
                 if (userToValidate != null)
                 {
-                    CourseHandler.ListStudentsInCourses(new List<Course>(), userToValidate);
+                    CourseHandler.ListStudentsInCourses(new List<Course>(), nullableStudents, userToValidate);
                 }
                 else
                 {
@@ -143,12 +142,11 @@ public static class SubStudentMenu
                 break;
             case "14":
                 return false;
-
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
 
-        return true; 
+        return true;
     }
 }

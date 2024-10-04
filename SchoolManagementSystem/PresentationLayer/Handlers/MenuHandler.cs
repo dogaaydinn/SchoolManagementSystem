@@ -7,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class MenuHandler
 {
-    public static void DisplayMainMenu(List<Student?>? students, List<Course>? courses, List<Teacher?>? teachers, List<Admin> admins, object? user)
+    public static void DisplayMainMenu(List<Student?> students, List<Course> courses, List<Teacher?> teachers, List<Admin> admins, object? user)
     {
         while (true)
         {

@@ -46,7 +46,7 @@ public static class Exceptions
         {
             Admin => true,
             Teacher teacher => student.GetEnrolledCourses()
-                .Any(course => course.GetAssignedTeacher() == teacher.GetTeacherId()),
+                .Any(course => Course.GetAssignedTeacher() == teacher.GetTeacherId()),
             Student studentUser => studentUser.GetStudentId() == student.GetStudentId(),
             _ => false
         };

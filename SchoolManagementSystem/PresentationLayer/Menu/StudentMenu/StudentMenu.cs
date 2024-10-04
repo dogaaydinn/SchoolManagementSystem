@@ -7,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
 
 public static class StudentMenu
 {
-    public static void DisplayStudentMenu(List<Student?>? students, List<Course>? courses, object? user)
+    public static void DisplayStudentMenu(List<Student?> students, List<Course> courses, object? user)
     {
         while (true)
         {
@@ -38,10 +38,12 @@ public static class StudentMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Student?>? students, List<Course>? courses, object? user)
+    private static bool HandleMenuChoice(string choice, List<Student?> students, List<Course> courses, object? user)
     {
-        var student = SchoolHelper.SelectStudent(students);
-        if (student == null) return true; 
+        var schoolHelper = new SchoolHelper(); 
+        var student = schoolHelper.SelectStudent(students);
+        var course = schoolHelper.SelectCourse(courses); 
+        if (student == null) return true;
 
         switch (choice)
         {
@@ -49,7 +51,14 @@ public static class StudentMenu
                 StudentHandler.DisplayStudentDetails(student);
                 break;
             case "2":
-                StudentHandler.DisplayStudentGrades(student, courses, user);
+                if (course != null)
+                {
+                    StudentHelper.DisplayGrades(course);
+                }
+                else
+                {
+                    Console.WriteLine("Error: No course selected.");
+                }
                 break;
             case "3":
                 if (user is IUser iUser)

@@ -3,7 +3,7 @@ using SchoolManagementSystem.Interfaces.Actions;
 
 namespace SchoolManagementSystem.Models.Concrete;
 
-public class Course : ISchoolActions
+public class Course : ISchoolActions, ICourseActions
 {
     #region Constructors
 
@@ -26,7 +26,7 @@ public class Course : ISchoolActions
     private string _courseName;
     private readonly List<Student?>? _enrolledStudents;
     private readonly Dictionary<int, Grade> _studentGrades;
-    private readonly Teacher? _assignedTeacher;
+    private static Teacher? _assignedTeacher;
     private int _credits;
 
     #endregion
@@ -56,13 +56,16 @@ public class Course : ISchoolActions
         return _studentGrades.Values.Select(grade => grade.GetGradeValue()).ToList();
     }
 
-    public string GetAssignedTeacherName()
+    public static string GetAssignedTeacherName()
     {
         return _assignedTeacher != null ? $"Teacher: {_assignedTeacher.GetTeacherFullName()}" : "No assigned teacher";
     }
+    public static int GetTeacherId()
+    {
+        return _assignedTeacher?.GetTeacherId() ?? -1;
+    }
     
-    
-    public int GetAssignedTeacher()
+    public static int GetAssignedTeacher()
     {
         return _assignedTeacher?.GetTeacherId() ?? -1;
     }
@@ -223,4 +226,14 @@ public class Course : ISchoolActions
     }
 
     #endregion
+
+    public void StartCourse(Course course)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EndCourse(Course course)
+    {
+        throw new NotImplementedException();
+    }
 }

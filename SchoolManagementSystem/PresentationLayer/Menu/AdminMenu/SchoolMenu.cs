@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class SchoolMenu
 {
-    public static void DisplaySchoolMenu(List<Course>? courses, List<Student>? students, List<Teacher?>? teachers, IUser? user)
+    public static void DisplaySchoolMenu(List<Course> courses, List<Student>? students, List<Teacher?> teachers, IUser? user)
     {
         while (true)
         {
@@ -39,11 +39,13 @@ public static class SchoolMenu
         }
     }
 
-    private static void HandleStudentMenu(List<Student?>? students, List<Course>? courses, Student? student)
+    private static void HandleStudentMenu(List<Student?> students, List<Course> courses, Student student)
     {
         var choice = GetUserChoice();
 
-        if (choice == null) return; 
+        if (choice == null) return;
+
+        var schoolHelper = new SchoolHelper(); // Create an instance of SchoolHelper
 
         switch (choice)
         {
@@ -61,17 +63,25 @@ public static class SchoolMenu
                 }
                 break;
             case "3":
-                // Add code for viewing grades here
+                var course = schoolHelper.SelectCourse(courses); // Use the instance method
+                if (course != null)
+                {
+                    StudentHelper.DisplayGrades(course);
+                }
+                else
+                {
+                    Console.WriteLine("Error: No course selected.");
+                }
                 break;
             case "4":
-                return; // Back to main menu
+                return;
             default:
                 Console.WriteLine("Invalid choice.");
                 break;
         }
     }
 
-    private static void HandleAdminMenu(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, Admin admin)
+    private static void HandleAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers, Admin admin)
     {
         var choice = GetUserChoice();
 
@@ -106,7 +116,7 @@ public static class SchoolMenu
         }
     }
 
-    private static void HandleTeacherMenu(List<Teacher?>? teachers, List<Course>? courses, Teacher? teacher)
+    private static void HandleTeacherMenu(List<Teacher?> teachers, List<Course> courses, Teacher teacher)
     {
         var choice = GetUserChoice();
 
@@ -115,7 +125,7 @@ public static class SchoolMenu
         switch (choice)
         {
             case "1":
-                TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, teachers);
+                TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, teachers);
                 break;
             case "2":
                 TeacherHandler.UpdateTeacherId(teachers, teacher);

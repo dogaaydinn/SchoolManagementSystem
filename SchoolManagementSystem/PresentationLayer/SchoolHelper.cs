@@ -5,7 +5,7 @@ namespace SchoolManagementSystem.PresentationLayer;
 
 public class SchoolHelper : ISchoolHelper
 {
-    public static Course? GetCourseFromUserInput(List<Course>? courses)
+    public Course? GetCourseFromUserInput(List<Course> courses)
     {
         Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
         var input = Console.ReadLine()?.Trim();
@@ -37,7 +37,7 @@ public class SchoolHelper : ISchoolHelper
         return null;
     }
 
-    public void DisplayStudents(List<Student?>? students)
+    public void DisplayStudents(List<Student?> students)
     {
         if (students == null || !students.Any())
         {
@@ -53,7 +53,7 @@ public class SchoolHelper : ISchoolHelper
         }
     }
 
-    public static void DisplayCourses(List<Course>? courses)
+    public void DisplayCourses(List<Course> courses)
     {
         if (courses == null || !courses.Any())
         {
@@ -65,25 +65,25 @@ public class SchoolHelper : ISchoolHelper
             Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()} (ID: {courses[i].GetCourseId()})");
     }
 
-    public static Student? SelectStudent(List<Student?>? students)
+    public Student? SelectStudent(List<Student?> students)
     {
         DisplayStudents(students);
         return GetUserSelection(students);
     }
 
-    public static Course? SelectCourse(List<Course>? courses)
+    public Course? SelectCourse(List<Course> courses)
     {
         DisplayCourses(courses);
         return GetUserSelection(courses);
     }
 
-    public static Teacher? SelectTeacher(List<Teacher?>? teachers)
+    public Teacher? SelectTeacher(List<Teacher?> teachers)
     {
         DisplayTeachers(teachers);
         return GetUserSelection(teachers);
     }
 
-    private static void DisplayTeachers(List<Teacher?>? teachers)
+    private void DisplayTeachers(List<Teacher?> teachers)
     {
         if (teachers == null || !teachers.Any())
         {
@@ -99,7 +99,7 @@ public class SchoolHelper : ISchoolHelper
         }
     }
 
-    private static T? GetUserSelection<T>(List<T?>? items) where T : class
+    private T? GetUserSelection<T>(List<T?> items) where T : class
     {
         if (int.TryParse(Console.ReadLine(), out var index) && index >= 1 && index <= items.Count)
             return items[index - 1];

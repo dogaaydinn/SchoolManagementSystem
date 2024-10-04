@@ -7,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminMenu
 {
-    public static void DisplayAdminMenu(List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
+    public static void DisplayAdminMenu(List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
     {
         while (true)
         {
@@ -39,7 +39,7 @@ public static class AdminMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Course>? courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
+    private static bool HandleMenuChoice(string choice, List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
     {
         switch (choice)
         {

@@ -6,5 +6,5 @@ public interface ITeacherHelper
 {
     void DisplayMenuOptions(string[] options);
     int GetValidatedUserChoice(int maxOptions);
-    void DisplayTeacherDetails(List<Teacher?>? teachers, object? user);
+    void DisplayTeacherDetails(List<Teacher?> teachers, object user);
 }

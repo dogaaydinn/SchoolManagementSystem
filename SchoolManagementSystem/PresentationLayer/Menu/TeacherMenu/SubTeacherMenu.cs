@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 public static class SubTeacherMenu
 {
-    public static void DisplaySubTeacherMenu(List<Teacher?>? teachers, object? user)
+    public static void DisplaySubTeacherMenu(List<Teacher?> teachers, object user)
     {
         while (true)
         {
@@ -46,14 +46,13 @@ public static class SubTeacherMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleSubTeacherMenuChoice(string choice, List<Teacher?>? teachers, object? user)
+    private static bool HandleSubTeacherMenuChoice(string choice, List<Teacher?> teachers, object user)
     {
-        Teacher? teacher = null;
-
+        var schoolHelper = new SchoolHelper();
+        var teacher = schoolHelper.SelectTeacher(teachers);
         switch (choice)
         {
             case "1":
-                teacher = SchoolHelper.SelectTeacher(teachers);
                 if (teacher != null)
                 {
                     TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
@@ -66,7 +65,6 @@ public static class SubTeacherMenu
                 TeacherHandler.DisplayTeachersBySubject(teachers);
                 break;
             case "4":
-                teacher = SchoolHelper.SelectTeacher(teachers);
                 if (teacher != null)
                 {
                     SchoolHandler.DemonstrateActions(teachers, user);
@@ -77,14 +75,12 @@ public static class SubTeacherMenu
                 }
                 break;
             case "5":
-                teacher = SchoolHelper.SelectTeacher(teachers);
                 if (teacher != null)
                 {
                     TeacherHandler.GetTeacherById(teachers);
                 }
                 break;
             case "6":
-                teacher = SchoolHelper.SelectTeacher(teachers);
                 if (teacher != null)
                 {
                     TeacherHandler.GetTeacherByName(teachers);
@@ -113,7 +109,6 @@ public static class SubTeacherMenu
                 }
                 break;
             case "13":
-                teacher = SchoolHelper.SelectTeacher(teachers);
                 if (teacher != null && user != null)
                 {
                     TeacherHandler.RemoveTeacher(teachers, teacher, (IUser)user);

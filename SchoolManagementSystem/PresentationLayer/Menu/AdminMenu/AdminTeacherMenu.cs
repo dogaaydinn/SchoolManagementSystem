@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminTeacherMenu
 {
-    public static void DisplayTeacherMenu(List<Teacher?>? teachers, List<Course> courses, object? user)
+    public static void DisplayTeacherMenu(List<Teacher?> teachers, List<Course> courses, object user)
     {
         while (true)
         {
@@ -14,14 +14,14 @@ public static class AdminTeacherMenu
             var choice = Console.ReadLine();
 
             if (!ValidationHelper.ValidateUserInput(choice, out var validChoice)) continue;
-            Teacher? teacher = null;
+            Teacher teacher = null;
 
             switch (validChoice)
             {
                 case 1:
                     if (teacher != null)
                     {
-                        TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
+                        TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, user);
                     }
                     else
                     {

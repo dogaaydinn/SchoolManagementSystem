@@ -7,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminStudentMenu
 {
-    public static void DisplayStudentMenu(List<Student?>? students, object? user)
+    public static void DisplayStudentMenu(List<Student?> students, object user)
     {
         while (true)
         {
@@ -78,7 +78,7 @@ public static class AdminStudentMenu
                     break;
                 case "9":
                     if (ValidationHelper.ValidateUser(user))
-                        CourseHandler.ListStudentsInCourses(new List<Course>(), (IUser)user);
+                        CourseHandler.ListStudentsInCourses(new List<Course>(), students.OfType<Student>().ToList(), (IUser)user);
                     break;
                 case "10":
                     student = ValidationHelper.SelectAndValidateStudent(students);
@@ -89,14 +89,15 @@ public static class AdminStudentMenu
                     if (ValidationHelper.ValidateUser(user))
                     {
                         var studentsToEnroll = students?.OfType<Student?>().ToList();
-                        SchoolHandler.EnrollStudentInCourse(studentsToEnroll, new List<Course>(), (IUser)user);
+                        SchoolHandler.EnrollStudentInCourse(studentsToEnroll, new List<Course?>(), (IUser)user);
                     }
                     break;
                 case "12":
                     var studentToRemove = ValidationHelper.SelectAndValidateStudent(students);
                     if (studentToRemove != null && ValidationHelper.ValidateUser(user))
                     {
-                        StudentHelper.RemoveStudent(students, studentToRemove);
+                        var studentHelper = new StudentHelper(); // Create an instance of StudentHelper
+                        studentHelper.RemoveStudent(students, studentToRemove); // Use the instance method
                     }
                     break;
                 case "13":
