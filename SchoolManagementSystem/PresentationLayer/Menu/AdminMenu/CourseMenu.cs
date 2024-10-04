@@ -3,6 +3,7 @@ using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
@@ -72,7 +73,7 @@ public static class CourseMenu
                 CourseHandler.ListStudentsInCourses(courses, nullableStudents, user);
                 break;
             case "5":
-                SchoolHandler.EnrollStudentInCourse(nullableStudents, courses, user);
+                SchoolHandler.EnrollStudentInCourse(courses, nullableStudents?.OfType<Student?>().ToList(), user);
                 break;
             case "6":
                 SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, user);

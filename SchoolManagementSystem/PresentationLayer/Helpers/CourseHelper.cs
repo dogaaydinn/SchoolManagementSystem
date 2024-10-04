@@ -1,7 +1,7 @@
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Models.Concrete;
 
-namespace SchoolManagementSystem.PresentationLayer;
+namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
 public class CourseHelper : ICourseHelper
 {

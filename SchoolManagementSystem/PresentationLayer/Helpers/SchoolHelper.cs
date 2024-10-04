@@ -1,40 +1,45 @@
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Models.Concrete;
 
-namespace SchoolManagementSystem.PresentationLayer;
+namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
 public class SchoolHelper : ISchoolHelper
 {
     public Course? GetCourseFromUserInput(List<Course> courses)
     {
-        Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
-        var input = Console.ReadLine()?.Trim();
-
-        if (string.IsNullOrEmpty(input) || input.ToLower() == "done") return null;
-
-        if (int.TryParse(input, out var courseId))
+        while (true)
         {
-            var course = courses?.Find(c => c.GetCourseId() == courseId);
-            if (course != null) return course;
+            Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
+            var input = Console.ReadLine()?.Trim();
 
-            Console.WriteLine("Course not found. Please try again.");
-        }
-        else
-        {
-            Console.WriteLine("Invalid course ID. Please try again.");
-        }
+            if (string.IsNullOrEmpty(input) || input.Equals("done", StringComparison.OrdinalIgnoreCase))
+                return null;
 
-        return null;
+            if (int.TryParse(input, out var courseId))
+            {
+                var course = courses?.Find(c => c.GetCourseId() == courseId);
+                if (course != null) return course;
+
+                Console.WriteLine("Course not found. Please try again.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid course ID. Please try again.");
+            }
+        }
     }
 
     public double? GetValidGrade(Student student)
     {
-        Console.WriteLine($"Enter the grade for {student.GetStudentFullName()} (ID: {student.GetStudentId()}):");
-        var input = Console.ReadLine();
+        while (true)
+        {
+            Console.WriteLine($"Enter the grade for {student.GetStudentFullName()} (ID: {student.GetStudentId()}):");
+            var input = Console.ReadLine();
 
-        if (double.TryParse(input, out var grade) && grade is >= 0 and <= 100) return grade;
-        Console.WriteLine("Invalid grade. Please enter a numeric value between 0 and 100.");
-        return null;
+            if (double.TryParse(input, out var grade) && grade is >= 0 and <= 100) return grade;
+
+            Console.WriteLine("Invalid grade. Please enter a numeric value between 0 and 100.");
+        }
     }
 
     public void DisplayStudents(List<Student?> students)
@@ -101,6 +106,7 @@ public class SchoolHelper : ISchoolHelper
 
     private T? GetUserSelection<T>(List<T?> items) where T : class
     {
+        Console.WriteLine("Select an item by entering the corresponding number:");
         if (int.TryParse(Console.ReadLine(), out var index) && index >= 1 && index <= items.Count)
             return items[index - 1];
         Console.WriteLine("Invalid selection. Please try again.");

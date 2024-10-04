@@ -2,6 +2,7 @@ using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
@@ -89,7 +90,8 @@ public static class AdminStudentMenu
                     if (ValidationHelper.ValidateUser(user))
                     {
                         var studentsToEnroll = students?.OfType<Student?>().ToList();
-                        SchoolHandler.EnrollStudentInCourse(studentsToEnroll, new List<Course?>(), (IUser)user);
+                        var coursesToEnroll = new List<Course?>(); // Assuming you have a list of courses to enroll students in
+                        SchoolHandler.EnrollStudentInCourse(coursesToEnroll, studentsToEnroll, (IUser)user);
                     }
                     break;
                 case "12":

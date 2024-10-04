@@ -1,4 +1,4 @@
-namespace SchoolManagementSystem.PresentationLayer;
+namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
 public static class InputHelper
 {
@@ -44,6 +44,19 @@ public static class InputHelper
                 return date;
 
             Console.WriteLine("Invalid date format. Please use yyyy-MM-dd.");
+        }
+    }
+    
+    public static string GetValidatedYesNoInput()
+    {
+        while (true)
+        {
+            var input = Console.ReadLine()?.Trim().ToLower();
+            if (input == "yes" || input == "no")
+            {
+                return input;
+            }
+            Console.WriteLine("Invalid input. Please enter 'yes' or 'no'.");
         }
     }
 }

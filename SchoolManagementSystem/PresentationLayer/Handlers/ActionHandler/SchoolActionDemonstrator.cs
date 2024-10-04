@@ -1,6 +1,7 @@
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
@@ -19,10 +20,18 @@ public static class SchoolActionDemonstrator
 
         foreach (var courseActions in courseActionsList)
         {
-            var schoolHelper = new SchoolHelper(); 
-            var course = schoolHelper.SelectCourse(courses); 
-            courseActions.StartCourse(course);
-            courseActions.EndCourse(course);
+            var schoolHelper = new SchoolHelper();
+            var nonNullCourses = courses.Where(c => c != null).Cast<Course>().ToList();
+            var course = schoolHelper.SelectCourse(nonNullCourses);
+            if (course != null)
+            {
+                courseActions.StartCourse(course);
+                courseActions.EndCourse(course);
+            }
+            else
+            {
+                Console.WriteLine("No course selected.");
+            }
         }
     }
 }

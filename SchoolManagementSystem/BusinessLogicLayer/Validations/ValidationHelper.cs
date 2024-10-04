@@ -1,5 +1,6 @@
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.BusinessLogicLayer.Validations;
 
@@ -91,7 +92,7 @@ public static class ValidationHelper
             throw new ArgumentNullException(nameof(user), "User cannot be null.");
         }
     }
-
+    
     public static void ValidateList<T>(List<T> list, string errorMessage)
     {
         if (list == null || list.Count == 0)
@@ -114,6 +115,19 @@ public static class ValidationHelper
         return false;
     }
 
+    public static void ValidateUserPermissions(object user, bool isAdmin)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
+        }
+
+        // Additional validation logic for user access
+        if (isAdmin && user is not Admin)
+        {
+            throw new UnauthorizedAccessException("User does not have admin access.");
+        }
+    }
 
 
     public static Student? SelectAndValidateStudent(List<Student?> students)
@@ -147,21 +161,35 @@ public static class ValidationHelper
 
     }
 
-    public static bool ValidateUser(object user)
+    public static bool ValidateUser(object? user)
     {
-        if (user != null) return true;
-        Console.WriteLine("User is not authenticated.");
-        return false;
-
-    }
-    public static void ValidateUserPermissions(object user, bool isAdmin)
-    {
-        if (!isAdmin)
+        if (user == null)
         {
-            throw new UnauthorizedAccessException("User does not have the required permissions.");
+            Console.WriteLine("User is not authenticated.");
+            return false;
+        }
+
+        // Additional validation logic for user access
+        if (user is not Admin)
+        {
+            Console.WriteLine("User does not have admin access.");
+            return false;
+        }
+
+        return true;
+    }
+    public static void ValidateUserAccess(object? user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
+        }
+        
+        if (user is not Admin)
+        {
+            throw new UnauthorizedAccessException("User does not have admin access.");
         }
     }
-
     public static void ValidateAdminPermissions(object? user, bool isAdmin = false)
     {
         if (user == null)
@@ -207,5 +235,15 @@ public static class ValidationHelper
                 throw new ArgumentNullException(nameof(parameter), "Parameter cannot be null.");
             }
         }
-    
+        public static int GetValidatedUserChoice(string prompt, int min, int max)
+        {
+            var choice = InputHelper.GetValidatedIntInput(prompt);
+            if (choice < min || choice > max)
+            {
+                Console.WriteLine($"Invalid choice. Please select between {min} and {max}.");
+                return GetValidatedUserChoice(prompt, min, max);
+            }
+            return choice;
+        }
+
 }

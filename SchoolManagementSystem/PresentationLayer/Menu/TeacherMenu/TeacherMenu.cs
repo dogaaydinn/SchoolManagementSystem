@@ -1,5 +1,6 @@
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
@@ -65,7 +66,7 @@ public static class TeacherMenu
                 break;
 
             case "6":
-                TeacherHelper.PromptToDisplayAllTeachers(teachers);
+                TeacherHandler.PromptToDisplayAllTeachers(teachers);
                 break;
 
             case "7":

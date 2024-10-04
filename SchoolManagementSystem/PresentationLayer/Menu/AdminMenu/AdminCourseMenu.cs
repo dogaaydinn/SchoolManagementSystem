@@ -2,6 +2,7 @@ using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
@@ -89,7 +90,7 @@ public static class AdminCourseMenu
                 }
                 break;
             case "5":
-                CourseHandler.DisplayTotalCourses(courses, students);
+                CourseHandler.DisplayTotalCourses(courses);
                 break;
             case "6":
                 CourseHandler.ListStudentsInCourses(courses, students, user);
@@ -98,7 +99,7 @@ public static class AdminCourseMenu
                 CourseHandler.DisplayCourseGrades(courses, students);
                 break;
             case "8":
-                SchoolHandler.EnrollStudentInCourse(students, courses, user);
+                SchoolHandler.EnrollStudentInCourse(courses, students, user);
                 break;
             case "9":
                 var studentHelper = new StudentHelper(); 

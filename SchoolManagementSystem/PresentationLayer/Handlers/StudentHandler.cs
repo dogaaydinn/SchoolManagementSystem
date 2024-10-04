@@ -2,114 +2,153 @@ using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class StudentHandler
 {
-    private static readonly IStudentHelper StudentHelper = new StudentHelper();
-    
-    public static void DisplayStudentDetails(Student student)
-    {
-        if (student == null) 
-        {
-            Console.WriteLine("Student not found.");
-            return;
-        }
-        
-        StudentHelper.DisplayStudentInfo(student);
-    }
-    
-    public static void UpdateStudentId(List<Student> students, object? user)
-    {
-        ValidationHelper.ValidateAdminAccess(user);
-        
-        var student = StudentHelper.GetStudentById(students);
-        if (student != null)
-        {
-            StudentHelper.UpdateStudentId(student);
-        }
-    }
+ private static readonly IStudentHelper StudentHelper = new StudentHelper();
 
-    public static void UpdateStudentGpa(Student? student, object user)
-    {
-        ValidationHelper.ValidateTeacherOrAdminAccess(user);
-        ValidationHelper.ValidateStudentNotNull(student);
-
-        if (student != null)
+        public static void DisplayStudentDetails(Student student)
         {
-            StudentHelper.UpdateStudentGpa(student);
-        }
-    }
-    
-    public static void UpdateStudentName(List<Student?>? students, object user)
-    {
-        ValidationHelper.ValidateUser(user);
-        var nonNullStudents = students?.OfType<Student>().ToList();
-        ValidationHelper.ValidateList(nonNullStudents, "Student list cannot be null or empty.");
+            if (student is null)
+            {
+                Console.WriteLine("Student not found.");
+                return;
+            }
 
-        Console.Write("Enter Student ID: ");
-        var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out var id))
-        {
-            Console.WriteLine("Invalid Student ID.");
-            return;
+            StudentHelper.DisplayStudentInfo(student);
         }
 
-        var student = nonNullStudents.FirstOrDefault(s => s.GetStudentId() == id);
-        if (student == null)
+        public static void UpdateStudentId(List<Student> students, object? user)
         {
-            Console.WriteLine("Student not found.");
-            return;
+            ValidationHelper.ValidateUserAccess(user);
+            var student = StudentHelper.GetStudentById(students);
+
+            if (student is not null)
+            {
+                StudentHelper.UpdateStudentId(student);
+            }
         }
 
-        Console.Write("Enter new Student Name: ");
-        var newName = Console.ReadLine();
-        ValidationHelper.ValidateNotEmpty(newName, "New Student Name cannot be empty.");
-        var names = newName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (names.Length >= 2)
+        public static void UpdateStudentGpa(Student? student, object user)
         {
-            student.SetFirstName(names[0]);
-            student.SetLastName(names[1]);
-            Console.WriteLine("Student Name updated successfully.");
-        }
-        else
-        {
-            Console.WriteLine("Please enter both first and last names.");
-        }
-    }
-    
-    public static void AddNewStudent(List<Student> students, IUser user)
-    {
-        ValidationHelper.ValidateStudentListNotNull(students);
-        ValidationHelper.ValidateUserNotNull(user);
+            ValidationHelper.ValidateUserAccess(user);
+            ValidationHelper.ValidateStudentNotNull(student);
 
-        StudentHelper.AddNewStudent(students);
-    }
-    
-    public static void RemoveStudent(List<Student>? students, Student? student, IUser user)
-    {
-        ValidationHelper.ValidateStudentListNotNull(students);
-        ValidationHelper.ValidateStudentNotNull(student);
-        ValidationHelper.ValidateUserNotNull(user);
-
-        if (student != null)
-        {
-            StudentHelper.RemoveStudent(students, student);
-        }
-    }
-
-    public static void DisplayAllStudents(List<Student?>? students)
-    {
-        if (students == null || students.Count == 0)
-        {
-            Console.WriteLine("No students available.");
-            return;
+            if (student is not null)
+            {
+                StudentHelper.UpdateStudentGpa(student);
+            }
         }
 
-        foreach (var student in students.OfType<Student>())
+        public static void UpdateStudentName(List<Student?>? students, object user)
         {
-            Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+            ValidationHelper.ValidateUserAccess(user);
+            var student = Helpers.StudentHelper.GetStudentById(students);
+
+            if (student is not null)
+            {
+                Console.Write("Enter new Student Name: ");
+                var newName = Console.ReadLine();
+                ValidationHelper.ValidateNotEmpty(newName, "New Student Name cannot be empty.");
+                Helpers.StudentHelper.UpdateStudentFullName(student, newName);
+            }
         }
-    }
+
+        public static void AddNewStudent(List<Student> students, IUser user)
+        {
+            ValidationHelper.ValidateStudentListNotNull(students);
+            ValidationHelper.ValidateUserNotNull(user);
+
+            StudentHelper.AddNewStudent(students);
+        }
+
+        public static void RemoveStudent(List<Student>? students, Student? student, IUser user)
+        {
+            ValidationHelper.ValidateStudentListNotNull(students);
+            ValidationHelper.ValidateStudentNotNull(student);
+            ValidationHelper.ValidateUserNotNull(user);
+
+            if (student is not null)
+            {
+                StudentHelper.RemoveStudent(students, student);
+            }
+        }
+
+        public static void DisplayAllStudents(List<Student?>? students)
+        {
+            if (students is null || !students.Any())
+            {
+                Console.WriteLine("No students available.");
+                return;
+            }
+
+            foreach (var student in students.OfType<Student>())
+            {
+                Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+            }
+        }
+    /*
+     public static void DisplayStudentGpas(List<Student> students)
+       {
+           ValidationHelper.ValidateStudentListNotNull(students);
+
+           foreach (var student in students)
+           {
+               Console.WriteLine($"Student ID: {student.GetStudentId()}, GPA: {student.GetGpa()}");
+           }
+       }
+
+       public static void SearchStudentByName(List<Student?>? students)
+       {
+           if (students is null || !students.Any())
+           {
+               Console.WriteLine("No students available.");
+               return;
+           }
+
+           Console.Write("Enter Student Name to Search: ");
+           var searchName = Console.ReadLine();
+           var matchingStudents = students
+               .OfType<Student>()
+               .Where(s => s.GetFullName().Contains(searchName, StringComparison.OrdinalIgnoreCase))
+               .ToList();
+
+           if (!matchingStudents.Any())
+           {
+               Console.WriteLine("No students found with that name.");
+               return;
+           }
+
+           foreach (var student in matchingStudents)
+           {
+               Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+           }
+       }
+     */
+    /* helper metods
+      private static void ValidateUserAccess(object? user)
+              {
+                  ValidationHelper.ValidateUser(user);
+              }
+
+              private static Student? GetStudentById(List<Student?>? students)
+              {
+                  if (students is null)
+                      return null;
+
+                  Console.Write("Enter Student ID: ");
+                  if (!int.TryParse(Console.ReadLine(), out var id))
+                  {
+                      Console.WriteLine("Invalid Student ID.");
+                      return null;
+                  }
+
+                  return students.OfType<Student>().FirstOrDefault(s => s.GetStudentId() == id);
+              }
+
+              
+     */
 }

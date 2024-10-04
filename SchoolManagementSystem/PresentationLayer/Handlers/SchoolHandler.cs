@@ -51,7 +51,7 @@ public class SchoolHandler
         }
     }
 
-    public static void EnrollStudentInCourse(List<Student?> courses, List<Course?> students, IUser user)
+    public static void EnrollStudentInCourse(List<Course?> courses, List<Student?> students, IUser user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
         ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
@@ -61,7 +61,8 @@ public class SchoolHandler
         {
             if (course == null)
             {
-                throw new InvalidOperationException("Course cannot be null.");
+                Console.WriteLine("Course cannot be null. Skipping...");
+                continue; // Skip to the next iteration
             }
 
             Console.WriteLine($"Enrolling students in course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
@@ -69,7 +70,8 @@ public class SchoolHandler
             {
                 if (student == null)
                 {
-                    throw new InvalidOperationException("Student cannot be null.");
+                    Console.WriteLine("Student cannot be null. Skipping...");
+                    continue; // Skip to the next iteration
                 }
 
                 course.EnrollStudent(student);
@@ -77,6 +79,7 @@ public class SchoolHandler
             }
         }
     }
+
 
     public static void DemonstrateActions(object person, object user)
     {

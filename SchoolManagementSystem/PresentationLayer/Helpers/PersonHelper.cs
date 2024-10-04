@@ -1,10 +1,9 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
-namespace SchoolManagementSystem.PresentationLayer;
+namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
 public class PersonHelper : IPersonHelper
 {

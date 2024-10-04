@@ -2,6 +2,7 @@ using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
@@ -81,19 +82,6 @@ public static class TeacherHandler
             }
         }
     }
-    public static void DisplayAllTeachers(List<Teacher?> teachers)
-    {
-        if (teachers == null || !teachers.Any())
-        {
-            Console.WriteLine("No teachers available.");
-            return;
-        }
-
-        foreach (var teacher in teachers.OfType<Teacher>())
-        {
-            Console.WriteLine($"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
-    }
     public static Teacher GetTeacherById(List<Teacher?> teachers)
     {
         Console.Write("Enter Teacher ID: ");
@@ -113,17 +101,6 @@ public static class TeacherHandler
         ValidationHelper.ValidateNotNull(teacher, "Teacher not found.");
         return teacher;
     }
-
-    public static void DisplayTeachersBySubject(List<Teacher?> teachers)
-    {
-        Console.Write("Enter Subject Name: ");
-        var subject = Console.ReadLine();
-        ValidationHelper.ValidateNotEmpty(subject, "Subject cannot be empty.");
-        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase)).ToList();
-        ValidationHelper.ValidateList(filteredTeachers, "No teachers found for this subject.");
-        DisplayTeacherNames(filteredTeachers);
-    }
-
     public static void UpdateTeacherId(List<Teacher?> teachers, object user)
     {
         var teacher = GetTeacherById(teachers);
@@ -134,37 +111,69 @@ public static class TeacherHandler
         teacher.SetTeacherId(int.Parse(newId));
         Console.WriteLine("Teacher ID updated successfully.");
     }
-    public static void GetTeacherByCourse(List<Teacher?>? teachers, List<Student?>? students)
+    
+    
+    public static void DisplayTeachersBySubject(List<Teacher?> teachers)
     {
-        Console.Write("Enter Course ID: ");
-        var courseIdInput = Console.ReadLine();
-        if (int.TryParse(courseIdInput, out int courseId))
-        {
-            var course = DataProvider.GetCourses(teachers, students)
-                .FirstOrDefault(c => c.GetCourseId() == courseId);
-            if (course != null)
-            {
-                var teacher = teachers?.FirstOrDefault(t => t.GetTeacherId() == Course.GetTeacherId());
-                if (teacher != null)
-                {
-                    DisplayTeacherDetails(new List<Teacher?> { teacher }, null);
-                }
-                else
-                {
-                    Console.WriteLine("Teacher not found for the given course.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Course not found.");
-            }
-        }
-        else
-        {
-            Console.WriteLine("Invalid Course ID.");
-        }
-        
+        Console.Write("Enter Subject Name: ");
+        var subject = Console.ReadLine();
+        ValidationHelper.ValidateNotEmpty(subject, "Subject cannot be empty.");
+        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase)).ToList();
+        ValidationHelper.ValidateList(filteredTeachers, "No teachers found for this subject.");
+        DisplayTeacherNames(filteredTeachers);
     }
+    public static void DisplayAllTeachers(List<Teacher?> teachers)
+    {
+        if (teachers == null || !teachers.Any())
+        {
+            Console.WriteLine("No teachers available.");
+            return;
+        }
+
+        foreach (var teacher in teachers.OfType<Teacher>())
+        {
+            Console.WriteLine($"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
+        }
+    }
+
+/*
+
+
+
+      
+      public static void GetTeacherByCourse(List<Teacher?>? teachers, List<Student?>? students)
+      {
+          Console.Write("Enter Course ID: ");
+          var courseIdInput = Console.ReadLine();
+          if (int.TryParse(courseIdInput, out int courseId))
+          {
+              var course = DataProvider.GetCourses(teachers, students)
+                  .FirstOrDefault(c => c.GetCourseId() == courseId);
+              if (course != null)
+              {
+                  var teacher = teachers?.FirstOrDefault(t => t.GetTeacherId() == Course.GetTeacherId());
+                  if (teacher != null)
+                  {
+                      DisplayTeacherDetails(new List<Teacher?> { teacher }, null);
+                  }
+                  else
+                  {
+                      Console.WriteLine("Teacher not found for the given course.");
+                  }
+              }
+              else
+              {
+                  Console.WriteLine("Course not found.");
+              }
+          }
+          else
+          {
+              Console.WriteLine("Invalid Course ID.");
+          }
+          
+      }
+ */
+   
 
     public static void RemoveTeacher(List<Teacher?> teachers, Teacher teacher, IUser user)
     {
@@ -312,7 +321,7 @@ public static class TeacherHandler
         }
     }
 
-    private static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
+    public static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
     {
         Console.WriteLine("Teacher not found. Would you like to see the list of teachers? (yes/no)");
         if (Console.ReadLine()?.Trim().ToLower() == "yes")

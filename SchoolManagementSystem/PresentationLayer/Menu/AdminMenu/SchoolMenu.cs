@@ -1,6 +1,7 @@
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
@@ -59,7 +60,7 @@ public static class SchoolMenu
                 }
                 else
                 {
-                    SchoolHandler.EnrollStudentInCourse(students.ToList(), courses, student);
+                    SchoolHandler.EnrollStudentInCourse(courses, students?.OfType<Student?>().ToList(), student);
                 }
                 break;
             case "3":

@@ -4,7 +4,7 @@ using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 
-namespace SchoolManagementSystem.PresentationLayer;
+namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
 public class StudentHelper : IStudentHelper
 {
@@ -123,5 +123,19 @@ public class StudentHelper : IStudentHelper
 
         students?.Remove(studentToRemove);
         Console.WriteLine($"Student ID: {studentId} has been removed successfully.");
+    }
+    public static void UpdateStudentFullName(Student student, string newName)
+    {
+        var names = newName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (names.Length >= 2)
+        {
+            student.SetFirstName(names[0]);
+            student.SetLastName(names[1]);
+            Console.WriteLine("Student Name updated successfully.");
+        }
+        else
+        {
+            Console.WriteLine("Please enter both first and last names.");
+        }
     }
 }
