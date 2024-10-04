@@ -18,7 +18,7 @@ public class SchoolHandler
         _validationHelper = validationHelper;
     }
 
-    public static void DisplayAllDetails(List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
+    public static void DisplayAllDetails(List<Course> courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
     {
         ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
         Console.WriteLine("Courses:");
@@ -51,7 +51,7 @@ public class SchoolHandler
         }
     }
 
-    public static void EnrollStudentInCourse(List<Course?> courses, List<Student?> students, IUser user)
+    public static void EnrollStudentInCourse(List<Course?>? courses, List<Student?> students, IUser user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
         ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
@@ -62,18 +62,12 @@ public class SchoolHandler
             if (course == null)
             {
                 Console.WriteLine("Course cannot be null. Skipping...");
-                continue; // Skip to the next iteration
+                continue; 
             }
 
             Console.WriteLine($"Enrolling students in course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
             foreach (var student in students.OfType<Student>())
             {
-                if (student == null)
-                {
-                    Console.WriteLine("Student cannot be null. Skipping...");
-                    continue; // Skip to the next iteration
-                }
-
                 course.EnrollStudent(student);
                 Console.WriteLine($"  Enrolled Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
             }
@@ -106,7 +100,7 @@ public class SchoolHandler
             switch (entity)
             {
                 case List<object> entityList:
-                    _validationHelper.ValidateNotNull(entityList, entity != null ? $"{entity.GetType().Name} cannot be null." : "Entity cannot be null.");
+                    _validationHelper.ValidateNotNull(entityList, true ? $"{entity.GetType().Name} cannot be null." : "Entity list cannot be null.");
                     break;
                 case List<Course> courseList:
                     _validationHelper.ValidateNotNull(courseList, "Course list cannot be null.");

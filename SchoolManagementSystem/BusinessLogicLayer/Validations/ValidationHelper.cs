@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Helpers;
 
@@ -77,7 +76,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateStudentListNotNull(List<Student?>? students)
+    public static void ValidateStudentListNotNull(List<Student?> students)
     {
         if (students == null || students.Count == 0)
         {
@@ -121,8 +120,7 @@ public static class ValidationHelper
         {
             throw new ArgumentNullException(nameof(user), "User cannot be null.");
         }
-
-        // Additional validation logic for user access
+        
         if (isAdmin && user is not Admin)
         {
             throw new UnauthorizedAccessException("User does not have admin access.");
@@ -130,7 +128,7 @@ public static class ValidationHelper
     }
 
 
-    public static Student? SelectAndValidateStudent(List<Student?> students)
+    public static Student? SelectAndValidateStudent(List<Student?>? students)
     {
         if (students == null || !students.Any())
         {
@@ -153,7 +151,7 @@ public static class ValidationHelper
 
     }
 
-    public static bool ValidateStudentList(List<Student?> students)
+    public static bool ValidateStudentList(List<Student?>? students)
     {
         if (students != null && students.Any()) return true;
         Console.WriteLine("Student list cannot be null or empty.");
@@ -161,24 +159,14 @@ public static class ValidationHelper
 
     }
 
-    public static bool ValidateUser(object? user)
+    public static bool ValidateUser(object user)
     {
-        if (user == null)
-        {
-            Console.WriteLine("User is not authenticated.");
-            return false;
-        }
+        if (user is Admin) return true;
+        Console.WriteLine("User does not have admin access.");
+        return false;
 
-        // Additional validation logic for user access
-        if (user is not Admin)
-        {
-            Console.WriteLine("User does not have admin access.");
-            return false;
-        }
-
-        return true;
     }
-    public static void ValidateUserAccess(object? user)
+    public static void ValidateUserAccess(object user)
     {
         if (user == null)
         {
@@ -235,15 +223,14 @@ public static class ValidationHelper
                 throw new ArgumentNullException(nameof(parameter), "Parameter cannot be null.");
             }
         }
+
         public static int GetValidatedUserChoice(string prompt, int min, int max)
         {
-            var choice = InputHelper.GetValidatedIntInput(prompt);
-            if (choice < min || choice > max)
+            while (true)
             {
+                var choice = InputHelper.GetValidatedIntInput(prompt);
+                if (choice >= min && choice <= max) return choice;
                 Console.WriteLine($"Invalid choice. Please select between {min} and {max}.");
-                return GetValidatedUserChoice(prompt, min, max);
             }
-            return choice;
         }
-
 }

@@ -5,13 +5,15 @@ namespace SchoolManagementSystem.Models.Concrete;
 
 public class Admin : Person, IUser
 {
-    public Admin(string firstName, string lastName, DateTime dateOfBirth, int adminId)
+    public Admin(string firstName, string lastName, DateTime dateOfBirth, int adminId, string password)
         : base(firstName, lastName, dateOfBirth, true)
     {
         AdminId = adminId;
+        Password = password;
     }
 
     private int AdminId { get; set; }
+    private string Password { get; set; }
 
     public new int Id
     {

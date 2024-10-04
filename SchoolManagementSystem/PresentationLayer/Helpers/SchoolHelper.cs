@@ -88,7 +88,7 @@ public class SchoolHelper : ISchoolHelper
         return GetUserSelection(teachers);
     }
 
-    private void DisplayTeachers(List<Teacher?> teachers)
+    private static void DisplayTeachers(List<Teacher?> teachers)
     {
         if (teachers == null || !teachers.Any())
         {
@@ -104,7 +104,7 @@ public class SchoolHelper : ISchoolHelper
         }
     }
 
-    private T? GetUserSelection<T>(List<T?> items) where T : class
+    private static T? GetUserSelection<T>(List<T?> items) where T : class
     {
         Console.WriteLine("Select an item by entering the corresponding number:");
         if (int.TryParse(Console.ReadLine(), out var index) && index >= 1 && index <= items.Count)

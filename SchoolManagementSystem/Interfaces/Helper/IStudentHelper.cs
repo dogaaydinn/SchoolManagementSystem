@@ -10,5 +10,5 @@ public interface IStudentHelper
     void UpdateStudentId(Student student);
     void UpdateStudentGpa(Student student);
     void AddNewStudent(List<Student> students);
-    void RemoveStudent(List<Student> students, IUser user);
+    void RemoveStudent(List<Student?> students, IUser user);
 }

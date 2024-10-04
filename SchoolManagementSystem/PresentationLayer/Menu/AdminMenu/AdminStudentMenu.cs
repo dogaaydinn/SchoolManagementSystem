@@ -8,7 +8,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminStudentMenu
 {
-    public static void DisplayStudentMenu(List<Student?> students, object user)
+    public static void DisplayStudentMenu(List<Student?>? students, object user)
     {
         while (true)
         {

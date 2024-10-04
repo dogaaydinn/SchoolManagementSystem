@@ -14,7 +14,7 @@ public static class SchoolActionDemonstrator
         schoolActions.RemoveCourse(course);
     }
 
-    public static void DemonstrateCourseActions(List<ICourseActions> courseActionsList, List<Course?> courses, IUser user)
+    public static void DemonstrateCourseActions(List<ICourseActions> courseActionsList, List<Course?>? courses, IUser user)
     {
         Console.WriteLine("Demonstrating course-specific actions:");
 

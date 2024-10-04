@@ -9,16 +9,17 @@ public class Student : SchoolMember, IStudentActions, IUser
 {
     #region Constructors
 
-    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa, string studentName)
+    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa)
         : base(firstName, lastName, dateOfBirth)
     {
+        FirstName = firstName;
+        LastName = lastName;
         StudentId = studentId;
-        StudentName = studentName;
+        StudentName = $"{firstName} {lastName}";
         Gpa = gpa;
         EnrolledCourses = new List<Course>();
         _courseGrades = new Dictionary<Course, int>();
     }
-
     #endregion
     #region Properties
 

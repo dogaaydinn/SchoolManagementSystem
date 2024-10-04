@@ -64,7 +64,7 @@ public static class SchoolMenu
                 }
                 break;
             case "3":
-                var course = schoolHelper.SelectCourse(courses); // Use the instance method
+                var course = schoolHelper.SelectCourse(courses); 
                 if (course != null)
                 {
                     StudentHelper.DisplayGrades(course);
@@ -91,7 +91,14 @@ public static class SchoolMenu
         switch (choice)
         {
             case "1":
-                SchoolHandler.DisplayAllDetails(courses, students.ToList(), teachers, admin);
+                if (students != null)
+                {
+                    SchoolHandler.DisplayAllDetails(courses, students.ToList(), teachers, admin);
+                }
+                else
+                {
+                    Console.WriteLine("Students list is null. Cannot display details.");
+                }
                 break;
             case "2":
                 // Add code for course management here
@@ -100,14 +107,7 @@ public static class SchoolMenu
                 // Add code for student and teacher management here
                 break;
             case "4":
-                if (courses == null)
-                {
-                    Console.WriteLine("Courses list is null. Cannot record grades for students.");
-                }
-                else
-                {
-                    SchoolHandler.RecordGradesForStudents(courses, teachers);
-                }
+                SchoolHandler.RecordGradesForStudents(courses, teachers);
                 break;
             case "5":
                 return;
@@ -126,7 +126,7 @@ public static class SchoolMenu
         switch (choice)
         {
             case "1":
-                TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, teachers);
+                TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, teachers);
                 break;
             case "2":
                 TeacherHandler.UpdateTeacherId(teachers, teacher);

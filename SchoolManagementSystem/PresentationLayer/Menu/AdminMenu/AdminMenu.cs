@@ -1,5 +1,4 @@
 using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 
@@ -7,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminMenu
 {
-    public static void DisplayAdminMenu(List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
+    public static void DisplayAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers, object user)
     {
         while (true)
         {
@@ -39,12 +38,19 @@ public static class AdminMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Course> courses, List<Student?> students, List<Teacher?> teachers, object user)
+    private static bool HandleMenuChoice(string choice, List<Course> courses, List<Student?>? students, List<Teacher?> teachers, object user)
     {
         switch (choice)
         {
             case "1":
-                AdminCourseMenu.DisplayCourseMenu(courses, students, user as IUser);
+                if (user is IUser validUser)
+                {
+                    AdminCourseMenu.DisplayCourseMenu(courses, students, validUser);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid user. Please try again.");
+                }
                 break;
             case "2":
                 AdminStudentMenu.DisplayStudentMenu(students, user);
@@ -56,12 +62,12 @@ public static class AdminMenu
                 SchoolHandler.DisplayAllDetails(courses, students, teachers, user);
                 break;
             case "5":
-                return false; 
+                return false;
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
 
-        return true; 
+        return true;
     }
 }

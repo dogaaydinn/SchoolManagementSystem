@@ -94,14 +94,14 @@ public static class SubStudentMenu
                 SchoolHandler.RecordGradesForStudents(new List<Course>(), userToValidate);
                 break;
             case "8":
-                var courses = DataProvider.GetCourses(new List<Teacher?>(), new List<Student>());
+                var courses = DataProvider.GetCourses();
                 SchoolHandler.RecordGradesForStudents(courses, userToValidate);
                 break;
             case "9":
                 StudentHandler.DisplayAllStudents(nullableStudents);
                 break;
             case "10":
-                var teachers = DataProvider.GetTeachers(new List<Course>());
+                var teachers = DataProvider.GetTeachers();
                 TeacherHandler.DisplayAllTeachers(teachers);
                 break;
             case "11":

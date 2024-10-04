@@ -17,7 +17,7 @@ public static class TeacherHandler
         DisplayMenuOptions(new[] { "Teacher ID", "Teacher Name", "List all teachers", "Teachers by subject" });
 
         var choice = GetValidatedUserChoice(4);
-        Teacher teacher = null;
+        Teacher? teacher = null;
 
         switch (choice)
         {
@@ -82,7 +82,7 @@ public static class TeacherHandler
             }
         }
     }
-    public static Teacher GetTeacherById(List<Teacher?> teachers)
+    public static Teacher? GetTeacherById(List<Teacher?> teachers)
     {
         Console.Write("Enter Teacher ID: ");
         var id = Console.ReadLine();
@@ -92,7 +92,7 @@ public static class TeacherHandler
         return teacher;
     }
 
-    public static Teacher GetTeacherByName(List<Teacher?> teachers)
+    public static Teacher? GetTeacherByName(List<Teacher?> teachers)
     {
         Console.Write("Enter Teacher Name: ");
         var name = Console.ReadLine();
@@ -135,45 +135,7 @@ public static class TeacherHandler
             Console.WriteLine($"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
         }
     }
-
-/*
-
-
-
-      
-      public static void GetTeacherByCourse(List<Teacher?>? teachers, List<Student?>? students)
-      {
-          Console.Write("Enter Course ID: ");
-          var courseIdInput = Console.ReadLine();
-          if (int.TryParse(courseIdInput, out int courseId))
-          {
-              var course = DataProvider.GetCourses(teachers, students)
-                  .FirstOrDefault(c => c.GetCourseId() == courseId);
-              if (course != null)
-              {
-                  var teacher = teachers?.FirstOrDefault(t => t.GetTeacherId() == Course.GetTeacherId());
-                  if (teacher != null)
-                  {
-                      DisplayTeacherDetails(new List<Teacher?> { teacher }, null);
-                  }
-                  else
-                  {
-                      Console.WriteLine("Teacher not found for the given course.");
-                  }
-              }
-              else
-              {
-                  Console.WriteLine("Course not found.");
-              }
-          }
-          else
-          {
-              Console.WriteLine("Invalid Course ID.");
-          }
-          
-      }
- */
-   
+    
 
     public static void RemoveTeacher(List<Teacher?> teachers, Teacher teacher, IUser user)
     {
@@ -293,7 +255,7 @@ public static class TeacherHandler
         return subject;
     }
 
-    public static void UpdateTeacherName(Teacher teacher, object user)
+    public static void UpdateTeacherName(Teacher? teacher, object user)
     {
         Console.Write("Enter new Teacher Name: ");
         var newName = Console.ReadLine();
@@ -353,8 +315,8 @@ public static class TeacherHandler
             return;
         }
 
-        var students = DataProvider.GetStudents(null); 
-        var courses = DataProvider.GetCourses(new List<Teacher?> { teacher }, students)
+        var students = DataProvider.GetStudents(); 
+        var courses = DataProvider.GetCourses()
             .Where(c => Course.GetTeacherId() == teacher.GetTeacherId())
             .ToList();
 

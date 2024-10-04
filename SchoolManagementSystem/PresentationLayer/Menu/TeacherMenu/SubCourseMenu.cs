@@ -9,7 +9,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 public static class SubCourseMenu
 {
-    public static void DisplayCourseMenu(List<Course?> courses, List<Student>? students, object user)
+    public static void DisplayCourseMenu(List<Course?>? courses, List<Student>? students, object user)
     {
         var nullableStudents = students.Cast<Student?>().ToList();
         var schoolHelper = new SchoolHelper(); 
@@ -49,7 +49,7 @@ public static class SubCourseMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleCourseMenuChoice(string choice, List<Course?> courses, List<Student?> nullableStudents, object user, SchoolHelper schoolHelper)
+    private static bool HandleCourseMenuChoice(string choice, List<Course?>? courses, List<Student?> nullableStudents, object user, SchoolHelper schoolHelper)
     {
         Course? course;
 

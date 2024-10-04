@@ -1,5 +1,3 @@
-using SchoolManagementSystem.Interfaces.User;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.PresentationLayer.Helpers;
@@ -8,7 +6,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
 
 public static class StudentMenu
 {
-    public static void DisplayStudentMenu(List<Student?> students, List<Course> courses, object? user)
+    public static void DisplayStudentMenu(List<Student?> students, List<Course> courses, object user)
     {
         while (true)
         {
@@ -34,22 +32,30 @@ public static class StudentMenu
     {
         Console.WriteLine("1. Display Student Details");
         Console.WriteLine("2. Display Student Grades");
-        Console.WriteLine("3. Update Student ID");
-        Console.WriteLine("4. Exit");
+        Console.WriteLine("3. Display Course Details");
+        Console.WriteLine("4. Display Total Courses");
+        Console.WriteLine("5. Update Student ID");
+        Console.WriteLine("6. Exit");
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Student?> students, List<Course> courses, object? user)
+    private static bool HandleMenuChoice(string choice, List<Student?> students, List<Course> courses, object user)
     {
-        var schoolHelper = new SchoolHelper(); 
+        var schoolHelper = new SchoolHelper();
         var student = schoolHelper.SelectStudent(students);
-        var course = schoolHelper.SelectCourse(courses); 
-        if (student == null) return true;
+        var course = schoolHelper.SelectCourse(courses);
 
         switch (choice)
         {
             case "1":
-                StudentHandler.DisplayStudentDetails(student);
+                if (student != null)
+                {
+                    StudentHandler.DisplayStudentDetails(student);
+                }
+                else
+                {
+                    Console.WriteLine("Error: No student selected.");
+                }
                 break;
             case "2":
                 if (course != null)
@@ -62,22 +68,35 @@ public static class StudentMenu
                 }
                 break;
             case "3":
-                if (user is IUser iUser)
+                if (course != null)
                 {
-                    StudentHandler.UpdateStudentId(new List<Student> { student }, iUser);
+                    CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
                 }
                 else
                 {
-                    Console.WriteLine("Invalid user type. Operation not permitted.");
+                    Console.WriteLine("Error: No course selected.");
                 }
                 break;
             case "4":
-                return false; 
+                CourseHandler.DisplayTotalCourses(courses);
+                break;
+            case "5":
+                if (student != null)
+                {
+                    StudentHandler.UpdateStudentId(new List<Student> { student }, user);
+                }
+                else
+                {
+                    Console.WriteLine("Error: No student selected.");
+                }
+                break;
+            case "6":
+                return false;
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
 
-        return true; 
+        return true;
     }
 }

@@ -21,7 +21,7 @@ public static class AdminTeacherMenu
                 case 1:
                     if (teacher != null)
                     {
-                        TeacherHandler.DisplayTeacherDetails(new List<Teacher> { teacher }, user);
+                        TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
                     }
                     else
                     {

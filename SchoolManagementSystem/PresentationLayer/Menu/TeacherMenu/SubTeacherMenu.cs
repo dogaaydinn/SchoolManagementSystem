@@ -7,7 +7,7 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
 
 public static class SubTeacherMenu
 {
-    public static void DisplaySubTeacherMenu(List<Teacher?> teachers, object user)
+    public static void DisplayTeacherMenu(List<Teacher?> teachers, object user)
     {
         while (true)
         {
@@ -21,7 +21,7 @@ public static class SubTeacherMenu
                 continue;
             }
 
-            if (!HandleSubTeacherMenuChoice(choice, teachers, user))
+            if (!HandleTeacherMenuChoice(choice, teachers, user))
             {
                 return; 
             }
@@ -47,7 +47,7 @@ public static class SubTeacherMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleSubTeacherMenuChoice(string choice, List<Teacher?> teachers, object user)
+    private static bool HandleTeacherMenuChoice(string choice, List<Teacher?> teachers, object user)
     {
         var schoolHelper = new SchoolHelper();
         var teacher = schoolHelper.SelectTeacher(teachers);

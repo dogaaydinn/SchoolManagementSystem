@@ -1,12 +1,44 @@
 using System.Diagnostics;
 using SchoolManagementSystem.Models;
+using SchoolManagementSystem.Models.Abstract;
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.Data;
 
 public static class DataProvider
 {
-    public static List<Teacher?> GetTeachers(List<Course> courses)
+    private static readonly List<SchoolMember?> SchoolMembers = new List<SchoolMember?>();
+    private static readonly List<Admin> Admins = new List<Admin>();
+    private static int _nextStudentId = 1;
+    
+    
+
+    public static SchoolMember? GetSchoolMemberByName(string firstName, string lastName)
+    {
+        return SchoolMembers.FirstOrDefault(u => 
+            u.GetFullName().Equals($"{firstName} {lastName}", StringComparison.OrdinalIgnoreCase));
+    }
+    
+    public static IEnumerable<SchoolMember?> GetAllSchoolMembers()
+    {
+        return SchoolMembers;
+    }
+
+    public static int GenerateStudentId()
+    {
+        return _nextStudentId++;
+    }
+    public static bool SchoolMemberExists(string firstName, string lastName, DateTime dateOfBirth, int id)
+    {
+        return SchoolMembers.Any(u => u.GetFullName() == $"{firstName} {lastName}" && u.DateOfBirth == dateOfBirth && u.Id == id);
+    }
+
+    public static void AddSchoolMember(SchoolMember? schoolMember)
+    {
+        SchoolMembers.Add(schoolMember);
+    }
+    
+    public static List<Teacher> GetTeachers()
     {
         var teacherList = new List<Teacher>
         {
@@ -32,69 +64,46 @@ public static class DataProvider
             new("Meredith", "Palmer", new DateTime(1960, 12, 11), 20, "Health Education")
         };
 
-        foreach (var teacher in teacherList)
-        {
-            var assignedCourses = courses.Where(c => Course.GetAssignedTeacherName().Contains(teacher.GetTeacherFullName())).ToList();
-            var averageGpa = assignedCourses.Any() ? assignedCourses.Average(c => c.GetEnrolledStudents().Average(s =>
-            {
-                Debug.Assert(s != null, nameof(s) + " != null");
-                return s.GetGpa();
-            })) : 0.0;
-            var studentCount = assignedCourses.Sum(c => c.GetEnrolledStudents().Count);
-
-            Console.WriteLine($"Teacher: {teacher.GetTeacherFullName()}, Average GPA: {averageGpa:F2}, Number of Students: {studentCount}");
-        }
-
         return teacherList;
     }
-    
-public static List<Student> GetStudents(List<Course> courses)
-{
-    var studentList = new List<Student>
-    {
-        new("Alice", "Smith", new DateTime(2005, 3, 22), 101, 3.8, "alice.smith@example.com"),
-        new("Bob", "Johnson", new DateTime(2004, 7, 19), 102, 3.2, "bob.johnson@example.com"),
-        new("Charlie", "Brown", new DateTime(2006, 9, 11), 103, 3.9, "charlie.brown@example.com"),
-        new("David", "Lee", new DateTime(2003, 11, 30), 104, 3.5, "david.lee@example.com"),
-        new("Eve", "Williams", new DateTime(2007, 1, 25), 105, 3.7, "eve.williams@example.com"),
-        new("Frank", "Davis", new DateTime(2002, 5, 5), 106, 3.6, "frank.davis@example.com"),
-        new("Grace", "Rodriguez", new DateTime(2008, 8, 15), 107, 3.4, "grace.rodriguez@example.com"),
-        new("Henry", "Martinez", new DateTime(2001, 10, 10), 108, 3.3, "henry.martinez@example.com"),
-        new("Isabel", "Hernandez", new DateTime(2009, 12, 1), 109, 3.1, "isabel.hernandez@example.com"),
-        new("Kevin", "Garcia", new DateTime(2000, 2, 20), 110, 3.0, "kevin.garcia@example.com"),
-        new("Linda", "Lopez", new DateTime(2010, 4, 10), 111, 2.9, "linda.lopez@example.com"),
-        new("Michael", "Perez", new DateTime(1999, 6, 5), 112, 2.8, "michael.perez@example.com"),
-        new("Nancy", "Torres", new DateTime(2011, 7, 30), 113, 2.7, "nancy.torres@example.com"),
-        new("Olivia", "Adams", new DateTime(2005, 2, 14), 114, 3.6, "olivia.adams@example.com"),
-        new("Paul", "Baker", new DateTime(2004, 5, 21), 115, 3.4, "paul.baker@example.com"),
-        new("Quincy", "Clark", new DateTime(2006, 8, 9), 116, 3.5, "quincy.clark@example.com"),
-        new("Rachel", "Davis", new DateTime(2003, 12, 3), 117, 3.8, "rachel.davis@example.com"),
-        new("Sam", "Evans", new DateTime(2007, 4, 17), 118, 3.2, "sam.evans@example.com"),
-        new("Tina", "Foster", new DateTime(2002, 6, 25), 119, 3.9, "tina.foster@example.com"),
-        new("Uma", "Green", new DateTime(2008, 9, 13), 120, 3.1, "uma.green@example.com"),
-        new("Victor", "Harris", new DateTime(2001, 11, 7), 121, 3.0, "victor.harris@example.com"),
-        new("Wendy", "Iverson", new DateTime(2009, 1, 19), 122, 2.9, "wendy.iverson@example.com"),
-        new("Xander", "Jackson", new DateTime(2000, 3, 11), 123, 2.8, "xander.jackson@example.com"),
-        new("Yara", "King", new DateTime(2010, 5, 23), 124, 2.7, "yara.king@example.com"),
-        new("Zane", "Lewis", new DateTime(2011, 7, 15), 125, 2.6, "zane.lewis@example.com")
-    };
 
-    foreach (var student in studentList)
+    public static List<Student> GetStudents()
     {
-        var enrolledCourses = courses.Where(c => c.IsStudentEnrolled(student)).ToList();
-        var averageGpa = enrolledCourses.Any() ? enrolledCourses.Average(c => c.GetAssignedGrades(student)) : 0.0;
-        var courseCount = enrolledCourses.Count;
+        var studentList = new List<Student>
+        {
+            new("Alice", "Smith", new DateTime(2005, 3, 22), 101, 3.8),
+            new("Bob", "Johnson", new DateTime(2004, 7, 19), 102, 3.2),
+            new("Charlie", "Brown", new DateTime(2006, 9, 11), 103, 3.9),
+            new("David", "Lee", new DateTime(2003, 11, 30), 104, 3.5),
+            new("Eve", "Williams", new DateTime(2007, 1, 25), 105, 3.7),
+            new("Frank", "Davis", new DateTime(2002, 5, 5), 106, 3.6),
+            new("Grace", "Rodriguez", new DateTime(2008, 8, 15), 107, 3.4),
+            new("Henry", "Martinez", new DateTime(2001, 10, 10), 108, 3.3),
+            new("Isabel", "Hernandez", new DateTime(2009, 12, 1), 109, 3.1),
+            new("Kevin", "Garcia", new DateTime(2000, 2, 20), 110, 3.0),
+            new("Linda", "Lopez", new DateTime(2010, 4, 10), 111, 2.9),
+            new("Michael", "Perez", new DateTime(1999, 6, 5), 112, 2.8),
+            new("Nancy", "Torres", new DateTime(2011, 7, 30), 113, 2.7),
+            new("Olivia", "Adams", new DateTime(2005, 2, 14), 114, 3.6),
+            new("Paul", "Baker", new DateTime(2004, 5, 21), 115, 3.4),
+            new("Quincy", "Clark", new DateTime(2006, 8, 9), 116, 3.5),
+            new("Rachel", "Davis", new DateTime(2003, 12, 3), 117, 3.8),
+            new("Sam", "Evans", new DateTime(2007, 4, 17), 118, 3.2),
+            new("Tina", "Foster", new DateTime(2002, 6, 25), 119, 3.9),
+            new("Uma", "Green", new DateTime(2008, 9, 13), 120, 3.1),
+            new("Victor", "Harris", new DateTime(2001, 11, 7), 121, 3.0),
+            new("Wendy", "Iverson", new DateTime(2009, 1, 19), 122, 2.9),
+            new("Xander", "Jackson", new DateTime(2000, 3, 11), 123, 2.8),
+            new("Yara", "King", new DateTime(2010, 5, 23), 124, 2.7),
+            new("Zane", "Lewis", new DateTime(2011, 7, 15), 125, 2.6)
+        };
 
-        Console.WriteLine($"Student: {student.GetStudentFullName()}, Average GPA: {averageGpa:F2}, Number of Courses: {courseCount}");
+        return studentList;
     }
 
-    return studentList;
-}
-
-    public static List<Course> GetCourses(List<Teacher?>? teachers, List<Student> students)
+    public static List<Course> GetCourses()
     {
-        if (teachers == null || teachers.Count == 0)
-            throw new ArgumentException("Teacher list cannot be null or empty.");
+        var teachers = GetTeachers();
 
         var courses = new List<Course>
         {
@@ -120,15 +129,11 @@ public static List<Student> GetStudents(List<Course> courses)
             new(20, "Health Education", teachers[19], 2)
         };
 
-        foreach (var course in courses)
-        {
-            var enrolledStudents = students.Where(s => s.IsEnrolledInCourse(course.GetCourseId())).ToList();
-            var averageGpa = enrolledStudents.Any() ? enrolledStudents.Average(s => s.GetGpa()) : 0.0;
-            var studentCount = enrolledStudents.Count;
-
-            Console.WriteLine($"Course: {course.GetCourseName()}, Average GPA: {averageGpa:F2}, Number of Students: {studentCount}");
-        }
-
         return courses;
+    }
+
+    public static List<Admin> GetAdmins()
+    {
+        return Admins;
     }
 }

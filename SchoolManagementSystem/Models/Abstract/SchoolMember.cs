@@ -12,7 +12,7 @@ public abstract class SchoolMember : Person
 
     #endregion
     #region Methods
-
+    public DateTime DateOfBirth { get; private set; }
     protected int GetAge()
     {
         var today = DateTime.Today;

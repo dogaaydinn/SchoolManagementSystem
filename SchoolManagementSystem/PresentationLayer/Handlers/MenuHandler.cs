@@ -1,4 +1,5 @@
 using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 using SchoolManagementSystem.PresentationLayer.Menu.StudentMenu;
 using SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
@@ -7,78 +8,55 @@ namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
 public static class MenuHandler
 {
-    public static void DisplayMainMenu(List<Student?> students, List<Course> courses, List<Teacher?> teachers, List<Admin> admins, object? user)
+    public static void DisplayMainMenu(List<Student> students, List<Course> courses, List<Teacher> teachers, List<Admin> admins, IUser user)
     {
         while (true)
         {
             Console.WriteLine("\nMain Menu:");
-            Console.WriteLine("1. Student Operations");
-            Console.WriteLine("2. Teacher Operations");
-            Console.WriteLine("3. Course Operations");
-            Console.WriteLine("4. School Operations");
-            Console.WriteLine("5. Exit");
-            Console.Write("Enter your choice: ");
-            var choice = Console.ReadLine();
+            Console.WriteLine("1. Admin Menu");
+            Console.WriteLine("2. Teacher Menu");
+            Console.WriteLine("3. Student Menu");
+            Console.WriteLine("4. Exit");
+            Console.Write("Select your option: ");
 
-            if (string.IsNullOrEmpty(choice))
+            if (int.TryParse(Console.ReadLine(), out int choice))
             {
-                Console.WriteLine("Input cannot be empty. Please try again.");
-                continue;
-            }
-
-            if (user is not Interfaces.User.IUser validUser)
-            {
-                Console.WriteLine("Invalid user type.");
-                continue;
-            }
-
-            switch (choice)
-            {
-                case "1":
-                    if (courses == null)
-                    {
-                        Console.WriteLine("Courses list is null. Cannot display student menu.");
-                    }
-                    else
-                    {
-                        StudentMenu.DisplayStudentMenu(students, courses, validUser);
-                    }
-                    break;
-                case "2":
-                    TeacherMenu.DisplayTeacherMenu(teachers, students?.Where(s => s != null).Cast<Student>().ToList(), courses, validUser);
-                    break;
-                case "3":
-                    if (courses == null)
-                    {
-                        Console.WriteLine("Courses list is null. Cannot display course menu.");
-                    }
-                    else
-                    {
-                        CourseMenu.DisplayCourseMenu(courses, students?.Where(s => s != null).Cast<Student>().ToList(), validUser);
-                    }
-                    break;
-                case "4":
-                    var admin = admins.FirstOrDefault();
-                    if (admin == null)
-                    {
-                        Console.WriteLine("No admin found. Cannot display school menu.");
+                switch (choice)
+                {
+                    case 1:
+                        if (user is Admin) 
+                        {
+                            AdminMenu.DisplayAdminMenu(courses, students, teachers, user);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have access to the Admin Menu.");
+                        }
                         break;
-                    }
-
-                    SchoolMenu.DisplaySchoolMenu(courses, students?.Where(s => s != null).Cast<Student>().ToList(), teachers, admin);
-                    break;
-                case "5":
-                    Console.Write("Are you sure you want to exit? (y/n): ");
-                    var confirm = Console.ReadLine();
-                    if (confirm?.ToLower() == "y")
-                    {
-                        Console.WriteLine("Exiting...");
-                        return;
-                    }
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice. Please try again.");
-                    break;
+                    case 2:
+                        if (user is Teacher) 
+                        {
+                            TeacherMenu.DisplayTeacherMenu(teachers, students, courses, user);
+                        }
+                        else
+                        {
+                            Console.WriteLine("You do not have access to the Teacher Menu.");
+                        }
+                        break;
+                    case 3:
+                        StudentMenu.DisplayStudentMenu(students, courses, user);
+                        break;
+                    case 4:
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please select a valid option.");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a number.");
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
+using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
@@ -97,15 +98,16 @@ public class StudentHelper : IStudentHelper
         var firstName = InputHelper.GetValidatedStringInput("Enter first name:");
         var lastName = InputHelper.GetValidatedStringInput("Enter last name:");
         var dateOfBirth = InputHelper.GetValidatedDateInput("Enter date of birth (yyyy-MM-dd):");
-        var studentId = InputHelper.GetValidatedIntInput("Enter student ID:");
         var gpa = InputHelper.GetValidatedDoubleInput("Enter GPA:", 0, 4);
 
-        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa, studentName: firstName + " " + lastName);
+        int studentId = DataProvider.GenerateStudentId();
+        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa);
+        newStudent.GeneratePassword(); // Call the inherited method
+
         students.Add(newStudent);
         Console.WriteLine($"New student added: {newStudent.GetStudentFullName()} (ID: {newStudent.GetStudentId()})");
-        
+        Console.WriteLine($"Generated password: {newStudent.GetPassword()}");
     }
-
     public void RemoveStudent(List<Student?> students, IUser user)
     {
         ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");

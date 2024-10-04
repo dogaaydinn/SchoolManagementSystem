@@ -21,7 +21,7 @@ public static class StudentHandler
             StudentHelper.DisplayStudentInfo(student);
         }
 
-        public static void UpdateStudentId(List<Student> students, object? user)
+        public static void UpdateStudentId(List<Student> students, object user)
         {
             ValidationHelper.ValidateUserAccess(user);
             var student = StudentHelper.GetStudentById(students);
@@ -65,7 +65,7 @@ public static class StudentHandler
             StudentHelper.AddNewStudent(students);
         }
 
-        public static void RemoveStudent(List<Student>? students, Student? student, IUser user)
+        public static void RemoveStudent(List<Student?> students, Student? student, IUser user)
         {
             ValidationHelper.ValidateStudentListNotNull(students);
             ValidationHelper.ValidateStudentNotNull(student);
@@ -77,7 +77,7 @@ public static class StudentHandler
             }
         }
 
-        public static void DisplayAllStudents(List<Student?>? students)
+        public static void DisplayAllStudents(List<Student?> students)
         {
             if (students is null || !students.Any())
             {
@@ -90,65 +90,4 @@ public static class StudentHandler
                 Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
             }
         }
-    /*
-     public static void DisplayStudentGpas(List<Student> students)
-       {
-           ValidationHelper.ValidateStudentListNotNull(students);
-
-           foreach (var student in students)
-           {
-               Console.WriteLine($"Student ID: {student.GetStudentId()}, GPA: {student.GetGpa()}");
-           }
-       }
-
-       public static void SearchStudentByName(List<Student?>? students)
-       {
-           if (students is null || !students.Any())
-           {
-               Console.WriteLine("No students available.");
-               return;
-           }
-
-           Console.Write("Enter Student Name to Search: ");
-           var searchName = Console.ReadLine();
-           var matchingStudents = students
-               .OfType<Student>()
-               .Where(s => s.GetFullName().Contains(searchName, StringComparison.OrdinalIgnoreCase))
-               .ToList();
-
-           if (!matchingStudents.Any())
-           {
-               Console.WriteLine("No students found with that name.");
-               return;
-           }
-
-           foreach (var student in matchingStudents)
-           {
-               Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
-           }
-       }
-     */
-    /* helper metods
-      private static void ValidateUserAccess(object? user)
-              {
-                  ValidationHelper.ValidateUser(user);
-              }
-
-              private static Student? GetStudentById(List<Student?>? students)
-              {
-                  if (students is null)
-                      return null;
-
-                  Console.Write("Enter Student ID: ");
-                  if (!int.TryParse(Console.ReadLine(), out var id))
-                  {
-                      Console.WriteLine("Invalid Student ID.");
-                      return null;
-                  }
-
-                  return students.OfType<Student>().FirstOrDefault(s => s.GetStudentId() == id);
-              }
-
-              
-     */
 }

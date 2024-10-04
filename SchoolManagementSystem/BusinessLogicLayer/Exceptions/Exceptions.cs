@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
