@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.PresentationLayer.Helpers;
 

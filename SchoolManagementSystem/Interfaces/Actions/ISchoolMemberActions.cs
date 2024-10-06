@@ -2,7 +2,7 @@ namespace SchoolManagementSystem.Interfaces.Actions;
 
 public interface ISchoolMemberActions
 {
-    void PerformDailyRoutine(); 
+    void PerformDailyRoutine();
     void Communicate();
-    void Rest(); 
+    void Rest();
 }

@@ -9,7 +9,7 @@ public class TeacherHelper : ITeacherHelper
     private static void ValidateUserPermissions(object? user)
     {
         ValidationHelper.ValidateNotNull(user, "User cannot be null.");
-        ValidationHelper.ValidateUserPermissions(user, isAdmin: true);
+        ValidationHelper.ValidateUserPermissions(user, true);
     }
 
     public static void AddNewTeacher(List<Teacher?> teachers, object? user)
@@ -34,7 +34,7 @@ public class TeacherHelper : ITeacherHelper
     private static int? GetValidatedTeacherId(List<Teacher> nonNullTeachers)
     {
         Console.Write("Enter Teacher ID: ");
-        if (int.TryParse(Console.ReadLine(), out int id) && nonNullTeachers.All(t => t.GetTeacherId() != id)) return id;
+        if (int.TryParse(Console.ReadLine(), out var id) && nonNullTeachers.All(t => t.GetTeacherId() != id)) return id;
         Console.WriteLine("Invalid or duplicate Teacher ID.");
         return null;
     }
@@ -68,22 +68,18 @@ public class TeacherHelper : ITeacherHelper
     private static void DisplayMenuOptions(string[] options)
     {
         ValidationHelper.ValidateNotNull(options, "Options cannot be null.");
-        for (var i = 0; i < options.Length; i++)
-        {
-            Console.WriteLine($"{i + 1}. {options[i]}");
-        }
+        for (var i = 0; i < options.Length; i++) Console.WriteLine($"{i + 1}. {options[i]}");
         Console.Write("Enter your choice: ");
     }
 
     private static int GetValidatedUserChoice(int maxOptions)
     {
-        if (maxOptions <= 0) throw new ArgumentOutOfRangeException(nameof(maxOptions), "Max options must be greater than 0.");
+        if (maxOptions <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxOptions), "Max options must be greater than 0.");
 
         int choice;
         while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > maxOptions)
-        {
             Console.WriteLine($"Invalid choice. Please select a number between 1 and {maxOptions}.");
-        }
         return choice;
     }
 
@@ -178,7 +174,8 @@ public class TeacherHelper : ITeacherHelper
         Console.Write("Enter Teacher Name: ");
         var name = Console.ReadLine();
         ValidationHelper.ValidateNotEmpty(name, "Teacher Name cannot be empty.");
-        var teacher = teachers?.FirstOrDefault(t => t.GetTeacherFullName().Equals(name, StringComparison.OrdinalIgnoreCase));
+        var teacher =
+            teachers?.FirstOrDefault(t => t.GetTeacherFullName().Equals(name, StringComparison.OrdinalIgnoreCase));
         ValidationHelper.ValidateNotNull(teacher, "Teacher not found.");
         return teacher;
     }
@@ -188,7 +185,8 @@ public class TeacherHelper : ITeacherHelper
         Console.Write("Enter Subject Name: ");
         var subject = Console.ReadLine();
         ValidationHelper.ValidateNotEmpty(subject, "Subject cannot be empty.");
-        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase)).ToList();
+        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         ValidationHelper.ValidateNotNull(filteredTeachers, "No teachers found for this subject.");
         DisplayTeacherNames(filteredTeachers);
     }
@@ -234,17 +232,14 @@ public class TeacherHelper : ITeacherHelper
     {
         Console.WriteLine("All Teachers:");
         foreach (var teacher in teachers.OfType<Teacher>())
-        {
-            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+            Console.WriteLine(
+                $"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
     }
 
     private static void DisplayTeacherNames(List<Teacher?> teachers)
     {
         Console.WriteLine("Filtered Teachers:");
         foreach (var teacher in teachers.OfType<Teacher>())
-        {
             Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}");
-        }
     }
 }

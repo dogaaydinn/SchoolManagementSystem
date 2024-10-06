@@ -10,7 +10,7 @@ public static class CourseHandler
     public static void DisplayCourseDetails(IEnumerable<Course?>? courses, object user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses");
-        ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: false);
+        ValidationHelper.ValidateUserPermission(user);
 
         Console.WriteLine("Do you want to search by:");
         Console.WriteLine("1. Course ID");
@@ -38,25 +38,18 @@ public static class CourseHandler
         }
 
         if (course != null)
-        {
             DisplayCourseInfo(course);
-        }
         else
-        {
             PromptAndDisplayAllCourses(courses, user);
-        }
     }
 
     private static void PromptAndDisplayAllCourses(IEnumerable<Course?>? courses, object user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses");
-        ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: false);
+        ValidationHelper.ValidateUserPermission(user);
 
         Console.WriteLine("Course not found. Would you like to see the list of courses? (yes/no)");
-        if (InputHelper.GetValidatedYesNoInput() == "yes")
-        {
-            DisplayCourseNames(courses, user);
-        }
+        if (InputHelper.GetValidatedYesNoInput() == "yes") DisplayCourseNames(courses, user);
     }
 
     private static void DisplayCourseInfo(Course? course)
@@ -71,13 +64,11 @@ public static class CourseHandler
     public static void DisplayCourseNames(IEnumerable<Course?>? courses, object user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses");
-        ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: false);
+        ValidationHelper.ValidateUserPermission(user);
 
         Console.WriteLine("Listing all courses:");
-        ListEntities(courses.OfType<Course>(), "Course", course =>
-        {
-            Console.WriteLine($"Course ID: {course.GetCourseId()}, Name: {course.GetCourseName()}");
-        });
+        ListEntities(courses.OfType<Course>(), "Course",
+            course => { Console.WriteLine($"Course ID: {course.GetCourseId()}, Name: {course.GetCourseName()}"); });
     }
 
     public static void DisplayCourseGrades(IEnumerable<Course> courses, IEnumerable<Student?> students)
@@ -101,10 +92,12 @@ public static class CourseHandler
                 continue;
             }
 
-            ListEntities(enrolledStudents.OfType<Student>(), "Student", student =>
-            {
-                Console.WriteLine($"  Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, Grade: {student.GetAssignedGrades(course)}");
-            });
+            ListEntities(enrolledStudents.OfType<Student>(), "Student",
+                student =>
+                {
+                    Console.WriteLine(
+                        $"  Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, Grade: {student.GetAssignedGrades(course)}");
+                });
         }
     }
 
@@ -120,17 +113,18 @@ public static class CourseHandler
         }
 
         Console.WriteLine($"Students enrolled in {course.GetCourseName()}:");
-        ListEntities(enrolledStudents.OfType<Student>(), "Student", student =>
-        {
-            Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
-        });
+        ListEntities(enrolledStudents.OfType<Student>(), "Student",
+            student =>
+            {
+                Console.WriteLine($"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
+            });
     }
 
     public static void ListStudentsInCourses(IEnumerable<Course?>? courses, IEnumerable<Student?> students, IUser user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
         ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
-        ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: true);
+        ValidationHelper.ValidateUserPermission(user, true);
 
         foreach (var course in courses.OfType<Course>())
         {
@@ -143,10 +137,11 @@ public static class CourseHandler
                 continue;
             }
 
-            ListEntities(enrolledStudents.OfType<Student>(), "Student", student =>
-            {
-                Console.WriteLine($"  Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
-            });
+            ListEntities(enrolledStudents.OfType<Student>(), "Student",
+                student =>
+                {
+                    Console.WriteLine($"  Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
+                });
         }
     }
 
@@ -185,7 +180,7 @@ public static class CourseHandler
     public static void DisplayCourseActions(Course? course, object user)
     {
         ValidationHelper.ValidateNotNull(course, "Course");
-        ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: true);
+        ValidationHelper.ValidateUserPermission(user, true);
 
         Console.WriteLine("Do you want to:");
         Console.WriteLine("1. Update Course ID");
@@ -214,7 +209,8 @@ public static class CourseHandler
         }
     }
 
-    private static void ListEntities<T>(IEnumerable<T?> entities, string entityType, Action<T> displayAction) where T : class
+    private static void ListEntities<T>(IEnumerable<T?> entities, string entityType, Action<T> displayAction)
+        where T : class
     {
         if (entities == null || !entities.Any())
         {

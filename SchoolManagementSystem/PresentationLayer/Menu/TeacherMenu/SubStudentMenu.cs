@@ -27,10 +27,7 @@ public static class SubStudentMenu
                 continue;
             }
 
-            if (!HandleMenuChoice(choice, students, nullableStudents, userToValidate, schoolHelper))
-            {
-                return;
-            }
+            if (!HandleMenuChoice(choice, students, nullableStudents, userToValidate, schoolHelper)) return;
         }
     }
 
@@ -53,7 +50,8 @@ public static class SubStudentMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Student> students, List<Student?> nullableStudents, IUser userToValidate, SchoolHelper schoolHelper)
+    private static bool HandleMenuChoice(string choice, List<Student> students, List<Student?> nullableStudents,
+        IUser userToValidate, SchoolHelper schoolHelper)
     {
         Student? selectedStudent = null;
 
@@ -61,34 +59,22 @@ public static class SubStudentMenu
         {
             case "1":
                 selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
-                if (selectedStudent != null)
-                {
-                    StudentHandler.DisplayStudentDetails(selectedStudent);
-                }
+                if (selectedStudent != null) StudentHandler.DisplayStudentDetails(selectedStudent);
                 break;
             case "2":
                 selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
-                if (selectedStudent != null)
-                {
-                    StudentHelper.DisplayGrades(selectedStudent);
-                }
+                if (selectedStudent != null) StudentHelper.DisplayGrades(selectedStudent);
                 break;
             case "3":
                 SchoolHandler.DemonstrateActions(students, userToValidate);
                 break;
             case "4":
                 selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
-                if (selectedStudent != null)
-                {
-                    StudentHandler.UpdateStudentGpa(selectedStudent, userToValidate);
-                }
+                if (selectedStudent != null) StudentHandler.UpdateStudentGpa(selectedStudent, userToValidate);
                 break;
             case "5":
                 var studentById = schoolHelper.SelectStudent(students); // Use the instance method
-                if (studentById != null)
-                {
-                    StudentHelper.GetStudentById(students);
-                }
+                if (studentById != null) StudentHelper.GetStudentById(students);
                 break;
             case "7":
                 SchoolHandler.RecordGradesForStudents(new List<Course>(), userToValidate);
@@ -106,41 +92,30 @@ public static class SubStudentMenu
                 break;
             case "11":
                 if (userToValidate != null)
-                {
                     StudentHandler.AddNewStudent(students, userToValidate);
-                }
                 else
-                {
                     Console.WriteLine("Error: User is null.");
-                }
                 break;
             case "12":
                 selectedStudent = schoolHelper.SelectStudent(students); // Use the instance method
                 if (selectedStudent != null)
                 {
                     if (userToValidate != null)
-                    {
                         StudentHandler.RemoveStudent(nullableStudents, selectedStudent, userToValidate);
-                    }
                     else
-                    {
                         Console.WriteLine("Error: User is null.");
-                    }
                 }
                 else
                 {
                     Console.WriteLine("Error: Student is null.");
                 }
+
                 break;
             case "13":
                 if (userToValidate != null)
-                {
                     CourseHandler.ListStudentsInCourses(new List<Course>(), nullableStudents, userToValidate);
-                }
                 else
-                {
                     Console.WriteLine("Error: User is null.");
-                }
                 break;
             case "14":
                 return false;

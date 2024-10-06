@@ -7,10 +7,7 @@ public static class ActionDemonstrator
         try
         {
             Console.WriteLine($"Demonstrating {actionType} actions:");
-            foreach (var action in actions)
-            {
-                action();
-            }
+            foreach (var action in actions) action();
         }
         catch (Exception ex)
         {

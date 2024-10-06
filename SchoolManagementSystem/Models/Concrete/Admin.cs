@@ -21,13 +21,13 @@ public class Admin : Person, IUser
         set => AdminId = value;
     }
 
-    public override void DisplayDetails()
-    {
-        Console.WriteLine($"Admin ID: {AdminId}, Name: {GetFullName()}, Date of Birth: {GetDateOfBirth():d}");
-    }
-
     public new void DisplayUserInfo()
     {
         DisplayDetails();
+    }
+
+    public override void DisplayDetails()
+    {
+        Console.WriteLine($"Admin ID: {AdminId}, Name: {GetFullName()}, Date of Birth: {GetDateOfBirth():d}");
     }
 }

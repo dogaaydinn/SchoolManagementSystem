@@ -1,4 +1,3 @@
-
 namespace SchoolManagementSystem.Interfaces.Actions;
 
 public interface ITeacherActions : ISchoolMemberActions
@@ -8,5 +7,4 @@ public interface ITeacherActions : ISchoolMemberActions
     void GradePapers();
     void PrepareLesson();
     void AttendMeeting();
-    
 }

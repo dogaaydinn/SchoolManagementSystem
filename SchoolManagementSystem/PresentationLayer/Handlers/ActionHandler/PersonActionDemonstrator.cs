@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
@@ -21,9 +20,9 @@ public static class PersonActionDemonstrator
         }
     }
 
-   public static void DemonstrateTeacherActions(ITeacherActions teacher)
+    public static void DemonstrateTeacherActions(ITeacherActions teacher)
     {
-        ActionDemonstrator.DemonstrateActions("teacher-specific", new []
+        ActionDemonstrator.DemonstrateActions("teacher-specific", new[]
         {
             teacher.Teach,
             teacher.CheckAttendance,
@@ -44,7 +43,6 @@ public static class PersonActionDemonstrator
             student.ParticipateInClass,
             student.AttendClass,
             student.DoHomework
-            
         });
     }
 }

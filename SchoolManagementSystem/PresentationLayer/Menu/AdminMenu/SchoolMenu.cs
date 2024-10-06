@@ -7,7 +7,8 @@ namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class SchoolMenu
 {
-    public static void DisplaySchoolMenu(List<Course> courses, List<Student>? students, List<Teacher?> teachers, IUser? user)
+    public static void DisplaySchoolMenu(List<Course> courses, List<Student>? students, List<Teacher?> teachers,
+        IUser? user)
     {
         while (true)
         {
@@ -55,24 +56,16 @@ public static class SchoolMenu
                 break;
             case "2":
                 if (courses == null)
-                {
                     Console.WriteLine("Courses list is null. Cannot enroll student in course.");
-                }
                 else
-                {
                     SchoolHandler.EnrollStudentInCourse(courses, students?.OfType<Student?>().ToList(), student);
-                }
                 break;
             case "3":
-                var course = schoolHelper.SelectCourse(courses); 
+                var course = schoolHelper.SelectCourse(courses);
                 if (course != null)
-                {
                     StudentHelper.DisplayGrades(course);
-                }
                 else
-                {
                     Console.WriteLine("Error: No course selected.");
-                }
                 break;
             case "4":
                 return;
@@ -82,23 +75,20 @@ public static class SchoolMenu
         }
     }
 
-    private static void HandleAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers, Admin admin)
+    private static void HandleAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers,
+        Admin admin)
     {
         var choice = GetUserChoice();
 
-        if (choice == null) return; 
+        if (choice == null) return;
 
         switch (choice)
         {
             case "1":
                 if (students != null)
-                {
                     SchoolHandler.DisplayAllDetails(courses, students.ToList(), teachers, admin);
-                }
                 else
-                {
                     Console.WriteLine("Students list is null. Cannot display details.");
-                }
                 break;
             case "2":
                 // Add code for course management here
@@ -121,7 +111,7 @@ public static class SchoolMenu
     {
         var choice = GetUserChoice();
 
-        if (choice == null) return; 
+        if (choice == null) return;
 
         switch (choice)
         {
@@ -132,7 +122,7 @@ public static class SchoolMenu
                 TeacherHandler.UpdateTeacherId(teachers, teacher);
                 break;
             case "3":
-                return; 
+                return;
             default:
                 Console.WriteLine("Invalid choice.");
                 break;
@@ -147,7 +137,6 @@ public static class SchoolMenu
         if (!string.IsNullOrEmpty(choice)) return choice;
         Console.WriteLine("Choice cannot be null or empty.");
         return null;
-
     }
 
     private static void DisplayStudentMenu()
@@ -157,7 +146,7 @@ public static class SchoolMenu
         Console.WriteLine("3. View Grades");
         Console.WriteLine("4. Back to Main Menu");
     }
-        
+
     private static void DisplayTeacherMenu()
     {
         Console.WriteLine("1. View All Details");

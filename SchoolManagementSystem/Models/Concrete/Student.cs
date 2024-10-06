@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
@@ -20,7 +19,11 @@ public class Student : SchoolMember, IStudentActions, IUser
         EnrolledCourses = new List<Course>();
         _courseGrades = new Dictionary<Course, int>();
     }
+
     #endregion
+
+    public int Id { get; set; }
+
     #region Properties
 
     private int StudentId { get; set; }
@@ -33,6 +36,7 @@ public class Student : SchoolMember, IStudentActions, IUser
     private string LastName { get; set; }
 
     #endregion
+
     #region IPersonActions Members
 
     public void Communicate()
@@ -51,6 +55,7 @@ public class Student : SchoolMember, IStudentActions, IUser
     }
 
     #endregion
+
     #region IStudentActions Members
 
     public void AttendClass()
@@ -89,6 +94,7 @@ public class Student : SchoolMember, IStudentActions, IUser
     }
 
     #endregion
+
     #region Methods
 
     public int GetAssignedGrades(Course course)
@@ -134,7 +140,8 @@ public class Student : SchoolMember, IStudentActions, IUser
 
     public override string ToString()
     {
-        return $"{StudentId}: {GetFullName()}, GPA: {Gpa:F2}, Age: {GetAge()}, Assigned Courses: {EnrolledCourses.Count}, Date of Birth: {GetDateOfBirth():d}";
+        return
+            $"{StudentId}: {GetFullName()}, GPA: {Gpa:F2}, Age: {GetAge()}, Assigned Courses: {EnrolledCourses.Count}, Date of Birth: {GetDateOfBirth():d}";
     }
 
     public void CalculateGpa()
@@ -221,8 +228,6 @@ public class Student : SchoolMember, IStudentActions, IUser
     {
         DisplayDetails();
     }
+
     #endregion
-
-    public int Id { get; set; }
-
 }

@@ -8,7 +8,11 @@ namespace SchoolManagementSystem.PresentationLayer;
 public static class Program
 {
     public static void Main(string[] args)
-    {
+    {        
+        var courses = DataProvider.GetCourses();
+ var teachers = DataProvider.GetTeachers();
+ var students = DataProvider.GetStudents();
+ var admins = DataProvider.GetAdmins();
         var user = GetSchoolMember();
         if (user == null)
         {
@@ -16,10 +20,7 @@ public static class Program
             return;
         }
 
-        var courses = DataProvider.GetCourses();
-        var teachers = DataProvider.GetTeachers();
-        var students = DataProvider.GetStudents();
-        var admins = DataProvider.GetAdmins();
+
 
         MenuHandler.DisplayMainMenu(students, courses, teachers, admins, user);
     }
@@ -49,20 +50,15 @@ public static class Program
         var firstName = Console.ReadLine();
         Console.Write("Enter last name: ");
         var lastName = Console.ReadLine();
-    
+
         int id;
         while (true)
         {
             Console.Write("Enter ID: ");
             var idInput = Console.ReadLine();
             if (int.TryParse(idInput, out id))
-            {
                 break;
-            }
-            else
-            {
-                Console.WriteLine("Invalid ID format. Please enter a numeric ID.");
-            }
+            Console.WriteLine("Invalid ID format. Please enter a numeric ID.");
         }
 
         Console.Write("Enter password: ");
@@ -84,16 +80,14 @@ public static class Program
             lastName = Console.ReadLine();
             user = DataProvider.GetSchoolMemberByName(firstName, lastName);
             if (user != null)
-            {
                 Console.WriteLine($"Your password is: {user.GetPassword()}");
-            }
             else
-            {
                 Console.WriteLine("User not found.");
-            }
         }
+
         return user;
     }
+
     private static SchoolMember? RegisterSchoolMember()
     {
         Console.Write("Enter first name: ");
@@ -105,7 +99,8 @@ public static class Program
 
         var newUser = Authenticator.Register(firstName, lastName, dateOfBirth);
         if (newUser == null) return newUser;
-        Console.WriteLine($"User created successfully. Your ID is: {newUser.Id}. Your password is: {newUser.GetPassword()}");
+        Console.WriteLine(
+            $"User created successfully. Your ID is: {newUser.Id}. Your password is: {newUser.GetPassword()}");
         Console.WriteLine("Warning: This information is important. Please note it down.");
         Console.WriteLine("Would you like to change your password? (yes/no)");
         var changePassword = Console.ReadLine();
@@ -118,10 +113,7 @@ public static class Program
         }
 
         Console.WriteLine("Current School Members:");
-        foreach (var member in DataProvider.GetAllSchoolMembers())
-        {
-            Console.WriteLine(member.GetFullName());
-        }
+        foreach (var member in DataProvider.GetAllSchoolMembers()) Console.WriteLine(member.GetFullName());
         return newUser;
     }
 }

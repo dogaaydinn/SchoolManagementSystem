@@ -1,4 +1,3 @@
-
 namespace SchoolManagementSystem.Models.Abstract;
 
 public abstract class SchoolMember : Person
@@ -11,8 +10,11 @@ public abstract class SchoolMember : Person
     }
 
     #endregion
+
     #region Methods
-    public DateTime DateOfBirth { get; private set; }
+
+    public DateTime DateOfBirth { get; }
+
     protected int GetAge()
     {
         var today = DateTime.Today;
@@ -20,6 +22,8 @@ public abstract class SchoolMember : Person
         if (GetDateOfBirth().Date > today.AddYears(-age)) age--;
         return age;
     }
+
     public abstract override void DisplayDetails();
+
     #endregion
 }

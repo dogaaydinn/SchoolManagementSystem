@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Models.Abstract;
 using SchoolManagementSystem.Models.Concrete;
 
@@ -7,18 +5,16 @@ namespace SchoolManagementSystem.Data;
 
 public static class DataProvider
 {
-    private static readonly List<SchoolMember?> SchoolMembers = new List<SchoolMember?>();
-    private static readonly List<Admin> Admins = new List<Admin>();
+    private static readonly List<SchoolMember?> SchoolMembers = new();
+    private static readonly List<Admin> Admins = new();
     private static int _nextStudentId = 1;
-    
-    
 
     public static SchoolMember? GetSchoolMemberByName(string firstName, string lastName)
     {
-        return SchoolMembers.FirstOrDefault(u => 
+        return SchoolMembers.FirstOrDefault(u =>
             u.GetFullName().Equals($"{firstName} {lastName}", StringComparison.OrdinalIgnoreCase));
     }
-    
+
     public static IEnumerable<SchoolMember?> GetAllSchoolMembers()
     {
         return SchoolMembers;
@@ -28,16 +24,18 @@ public static class DataProvider
     {
         return _nextStudentId++;
     }
+
     public static bool SchoolMemberExists(string firstName, string lastName, DateTime dateOfBirth, int id)
     {
-        return SchoolMembers.Any(u => u.GetFullName() == $"{firstName} {lastName}" && u.DateOfBirth == dateOfBirth && u.Id == id);
+        return SchoolMembers.Any(u =>
+            u.GetFullName() == $"{firstName} {lastName}" && u.DateOfBirth == dateOfBirth && u.Id == id);
     }
 
     public static void AddSchoolMember(SchoolMember? schoolMember)
     {
         SchoolMembers.Add(schoolMember);
     }
-    
+
     public static List<Teacher> GetTeachers()
     {
         var teacherList = new List<Teacher>
@@ -63,6 +61,8 @@ public static class DataProvider
             new("Phyllis", "Vance", new DateTime(1955, 7, 10), 19, "Home Economics"),
             new("Meredith", "Palmer", new DateTime(1960, 12, 11), 20, "Health Education")
         };
+        
+        SchoolMembers.AddRange(teacherList);
 
         return teacherList;
     }
@@ -97,6 +97,8 @@ public static class DataProvider
             new("Yara", "King", new DateTime(2010, 5, 23), 124, 2.7),
             new("Zane", "Lewis", new DateTime(2011, 7, 15), 125, 2.6)
         };
+        
+        SchoolMembers.AddRange(studentList);
 
         return studentList;
     }
@@ -134,6 +136,7 @@ public static class DataProvider
 
     public static List<Admin> GetAdmins()
     {
+        Admins.Add(new("Admin", "Admin", new DateTime(1990, 1, 1), 1000, "admin"));
         return Admins;
     }
 }

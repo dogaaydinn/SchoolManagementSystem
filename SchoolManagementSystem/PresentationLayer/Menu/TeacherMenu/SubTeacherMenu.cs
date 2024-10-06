@@ -1,6 +1,6 @@
-using SchoolManagementSystem.PresentationLayer.Handlers;
-using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.Interfaces.User;
+using SchoolManagementSystem.Models.Concrete;
+using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.TeacherMenu;
@@ -21,10 +21,7 @@ public static class SubTeacherMenu
                 continue;
             }
 
-            if (!HandleTeacherMenuChoice(choice, teachers, user))
-            {
-                return; 
-            }
+            if (!HandleTeacherMenuChoice(choice, teachers, user)) return;
         }
     }
 
@@ -54,10 +51,7 @@ public static class SubTeacherMenu
         switch (choice)
         {
             case "1":
-                if (teacher != null)
-                {
-                    TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
-                }
+                if (teacher != null) TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
                 break;
             case "2":
                 TeacherHandler.DisplayTeacherCourses(teachers, user);
@@ -67,25 +61,15 @@ public static class SubTeacherMenu
                 break;
             case "4":
                 if (teacher != null)
-                {
                     SchoolHandler.DemonstrateActions(teachers, user);
-                }
                 else
-                {
                     Console.WriteLine("Teacher not found.");
-                }
                 break;
             case "5":
-                if (teacher != null)
-                {
-                    TeacherHandler.GetTeacherById(teachers);
-                }
+                if (teacher != null) TeacherHandler.GetTeacherById(teachers);
                 break;
             case "6":
-                if (teacher != null)
-                {
-                    TeacherHandler.GetTeacherByName(teachers);
-                }
+                if (teacher != null) TeacherHandler.GetTeacherByName(teachers);
                 break;
             case "8":
                 TeacherHelper.DisplayTeachersBySubject(teachers);
@@ -101,30 +85,23 @@ public static class SubTeacherMenu
                 break;
             case "12":
                 if (user != null)
-                {
                     TeacherHelper.AddNewTeacher(teachers, (IUser)user);
-                }
                 else
-                {
                     Console.WriteLine("Error: User is null.");
-                }
                 break;
             case "13":
                 if (teacher != null && user != null)
-                {
                     TeacherHandler.RemoveTeacher(teachers, teacher, (IUser)user);
-                }
                 else
-                {
                     Console.WriteLine("Error: Teacher or User is null.");
-                }
                 break;
             case "14":
-                return false; 
+                return false;
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;
         }
-        return true; 
+
+        return true;
     }
 }

@@ -11,8 +11,8 @@ public static class AdminCourseMenu
     public static void DisplayCourseMenu(List<Course> courses, List<Student?> students, IUser user)
     {
         var exitMenu = false;
-        var schoolHelper = new SchoolHelper(); 
-        var courseHelper = new CourseHelper(); 
+        var schoolHelper = new SchoolHelper();
+        var courseHelper = new CourseHelper();
 
         while (!exitMenu)
         {
@@ -28,13 +28,9 @@ public static class AdminCourseMenu
             }
 
             if (choice == "17")
-            {
                 exitMenu = true;
-            }
             else
-            {
                 HandleMenuChoice(choice, courses, students, user, schoolHelper, courseHelper);
-            }
         }
     }
 
@@ -60,34 +56,27 @@ public static class AdminCourseMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static void HandleMenuChoice(string choice, List<Course> courses, List<Student?> students, IUser user, SchoolHelper schoolHelper, CourseHelper courseHelper)
+    private static void HandleMenuChoice(string choice, List<Course> courses, List<Student?> students, IUser user,
+        SchoolHelper schoolHelper, CourseHelper courseHelper)
     {
         Course? selectedCourse;
 
         switch (choice)
         {
             case "1":
-                selectedCourse = schoolHelper.SelectCourse(courses); 
-                if (selectedCourse != null)
-                {
-                    CourseHandler.DisplayCourseActions(selectedCourse, user);
-                }
+                selectedCourse = schoolHelper.SelectCourse(courses);
+                if (selectedCourse != null) CourseHandler.DisplayCourseActions(selectedCourse, user);
                 break;
             case "2":
-                selectedCourse = schoolHelper.SelectCourse(courses); 
+                selectedCourse = schoolHelper.SelectCourse(courses);
                 if (selectedCourse != null)
-                {
                     CourseHandler.DisplayCourseDetails(new List<Course?> { selectedCourse }, user);
-                }
                 break;
             case "3":
                 CourseHandler.DisplayCourseNames(courses, students);
                 break;
             case "4":
-                if (ValidationHelper.ValidateUser(user))
-                {
-                    CourseHandler.ListStudentsInCourses(courses, students, user);
-                }
+                if (ValidationHelper.ValidateUser(user)) CourseHandler.ListStudentsInCourses(courses, students, user);
                 break;
             case "5":
                 CourseHandler.DisplayTotalCourses(courses);
@@ -102,52 +91,36 @@ public static class AdminCourseMenu
                 SchoolHandler.EnrollStudentInCourse(courses, students, user);
                 break;
             case "9":
-                var studentHelper = new StudentHelper(); 
-                studentHelper.RemoveStudent(students, user); 
+                var studentHelper = new StudentHelper();
+                studentHelper.RemoveStudent(students, user);
                 break;
             case "10":
-                schoolHelper.GetCourseFromUserInput(courses); 
+                schoolHelper.GetCourseFromUserInput(courses);
                 break;
             case "11":
-                courseHelper.GetCourseById(courses); 
+                courseHelper.GetCourseById(courses);
                 break;
             case "12":
-                selectedCourse = schoolHelper.SelectCourse(courses); 
-                if (selectedCourse != null)
-                {
-                    CourseHandler.GetStudentFromCourse(selectedCourse);
-                }
+                selectedCourse = schoolHelper.SelectCourse(courses);
+                if (selectedCourse != null) CourseHandler.GetStudentFromCourse(selectedCourse);
                 break;
             case "13":
                 selectedCourse = schoolHelper.SelectCourse(courses);
-                if (selectedCourse != null)
-                {
-                    StudentHelper.DisplayGrades(selectedCourse);
-                }
+                if (selectedCourse != null) StudentHelper.DisplayGrades(selectedCourse);
                 break;
             case "14":
-                selectedCourse = schoolHelper.SelectCourse(courses); 
-                if (selectedCourse != null)
-                {
-                    CourseHandler.UpdateCourseId(selectedCourse);
-                }
+                selectedCourse = schoolHelper.SelectCourse(courses);
+                if (selectedCourse != null) CourseHandler.UpdateCourseId(selectedCourse);
                 break;
             case "15":
-                selectedCourse = schoolHelper.SelectCourse(courses); 
-                if (selectedCourse != null)
-                {
-                    CourseHandler.UpdateCourseName(selectedCourse);
-                }
+                selectedCourse = schoolHelper.SelectCourse(courses);
+                if (selectedCourse != null) CourseHandler.UpdateCourseName(selectedCourse);
                 break;
             case "16":
                 if (courses != null && students != null)
-                {
                     SchoolHandler.AssignCoursesToStudents(courses, students, user);
-                }
                 else
-                {
                     Console.WriteLine("Courses or students list is null.");
-                }
                 break;
             case "17":
                 return;

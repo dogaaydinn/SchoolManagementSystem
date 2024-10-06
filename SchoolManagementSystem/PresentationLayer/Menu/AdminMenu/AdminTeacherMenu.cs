@@ -20,13 +20,9 @@ public static class AdminTeacherMenu
             {
                 case 1:
                     if (teacher != null)
-                    {
                         TeacherHandler.DisplayTeacherDetails(new List<Teacher?> { teacher }, user);
-                    }
                     else
-                    {
                         Console.WriteLine("No teacher selected. Please select a teacher first.");
-                    }
                     break;
                 case 2:
                     TeacherHandler.DisplayTeacherNames(teachers);
@@ -49,13 +45,9 @@ public static class AdminTeacherMenu
                 case 8:
                     teacher = TeacherHandler.GetTeacherById(teachers);
                     if (teacher != null)
-                    {
                         TeacherHandler.UpdateTeacherName(teacher, user);
-                    }
                     else
-                    {
                         Console.WriteLine("Teacher not found.");
-                    }
                     break;
                 case 9:
                     TeacherHandler.AddNewTeacher(teachers, user);
@@ -64,14 +56,14 @@ public static class AdminTeacherMenu
                     TeacherHandler.RemoveTeacher(teachers, user);
                     break;
                 case 11:
-                    return; 
+                    return;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
         }
     }
-    
+
     private static void DisplayMenuOptions()
     {
         Console.WriteLine("\nAdmin Teacher Menu:");

@@ -21,10 +21,7 @@ public static class StudentMenu
                 continue;
             }
 
-            if (!HandleMenuChoice(choice, students, courses, user))
-            {
-                return; 
-            }
+            if (!HandleMenuChoice(choice, students, courses, user)) return;
         }
     }
 
@@ -49,46 +46,30 @@ public static class StudentMenu
         {
             case "1":
                 if (student != null)
-                {
                     StudentHandler.DisplayStudentDetails(student);
-                }
                 else
-                {
                     Console.WriteLine("Error: No student selected.");
-                }
                 break;
             case "2":
                 if (course != null)
-                {
                     StudentHelper.DisplayGrades(course);
-                }
                 else
-                {
                     Console.WriteLine("Error: No course selected.");
-                }
                 break;
             case "3":
                 if (course != null)
-                {
                     CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
-                }
                 else
-                {
                     Console.WriteLine("Error: No course selected.");
-                }
                 break;
             case "4":
                 CourseHandler.DisplayTotalCourses(courses);
                 break;
             case "5":
                 if (student != null)
-                {
                     StudentHandler.UpdateStudentId(new List<Student> { student }, user);
-                }
                 else
-                {
                     Console.WriteLine("Error: No student selected.");
-                }
                 break;
             case "6":
                 return false;

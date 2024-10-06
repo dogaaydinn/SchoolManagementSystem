@@ -6,7 +6,7 @@ using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
-public static class TeacherHandler 
+public static class TeacherHandler
 {
     public static void DisplayTeacherDetails(List<Teacher?> teachers, object user)
     {
@@ -39,13 +39,10 @@ public static class TeacherHandler
         }
 
         if (teacher != null)
-        {
-            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+            Console.WriteLine(
+                $"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
         else
-        {
             PromptToDisplayAllTeachers(nonNullTeachers);
-        }
     }
 
     public static void UpdateTeacherDetails(List<Teacher?> teachers, object user)
@@ -69,10 +66,7 @@ public static class TeacherHandler
                     break;
                 case 3:
                     var teacher = GetTeacherById(nonNullTeachers);
-                    if (teacher != null)
-                    {
-                        UpdateTeacherName(teacher, user);
-                    }
+                    if (teacher != null) UpdateTeacherName(teacher, user);
                     break;
                 case 4:
                     return;
@@ -82,6 +76,7 @@ public static class TeacherHandler
             }
         }
     }
+
     public static Teacher? GetTeacherById(List<Teacher?> teachers)
     {
         Console.Write("Enter Teacher ID: ");
@@ -97,10 +92,12 @@ public static class TeacherHandler
         Console.Write("Enter Teacher Name: ");
         var name = Console.ReadLine();
         ValidationHelper.ValidateNotEmpty(name, "Teacher Name cannot be empty.");
-        var teacher = teachers?.FirstOrDefault(t => t.GetTeacherFullName().Equals(name, StringComparison.OrdinalIgnoreCase));
+        var teacher =
+            teachers?.FirstOrDefault(t => t.GetTeacherFullName().Equals(name, StringComparison.OrdinalIgnoreCase));
         ValidationHelper.ValidateNotNull(teacher, "Teacher not found.");
         return teacher;
     }
+
     public static void UpdateTeacherId(List<Teacher?> teachers, object user)
     {
         var teacher = GetTeacherById(teachers);
@@ -111,17 +108,19 @@ public static class TeacherHandler
         teacher.SetTeacherId(int.Parse(newId));
         Console.WriteLine("Teacher ID updated successfully.");
     }
-    
-    
+
+
     public static void DisplayTeachersBySubject(List<Teacher?> teachers)
     {
         Console.Write("Enter Subject Name: ");
         var subject = Console.ReadLine();
         ValidationHelper.ValidateNotEmpty(subject, "Subject cannot be empty.");
-        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase)).ToList();
+        var filteredTeachers = teachers?.Where(t => t.GetSubject().Equals(subject, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         ValidationHelper.ValidateList(filteredTeachers, "No teachers found for this subject.");
         DisplayTeacherNames(filteredTeachers);
     }
+
     public static void DisplayAllTeachers(List<Teacher?> teachers)
     {
         if (teachers == null || !teachers.Any())
@@ -131,11 +130,10 @@ public static class TeacherHandler
         }
 
         foreach (var teacher in teachers.OfType<Teacher>())
-        {
-            Console.WriteLine($"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+            Console.WriteLine(
+                $"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
     }
-    
+
 
     public static void RemoveTeacher(List<Teacher?> teachers, Teacher teacher, IUser user)
     {
@@ -144,7 +142,7 @@ public static class TeacherHandler
 
         Console.Write("Enter Teacher ID to remove: ");
         var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out int id))
+        if (!int.TryParse(idInput, out var id))
         {
             Console.WriteLine("Invalid Teacher ID.");
             return;
@@ -160,6 +158,7 @@ public static class TeacherHandler
         nonNullTeachers.Remove(teacherToRemove);
         Console.WriteLine("Teacher removed successfully.");
     }
+
     public static void UpdateTeacherSubject(List<Teacher?> teachers, object user)
     {
         var teacher = GetTeacherById(teachers);
@@ -170,12 +169,12 @@ public static class TeacherHandler
         teacher.SetSubject(newSubject);
         Console.WriteLine("Teacher Subject updated successfully.");
     }
-    
+
     public static void AddNewTeacher(List<Teacher?> teachers, object user)
     {
         ValidateUser(user);
         var nonNullTeachers = GetNonNullTeachers(teachers);
-        
+
         var id = GetValidatedTeacherId(nonNullTeachers);
         if (id == null) return;
 
@@ -184,7 +183,7 @@ public static class TeacherHandler
 
         Console.Write("Enter Teacher Subject ID: ");
         var subjectInput = Console.ReadLine();
-        if (!int.TryParse(subjectInput, out int subjectId))
+        if (!int.TryParse(subjectInput, out var subjectId))
         {
             Console.WriteLine("Invalid Subject ID.");
             return;
@@ -200,7 +199,7 @@ public static class TeacherHandler
     {
         Console.Write("Enter Teacher ID: ");
         var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out int id))
+        if (!int.TryParse(idInput, out var id))
         {
             Console.WriteLine("Invalid Teacher ID.");
             return null;
@@ -210,8 +209,8 @@ public static class TeacherHandler
         if (!teacherExists) return id;
         Console.WriteLine("Teacher with this ID already exists.");
         return null;
-
     }
+
     public static void RemoveTeacher(List<Teacher?> teachers, object user)
     {
         ValidateUser(user);
@@ -219,7 +218,7 @@ public static class TeacherHandler
 
         Console.Write("Enter Teacher ID to remove: ");
         var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out int id))
+        if (!int.TryParse(idInput, out var id))
         {
             Console.WriteLine("Invalid Teacher ID.");
             return;
@@ -235,6 +234,7 @@ public static class TeacherHandler
         nonNullTeachers.Remove(teacherToRemove);
         Console.WriteLine("Teacher removed successfully.");
     }
+
     private static string[]? GetValidatedTeacherName()
     {
         Console.Write("Enter Teacher Name: ");
@@ -244,7 +244,6 @@ public static class TeacherHandler
         if (names.Length >= 2) return names;
         Console.WriteLine("Please enter both first and last names.");
         return null;
-
     }
 
     private static string GetValidatedTeacherSubject()
@@ -278,18 +277,14 @@ public static class TeacherHandler
         ValidationHelper.ValidateList(teachers, "Teacher list cannot be null or empty.");
         Console.WriteLine("Teacher Names:");
         foreach (var teacher in teachers)
-        {
-            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+            Console.WriteLine(
+                $"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
     }
 
     public static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
     {
         Console.WriteLine("Teacher not found. Would you like to see the list of teachers? (yes/no)");
-        if (Console.ReadLine()?.Trim().ToLower() == "yes")
-        {
-            DisplayTeacherNames(teachers);
-        }
+        if (Console.ReadLine()?.Trim().ToLower() == "yes") DisplayTeacherNames(teachers);
     }
 
     public static void DisplayTeacherCourses(List<Teacher?> teachers, object user)
@@ -302,7 +297,7 @@ public static class TeacherHandler
 
         Console.Write("Enter Teacher ID: ");
         var idInput = Console.ReadLine();
-        if (!int.TryParse(idInput, out int id))
+        if (!int.TryParse(idInput, out var id))
         {
             Console.WriteLine("Invalid Teacher ID.");
             return;
@@ -315,7 +310,7 @@ public static class TeacherHandler
             return;
         }
 
-        var students = DataProvider.GetStudents(); 
+        var students = DataProvider.GetStudents();
         var courses = DataProvider.GetCourses()
             .Where(c => Course.GetTeacherId() == teacher.GetTeacherId())
             .ToList();
@@ -327,38 +322,31 @@ public static class TeacherHandler
         }
 
         Console.WriteLine($"Courses for {teacher.GetTeacherFullName()}:");
-        foreach (var course in courses)
-        {
-            Console.WriteLine($"- {course.GetCourseName()} (ID: {course.GetCourseId()})");
-        }
+        foreach (var course in courses) Console.WriteLine($"- {course.GetCourseName()} (ID: {course.GetCourseId()})");
     }
 
     private static void DisplayMenuOptions(string[] options)
     {
         ValidationHelper.ValidateNotNull(options, "Options cannot be null.");
-        for (var i = 0; i < options.Length; i++)
-        {
-            Console.WriteLine($"{i + 1}. {options[i]}");
-        }
+        for (var i = 0; i < options.Length; i++) Console.WriteLine($"{i + 1}. {options[i]}");
         Console.Write("Enter your choice: ");
     }
 
     private static int GetValidatedUserChoice(int maxOptions)
     {
-        if (maxOptions <= 0) throw new ArgumentOutOfRangeException(nameof(maxOptions), "Max options must be greater than zero.");
+        if (maxOptions <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxOptions), "Max options must be greater than zero.");
 
         int choice;
         while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > maxOptions)
-        {
             Console.WriteLine($"Invalid choice. Please select a number between 1 and {maxOptions}.");
-        }
         return choice;
     }
 
     private static void ValidateUser(object user)
     {
         ValidationHelper.ValidateNotNull(user, "User cannot be null.");
-        ValidationHelper.ValidateUserPermissions(user, isAdmin: true);
+        ValidationHelper.ValidateUserPermissions(user, true);
     }
 
     private static List<Teacher> GetNonNullTeachers(List<Teacher?> teachers)

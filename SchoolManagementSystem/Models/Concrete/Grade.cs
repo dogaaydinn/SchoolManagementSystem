@@ -2,14 +2,6 @@ namespace SchoolManagementSystem.Models.Concrete;
 
 public class Grade
 {
-    
-    #region Properties
-
-    private int StudentId { get; }
-    private int CourseId { get; }
-    private double Value { get; set; }
-
-    #endregion
     #region Constructors
 
     public Grade(int studentId, int courseId, double value)
@@ -20,8 +12,17 @@ public class Grade
     }
 
     #endregion
+
+    #region Properties
+
+    private int StudentId { get; }
+    private int CourseId { get; }
+    private double Value { get; set; }
+
+    #endregion
+
     #region Methods
-    
+
     public void UpdateValue(double newValue)
     {
         if (newValue is < 0 or > 100)
@@ -29,6 +30,7 @@ public class Grade
 
         Value = newValue;
     }
+
     public double GetGradeValue()
     {
         return Value;
@@ -38,6 +40,6 @@ public class Grade
     {
         return $"Student ID: {StudentId}, Course ID: {CourseId}, Grade: {Value}";
     }
+
     #endregion
-    
 }

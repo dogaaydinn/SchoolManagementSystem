@@ -95,7 +95,9 @@ public static class Exceptions
 
     public class InvalidNameException : Exception
     {
-        public InvalidNameException(string message) : base(message) { }
+        public InvalidNameException(string message) : base(message)
+        {
+        }
     }
 
     public class StudentNotFoundException : Exception

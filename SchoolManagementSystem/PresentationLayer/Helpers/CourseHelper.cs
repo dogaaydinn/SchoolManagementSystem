@@ -11,15 +11,14 @@ public class CourseHelper : ICourseHelper
         return FindCourse(courses, c => c.GetCourseId() == courseId);
     }
 
-    private static Course? FindCourse(IEnumerable<Course?> courses, Func<Course?, bool> predicate)
-    {
-        return courses.FirstOrDefault(predicate);
-    }
-
     public Course? GetCourseByName(IEnumerable<Course?> courses)
     {
         var courseName = InputHelper.GetValidatedStringInput("Enter the Course Name:");
         return FindCourse(courses, c => c.GetCourseName().Equals(courseName, StringComparison.OrdinalIgnoreCase));
     }
-    
+
+    private static Course? FindCourse(IEnumerable<Course?> courses, Func<Course?, bool> predicate)
+    {
+        return courses.FirstOrDefault(predicate);
+    }
 }

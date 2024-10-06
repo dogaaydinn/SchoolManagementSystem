@@ -22,13 +22,9 @@ public class PersonHelper : IPersonHelper
         }
 
         if (HasPermission(user, person))
-        {
             DemonstrateActions(person);
-        }
         else
-        {
             Console.WriteLine("You do not have permission to demonstrate these actions.");
-        }
     }
 
     private static void DemonstrateActions(ISchoolMemberActions schoolMember)

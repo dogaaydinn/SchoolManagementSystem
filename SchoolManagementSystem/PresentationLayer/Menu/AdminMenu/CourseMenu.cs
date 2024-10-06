@@ -11,7 +11,7 @@ public static class CourseMenu
 {
     public static void DisplayCourseMenu(List<Course> courses, List<Student>? students, IUser user)
     {
-        var schoolHelper = new SchoolHelper(); 
+        var schoolHelper = new SchoolHelper();
 
         while (true)
         {
@@ -26,10 +26,7 @@ public static class CourseMenu
                 continue;
             }
 
-            if (!HandleCourseMenuChoice(choice, courses, students, user, schoolHelper))
-            {
-                return;
-            }
+            if (!HandleCourseMenuChoice(choice, courses, students, user, schoolHelper)) return;
         }
     }
 
@@ -42,29 +39,23 @@ public static class CourseMenu
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleCourseMenuChoice(string choice, List<Course> courses, List<Student?> nullableStudents, IUser user, SchoolHelper schoolHelper)
+    private static bool HandleCourseMenuChoice(string choice, List<Course> courses, List<Student?> nullableStudents,
+        IUser user, SchoolHelper schoolHelper)
     {
         Course? course = null;
 
         switch (choice)
         {
             case "1":
-                course = schoolHelper.SelectCourse(courses); 
+                course = schoolHelper.SelectCourse(courses);
                 if (course != null)
-                {
                     CourseHandler.DisplayCourseActions(course, user);
-                }
                 else
-                {
                     Console.WriteLine("Error: No course selected.");
-                }
                 break;
             case "2":
-                course = schoolHelper.SelectCourse(courses); 
-                if (course != null)
-                {
-                    CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
-                }
+                course = schoolHelper.SelectCourse(courses);
+                if (course != null) CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
                 break;
             case "3":
                 CourseHandler.DisplayCourseNames(courses, user);
@@ -79,13 +70,13 @@ public static class CourseMenu
                 SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, user);
                 break;
             case "7":
-                schoolHelper.DisplayCourses(courses); 
+                schoolHelper.DisplayCourses(courses);
                 break;
             case "8":
                 CourseHandler.ListStudentsInCourses(courses, nullableStudents, user);
                 break;
             case "9":
-                schoolHelper.GetCourseFromUserInput(courses); 
+                schoolHelper.GetCourseFromUserInput(courses);
                 break;
             case "10":
                 var courseActionsList = courses.Cast<ICourseActions>().ToList();

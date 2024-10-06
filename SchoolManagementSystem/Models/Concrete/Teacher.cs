@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Abstract;
@@ -18,6 +17,9 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
 
     #endregion
+
+    public new int Id { get; set; }
+
     #region Properties
 
     private int TeacherId { get; set; }
@@ -26,6 +28,7 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     private string FullName { get; set; }
 
     #endregion
+
     #region ITeacherActions
 
     public void Teach()
@@ -54,6 +57,7 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
 
     #endregion
+
     #region IPersonActions
 
     public void Communicate()
@@ -72,6 +76,7 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
 
     #endregion
+
     #region Methods
 
     public override string ToString()
@@ -89,10 +94,12 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         DisplayDetails();
     }
+
     public void SetTeacherFullName(string fullName)
     {
         FullName = fullName;
     }
+
     public string GetTeacherFullName()
     {
         return GetFullName();
@@ -102,6 +109,7 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         return TeacherId;
     }
+
     public string GetSubject()
     {
         return Subject;
@@ -111,11 +119,12 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         Subject = newSubject;
     }
+
     public void SetTeacherId(int newTeacherId)
     {
         TeacherId = newTeacherId;
     }
-    
+
     public void SetFirstName(string firstName)
     {
         // Implementation for setting the first name
@@ -125,9 +134,6 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     {
         // Implementation for setting the last name
     }
-    
+
     #endregion
-
-    public new int Id { get; set; }
-
 }

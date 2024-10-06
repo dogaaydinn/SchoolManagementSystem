@@ -18,7 +18,8 @@ public class SchoolHandler
         _validationHelper = validationHelper;
     }
 
-    public static void DisplayAllDetails(List<Course> courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
+    public static void DisplayAllDetails(List<Course> courses, List<Student?>? students, List<Teacher?>? teachers,
+        object? user)
     {
         ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
         Console.WriteLine("Courses:");
@@ -35,20 +36,14 @@ public class SchoolHandler
     {
         ValidateUserAndEntities(user as IUser, true, courses, students);
 
-        foreach (var student in students.OfType<Student>())
-        {
-            AssignCoursesToStudent(student, courses);
-        }
+        foreach (var student in students.OfType<Student>()) AssignCoursesToStudent(student, courses);
     }
 
     public static void RecordGradesForStudents(List<Course> courses, object user)
     {
         ValidateUserAndEntities(user as IUser, true, courses);
 
-        foreach (var course in courses ?? Enumerable.Empty<Course>())
-        {
-            RecordGradesForCourse(course);
-        }
+        foreach (var course in courses ?? Enumerable.Empty<Course>()) RecordGradesForCourse(course);
     }
 
     public static void EnrollStudentInCourse(List<Course?>? courses, List<Student?> students, IUser user)
@@ -62,14 +57,15 @@ public class SchoolHandler
             if (course == null)
             {
                 Console.WriteLine("Course cannot be null. Skipping...");
-                continue; 
+                continue;
             }
 
             Console.WriteLine($"Enrolling students in course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
             foreach (var student in students.OfType<Student>())
             {
                 course.EnrollStudent(student);
-                Console.WriteLine($"  Enrolled Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
+                Console.WriteLine(
+                    $"  Enrolled Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}");
             }
         }
     }
@@ -96,11 +92,11 @@ public class SchoolHandler
     {
         _validationHelper.CheckHasPermission(user, isAdmin);
         foreach (var entity in entities)
-        {
             switch (entity)
             {
                 case List<object> entityList:
-                    _validationHelper.ValidateNotNull(entityList, true ? $"{entity.GetType().Name} cannot be null." : "Entity list cannot be null.");
+                    _validationHelper.ValidateNotNull(entityList,
+                        true ? $"{entity.GetType().Name} cannot be null." : "Entity list cannot be null.");
                     break;
                 case List<Course> courseList:
                     _validationHelper.ValidateNotNull(courseList, "Course list cannot be null.");
@@ -114,7 +110,6 @@ public class SchoolHandler
                 default:
                     throw new ArgumentException("Entity is not a valid list.");
             }
-        }
     }
 
     private static void AssignCoursesToStudent(Student student, List<Course> courses)
@@ -147,16 +142,15 @@ public class SchoolHandler
             var grade = _schoolHelper.GetValidGrade(student);
             if (grade == null) continue;
             course.AssignGrade(student, grade.Value);
-            Console.WriteLine($"Recorded grade {grade} for {student.GetStudentFullName()} in {course.GetCourseName()}.");
+            Console.WriteLine(
+                $"Recorded grade {grade} for {student.GetStudentFullName()} in {course.GetCourseName()}.");
         }
     }
 
     private static void DisplayTeacherDetails(List<Teacher?> teachers)
     {
         foreach (var teacher in teachers.OfType<Teacher>())
-        {
-            Console.WriteLine($"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
-        }
+            Console.WriteLine(
+                $"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
     }
-    
 }

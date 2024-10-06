@@ -1,4 +1,3 @@
-using SchoolManagementSystem.Interfaces;
 using SchoolManagementSystem.Interfaces.Actions;
 
 namespace SchoolManagementSystem.Models.Concrete;
@@ -18,6 +17,17 @@ public class Course : ISchoolActions, ICourseActions
     }
 
     #endregion
+
+    public void StartCourse(Course course)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EndCourse(Course course)
+    {
+        throw new NotImplementedException();
+    }
+
     #region Fields
 
     private const int MaxStudents = 30;
@@ -30,6 +40,7 @@ public class Course : ISchoolActions, ICourseActions
     private int _credits;
 
     #endregion
+
     #region Methods
 
     public void SetCredits(int newCredits)
@@ -46,11 +57,12 @@ public class Course : ISchoolActions, ICourseActions
     {
         return _credits;
     }
-    
+
     public void SetCourseId(int newCourseId)
     {
         _courseId = newCourseId;
     }
+
     public List<double> GetGrades()
     {
         return _studentGrades.Values.Select(grade => grade.GetGradeValue()).ToList();
@@ -60,15 +72,17 @@ public class Course : ISchoolActions, ICourseActions
     {
         return _assignedTeacher != null ? $"Teacher: {_assignedTeacher.GetTeacherFullName()}" : "No assigned teacher";
     }
+
     public static int GetTeacherId()
     {
         return _assignedTeacher?.GetTeacherId() ?? -1;
     }
-    
+
     public static int GetAssignedTeacher()
     {
         return _assignedTeacher?.GetTeacherId() ?? -1;
     }
+
     public void EnrollStudent(Student? student)
     {
         if (student == null)
@@ -79,7 +93,8 @@ public class Course : ISchoolActions, ICourseActions
 
         if (_enrolledStudents == null || _enrolledStudents.Count == MaxStudents)
         {
-            Console.WriteLine($"Course {_courseName} is full or the enrolled students list is null. Cannot enroll more students.");
+            Console.WriteLine(
+                $"Course {_courseName} is full or the enrolled students list is null. Cannot enroll more students.");
             return;
         }
 
@@ -121,10 +136,12 @@ public class Course : ISchoolActions, ICourseActions
     {
         return _courseName;
     }
+
     public void SetCourseName(string newCourseName)
     {
         _courseName = newCourseName;
     }
+
     public List<Student?>? GetEnrolledStudents()
     {
         return _enrolledStudents;
@@ -134,16 +151,10 @@ public class Course : ISchoolActions, ICourseActions
     {
         Console.WriteLine($"Course {_courseName} has the following students:");
         if (_enrolledStudents != null)
-        {
             foreach (var student in _enrolledStudents)
-            {
                 Console.WriteLine(student?.GetStudentFullName());
-            }
-        }
         else
-        {
             Console.WriteLine("No students are enrolled in this course.");
-        }
     }
 
     public void AssignGrade(Student? student, double grade)
@@ -157,7 +168,8 @@ public class Course : ISchoolActions, ICourseActions
 
         if (student != null)
         {
-            var gradeObj = _studentGrades.GetValueOrDefault(student.GetStudentId(), new Grade(student.GetStudentId(), _courseId, grade));
+            var gradeObj = _studentGrades.GetValueOrDefault(student.GetStudentId(),
+                new Grade(student.GetStudentId(), _courseId, grade));
             gradeObj.UpdateValue(grade);
             _studentGrades[student.GetStudentId()] = gradeObj;
         }
@@ -169,12 +181,16 @@ public class Course : ISchoolActions, ICourseActions
 
     public double GetAssignedGrades(Student? student)
     {
-        return student != null && _studentGrades.TryGetValue(student.GetStudentId(), out var grade) ? grade.GetGradeValue() : -1.0;
+        return student != null && _studentGrades.TryGetValue(student.GetStudentId(), out var grade)
+            ? grade.GetGradeValue()
+            : -1.0;
     }
 
     public override string? ToString()
     {
-        return _assignedTeacher != null ? $"{_courseId}: {_courseName}, Teacher: {_assignedTeacher.GetTeacherFullName()}" : null;
+        return _assignedTeacher != null
+            ? $"{_courseId}: {_courseName}, Teacher: {_assignedTeacher.GetTeacherFullName()}"
+            : null;
     }
 
     public void ListGrades()
@@ -187,9 +203,7 @@ public class Course : ISchoolActions, ICourseActions
 
         Console.WriteLine($"Course {_courseName} has the following grades:");
         foreach (var gradeEntry in _studentGrades)
-        {
             Console.WriteLine($"Student ID: {gradeEntry.Key}, Grade: {gradeEntry.Value.GetGradeValue()}");
-        }
     }
 
     public void UpdateStudentGpa(Student? student, double newGpa)
@@ -213,6 +227,7 @@ public class Course : ISchoolActions, ICourseActions
     }
 
     #endregion
+
     #region ISchoolActions
 
     public void AssignCourse(Course course)
@@ -226,14 +241,4 @@ public class Course : ISchoolActions, ICourseActions
     }
 
     #endregion
-
-    public void StartCourse(Course course)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void EndCourse(Course course)
-    {
-        throw new NotImplementedException();
-    }
 }

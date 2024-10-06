@@ -79,7 +79,8 @@ public static class AdminStudentMenu
                     break;
                 case "9":
                     if (ValidationHelper.ValidateUser(user))
-                        CourseHandler.ListStudentsInCourses(new List<Course>(), students.OfType<Student>().ToList(), (IUser)user);
+                        CourseHandler.ListStudentsInCourses(new List<Course>(), students.OfType<Student>().ToList(),
+                            (IUser)user);
                     break;
                 case "10":
                     student = ValidationHelper.SelectAndValidateStudent(students);
@@ -90,9 +91,11 @@ public static class AdminStudentMenu
                     if (ValidationHelper.ValidateUser(user))
                     {
                         var studentsToEnroll = students?.OfType<Student?>().ToList();
-                        var coursesToEnroll = new List<Course?>(); // Assuming you have a list of courses to enroll students in
+                        var coursesToEnroll =
+                            new List<Course?>(); // Assuming you have a list of courses to enroll students in
                         SchoolHandler.EnrollStudentInCourse(coursesToEnroll, studentsToEnroll, (IUser)user);
                     }
+
                     break;
                 case "12":
                     var studentToRemove = ValidationHelper.SelectAndValidateStudent(students);
@@ -101,6 +104,7 @@ public static class AdminStudentMenu
                         var studentHelper = new StudentHelper(); // Create an instance of StudentHelper
                         studentHelper.RemoveStudent(students, studentToRemove); // Use the instance method
                     }
+
                     break;
                 case "13":
                     if (ValidationHelper.ValidateUser(user))

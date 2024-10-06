@@ -43,16 +43,13 @@ public static class InputHelper
             Console.WriteLine("Invalid date format. Please use yyyy-MM-dd.");
         }
     }
-    
+
     public static string GetValidatedYesNoInput()
     {
         while (true)
         {
             var input = Console.ReadLine()?.Trim().ToLower();
-            if (input is "yes" or "no")
-            {
-                return input;
-            }
+            if (input is "yes" or "no") return input;
             Console.WriteLine("Invalid input. Please enter 'yes' or 'no'.");
         }
     }
