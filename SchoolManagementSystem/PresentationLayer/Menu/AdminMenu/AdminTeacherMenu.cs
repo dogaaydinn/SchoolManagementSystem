@@ -43,7 +43,7 @@ public static class AdminTeacherMenu
                     TeacherHandler.UpdateTeacherSubject(teachers, user);
                     break;
                 case 8:
-                    teacher = TeacherHandler.GetTeacherById(teachers);
+                   TeacherHandler.GetTeacherById(teachers);
                     if (teacher != null)
                         TeacherHandler.UpdateTeacherName(teacher, user);
                     else

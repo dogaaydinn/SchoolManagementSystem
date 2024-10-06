@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Models.Concrete;
 
@@ -9,22 +12,24 @@ public class SchoolHelper : ISchoolHelper
     {
         while (true)
         {
-            Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
-            var input = Console.ReadLine()?.Trim();
-
-            if (string.IsNullOrEmpty(input) || input.Equals("done", StringComparison.OrdinalIgnoreCase))
-                return null;
-
-            if (int.TryParse(input, out var courseId))
+            try
             {
+                Console.WriteLine("Enter the course ID to assign (or type 'done' to finish):");
+                var input = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrEmpty(input) || input.Equals("done", StringComparison.OrdinalIgnoreCase))
+                    return null;
+
+                if (!int.TryParse(input, out var courseId))
+                    throw new Exceptions.InvalidCourseException("Invalid course ID. Please try again.");
                 var course = courses?.Find(c => c.GetCourseId() == courseId);
                 if (course != null) return course;
 
-                Console.WriteLine("Course not found. Please try again.");
+                throw new Exceptions.InvalidCourseException("Course not found. Please try again.");
             }
-            else
+            catch (Exceptions.InvalidCourseException ex)
             {
-                Console.WriteLine("Invalid course ID. Please try again.");
+                Console.WriteLine(ex.Message);
             }
         }
     }
@@ -44,32 +49,44 @@ public class SchoolHelper : ISchoolHelper
 
     public void DisplayStudents(List<Student?> students)
     {
-        if (students == null || !students.Any())
+        try
         {
-            Console.WriteLine("No students available to display.");
-            return;
-        }
+            ValidationHelper.ValidateList(students, "Students list cannot be null or empty.");
 
-        for (var i = 0; i < students.Count; i++)
+            for (var i = 0; i < students.Count; i++)
+            {
+                var student = students[i];
+                if (student != null)
+                    Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+            }
+        }
+        catch (ValidationException ex)
         {
-            var student = students[i];
-            if (student != null)
-                Console.WriteLine($"{i + 1}. {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
+            Console.WriteLine($"Validation error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while displaying students: {ex.Message}");
         }
     }
-
     public void DisplayCourses(List<Course> courses)
     {
-        if (courses == null || !courses.Any())
+        try
         {
-            Console.WriteLine("No courses available to display.");
-            return;
+            ValidationHelper.ValidateList(courses, "Courses list cannot be null or empty.");
+
+            for (var i = 0; i < courses.Count; i++)
+                Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()} (ID: {courses[i].GetCourseId()})");
         }
-
-        for (var i = 0; i < courses.Count; i++)
-            Console.WriteLine($"{i + 1}. {courses[i].GetCourseName()} (ID: {courses[i].GetCourseId()})");
+        catch (ValidationException ex)
+        {
+            Console.WriteLine($"Validation error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while displaying courses: {ex.Message}");
+        }
     }
-
     public Student? SelectStudent(List<Student?> students)
     {
         DisplayStudents(students);
@@ -82,7 +99,7 @@ public class SchoolHelper : ISchoolHelper
         return GetUserSelection(courses);
     }
 
-    public Teacher? SelectTeacher(List<Teacher?> teachers)
+    public static Teacher? SelectTeacher(List<Teacher?> teachers)
     {
         DisplayTeachers(teachers);
         return GetUserSelection(teachers);
@@ -90,17 +107,24 @@ public class SchoolHelper : ISchoolHelper
 
     private static void DisplayTeachers(List<Teacher?> teachers)
     {
-        if (teachers == null || !teachers.Any())
+        try
         {
-            Console.WriteLine("No teachers available to display.");
-            return;
-        }
+            ValidationHelper.ValidateList(teachers, "Teachers list cannot be null or empty.");
 
-        for (var i = 0; i < teachers.Count; i++)
+            for (var i = 0; i < teachers.Count; i++)
+            {
+                var teacher = teachers[i];
+                if (teacher != null)
+                    Console.WriteLine($"{i + 1}. {teacher.GetTeacherFullName()} (ID: {teacher.GetTeacherId()})");
+            }
+        }
+        catch (ValidationException ex)
         {
-            var teacher = teachers[i];
-            if (teacher != null)
-                Console.WriteLine($"{i + 1}. {teacher.GetTeacherFullName()} (ID: {teacher.GetTeacherId()})");
+            Console.WriteLine($"Validation error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while displaying teachers: {ex.Message}");
         }
     }
 

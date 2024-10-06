@@ -1,4 +1,6 @@
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
+using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Helpers;
@@ -24,10 +26,10 @@ public static class CourseHandler
         switch (choice)
         {
             case 1:
-                course = courseHelper.GetCourseById(courses.ToList());
+                course = CourseHelper.GetCourseById(courses.ToList());
                 break;
             case 2:
-                course = courseHelper.GetCourseByName(courses.ToList());
+                course = CourseHelper.GetCourseByName(courses.ToList());
                 break;
             case 3:
                 DisplayCourseNames(courses, user);
@@ -199,7 +201,8 @@ public static class CourseHandler
                 UpdateCourseName(course);
                 break;
             case 3:
-                SchoolHandler.AssignCoursesToStudents(new List<Course> { course }, new List<Student?>(), user);
+                var schoolHelper = new SchoolHelper(); 
+                SchoolHandler.AssignCoursesToStudents(schoolHelper, new List<Course>(), new List<Student?>(), (IUser)user);
                 break;
             case 4:
                 return;
@@ -212,21 +215,32 @@ public static class CourseHandler
     private static void ListEntities<T>(IEnumerable<T?> entities, string entityType, Action<T> displayAction)
         where T : class
     {
-        if (entities == null || !entities.Any())
+        try
         {
-            Console.WriteLine($"No {entityType}s found.");
-            return;
-        }
-
-        foreach (var entity in entities)
-        {
-            if (entity == null)
+            var enumerable = entities.ToList();
+            if (entities == null || !enumerable.Any())
             {
-                Console.WriteLine($"Invalid {entityType} detected.");
-                continue;
+                throw new Exceptions.EntityNotFoundException($"No {entityType}s found.");
             }
 
-            displayAction(entity);
+            foreach (var entity in enumerable)
+            {
+                if (entity == null)
+                {
+                    Console.WriteLine($"Invalid {entityType} detected.");
+                    continue;
+                }
+
+                displayAction(entity);
+            }
+        }
+        catch (Exceptions.EntityNotFoundException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while listing entities: {ex.Message}");
         }
     }
 }

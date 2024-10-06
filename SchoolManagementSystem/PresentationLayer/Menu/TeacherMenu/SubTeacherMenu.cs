@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
@@ -47,7 +48,7 @@ public static class SubTeacherMenu
     private static bool HandleTeacherMenuChoice(string choice, List<Teacher?> teachers, object user)
     {
         var schoolHelper = new SchoolHelper();
-        var teacher = schoolHelper.SelectTeacher(teachers);
+        var teacher = SchoolHelper.SelectTeacher(teachers);
         switch (choice)
         {
             case "1":
@@ -60,10 +61,17 @@ public static class SubTeacherMenu
                 TeacherHandler.DisplayTeachersBySubject(teachers);
                 break;
             case "4":
-                if (teacher != null)
-                    SchoolHandler.DemonstrateActions(teachers, user);
-                else
-                    Console.WriteLine("Teacher not found.");
+                try
+                {
+                    if (teacher != null)
+                        SchoolHandler.DemonstrateActions(teachers, user);
+                    else
+                        throw new Exceptions.TeacherNotFoundException("No teacher selected. Please select a teacher first.");
+                }
+                catch (Exceptions.TeacherNotFoundException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "5":
                 if (teacher != null) TeacherHandler.GetTeacherById(teachers);
@@ -84,16 +92,36 @@ public static class SubTeacherMenu
                 TeacherHandler.DisplayAllTeachers(teachers);
                 break;
             case "12":
-                if (user != null)
-                    TeacherHelper.AddNewTeacher(teachers, (IUser)user);
-                else
-                    Console.WriteLine("Error: User is null.");
+                try
+                {
+                    if (user != null)
+                        TeacherHelper.AddNewTeacher(teachers, (IUser)user);
+                    else
+                        throw new Exceptions.UserNotFoundException();
+                }
+                catch (Exceptions.UserNotFoundException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "13":
-                if (teacher != null && user != null)
-                    TeacherHandler.RemoveTeacher(teachers, teacher, (IUser)user);
-                else
-                    Console.WriteLine("Error: Teacher or User is null.");
+                try
+                {
+                    if (teacher != null && user != null)
+                        TeacherHandler.RemoveTeacher(teachers, teacher, (IUser)user);
+                    else if (teacher == null)
+                        throw new Exceptions.TeacherNotFoundException("Error: Teacher is null.");
+                    else
+                        throw new Exceptions.UserNotFoundException();
+                }
+                catch (Exceptions.TeacherNotFoundException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exceptions.UserNotFoundException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "14":
                 return false;

@@ -1,4 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using SchoolManagementSystem.BusinessLogicLayer.Authentications;
+using SchoolManagementSystem.BusinessLogicLayer.Utilities;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.Helper;
@@ -48,12 +51,13 @@ public class StudentHelper : IStudentHelper
         var gpa = InputHelper.GetValidatedDoubleInput("Enter GPA:", 0, 4);
 
         var studentId = DataProvider.GenerateStudentId();
-        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa);
-        newStudent.GeneratePassword(); // Call the inherited method
+        var password = Authenticator.GenerateRandomPassword();
+        var hashedPassword = PasswordHelper.HashPassword(password);
+        var newStudent = new Student(firstName, lastName, dateOfBirth, studentId, gpa, hashedPassword);
 
         students.Add(newStudent);
         Console.WriteLine($"New student added: {newStudent.GetStudentFullName()} (ID: {newStudent.GetStudentId()})");
-        Console.WriteLine($"Generated password: {newStudent.GetPassword()}");
+        Console.WriteLine($"Generated password: {password}");
     }
 
     public void RemoveStudent(List<Student?> students, IUser user)
@@ -93,20 +97,30 @@ public class StudentHelper : IStudentHelper
 
     public static Student? GetStudentById(List<Student> students)
     {
-        var studentId = InputHelper.GetValidatedIntInput("Enter the Student ID:");
-
-        if (students == null)
+        try
         {
-            Console.WriteLine("Students list is null.");
+            if (students == null)
+                throw new ValidationException("Students list cannot be null.");
+
+            var studentId = InputHelper.GetValidatedIntInput("Enter the Student ID:");
+            var student = students.FirstOrDefault(s => s.GetStudentId() == studentId);
+
+            if (student == null)
+                Console.WriteLine("Student not found.");
+
+            return student;
+        }
+        catch (ValidationException ex)
+        {
+            Console.WriteLine($"Validation error: {ex.Message}");
             return null;
         }
-
-        var student = students.FirstOrDefault(s => s.GetStudentId() == studentId);
-        if (student == null) Console.WriteLine("Student not found.");
-
-        return student;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return null;
+        }
     }
-
     public static void DisplayGrades(Course course)
     {
         var enrolledStudents = course.GetEnrolledStudents();

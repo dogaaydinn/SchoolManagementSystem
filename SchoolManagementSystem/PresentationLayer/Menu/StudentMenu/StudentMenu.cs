@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
 using SchoolManagementSystem.PresentationLayer.Helpers;
@@ -45,31 +46,59 @@ public static class StudentMenu
         switch (choice)
         {
             case "1":
-                if (student != null)
-                    StudentHandler.DisplayStudentDetails(student);
-                else
-                    Console.WriteLine("Error: No student selected.");
+                try
+                {
+                    if (student != null)
+                        StudentHandler.DisplayStudentDetails(student);
+                    else
+                        throw new Exceptions.StudentNotSelectedException();
+                }
+                catch (Exceptions.StudentNotSelectedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "2":
-                if (course != null)
-                    StudentHelper.DisplayGrades(course);
-                else
-                    Console.WriteLine("Error: No course selected.");
+                try
+                {
+                    if (course != null)
+                        StudentHelper.DisplayGrades(course);
+                    else
+                        throw new Exceptions.CourseNotSelectedException();
+                }
+                catch (Exceptions.CourseNotSelectedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "3":
-                if (course != null)
-                    CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
-                else
-                    Console.WriteLine("Error: No course selected.");
+                try
+                {
+                    if (course != null)
+                        CourseHandler.DisplayCourseDetails(new List<Course?> { course }, user);
+                    else
+                        throw new Exceptions.CourseNotSelectedException();
+                }
+                catch (Exceptions.CourseNotSelectedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "4":
                 CourseHandler.DisplayTotalCourses(courses);
                 break;
             case "5":
-                if (student != null)
-                    StudentHandler.UpdateStudentId(new List<Student> { student }, user);
-                else
-                    Console.WriteLine("Error: No student selected.");
+                try
+                {
+                    if (student != null)
+                        StudentHandler.UpdateStudentId(new List<Student> { student }, user);
+                    else
+                        throw new Exceptions.StudentNotSelectedException();
+                }
+                catch (Exceptions.StudentNotSelectedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 break;
             case "6":
                 return false;

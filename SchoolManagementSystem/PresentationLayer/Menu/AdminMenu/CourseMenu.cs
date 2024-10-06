@@ -67,7 +67,7 @@ public static class CourseMenu
                 SchoolHandler.EnrollStudentInCourse(courses, nullableStudents?.OfType<Student?>().ToList(), user);
                 break;
             case "6":
-                SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, user);
+                SchoolHandler.AssignCoursesToStudents(schoolHelper, courses, nullableStudents, user);
                 break;
             case "7":
                 schoolHelper.DisplayCourses(courses);

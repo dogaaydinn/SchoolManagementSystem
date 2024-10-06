@@ -74,7 +74,7 @@ public static class SubCourseMenu
                 SchoolHandler.EnrollStudentInCourse(courses, nullableStudents, (IUser)user);
                 break;
             case "6":
-                SchoolHandler.AssignCoursesToStudents(courses, nullableStudents, (IUser)user);
+                SchoolHandler.AssignCoursesToStudents(schoolHelper,courses, nullableStudents, (IUser)user);
                 break;
             case "7":
                 schoolHelper.DisplayCourses(courses);

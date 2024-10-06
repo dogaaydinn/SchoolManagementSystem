@@ -4,8 +4,15 @@ public static class InputHelper
 {
     public static string GetValidatedStringInput(string prompt)
     {
-        Console.Write(prompt);
-        return Console.ReadLine() ?? string.Empty;
+        while (true)
+        {
+            Console.Write(prompt);
+            var input = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(input))
+                return input;
+
+            Console.WriteLine("Invalid input. Please enter a non-empty string.");
+        }
     }
 
     public static int GetValidatedIntInput(string prompt)
@@ -13,7 +20,8 @@ public static class InputHelper
         while (true)
         {
             Console.Write(prompt);
-            if (int.TryParse(Console.ReadLine(), out var value))
+            var input = Console.ReadLine();
+            if (int.TryParse(input, out var value))
                 return value;
 
             Console.WriteLine("Invalid input. Please enter a valid integer.");
@@ -25,7 +33,8 @@ public static class InputHelper
         while (true)
         {
             Console.Write(prompt);
-            if (double.TryParse(Console.ReadLine(), out var value) && value >= min && value <= max)
+            var input = Console.ReadLine();
+            if (double.TryParse(input, out var value) && value >= min && value <= max)
                 return value;
 
             Console.WriteLine($"Invalid input. Please enter a valid number between {min} and {max}.");
@@ -37,7 +46,8 @@ public static class InputHelper
         while (true)
         {
             Console.Write(prompt);
-            if (DateTime.TryParse(Console.ReadLine(), out var date))
+            var input = Console.ReadLine();
+            if (DateTime.TryParse(input, out var date))
                 return date;
 
             Console.WriteLine("Invalid date format. Please use yyyy-MM-dd.");
@@ -49,7 +59,9 @@ public static class InputHelper
         while (true)
         {
             var input = Console.ReadLine()?.Trim().ToLower();
-            if (input is "yes" or "no") return input;
+            if (input is "yes" or "no")
+                return input;
+
             Console.WriteLine("Invalid input. Please enter 'yes' or 'no'.");
         }
     }

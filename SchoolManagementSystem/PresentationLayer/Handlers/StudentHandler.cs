@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Interfaces.User;
@@ -12,13 +13,23 @@ public static class StudentHandler
 
     public static void DisplayStudentDetails(Student student)
     {
-        if (student is null)
+        try
         {
-            Console.WriteLine("Student not found.");
-            return;
-        }
+            if (student is null)
+            {
+                throw new Exceptions.StudentNotFoundException("Student not found.");
+            }
 
-        StudentHelper.DisplayStudentInfo(student);
+            StudentHelper.DisplayStudentInfo(student);
+        }
+        catch (Exceptions.StudentNotFoundException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while displaying student details: {ex.Message}");
+        }
     }
 
     public static void UpdateStudentId(List<Student> students, object user)
@@ -42,13 +53,11 @@ public static class StudentHandler
         ValidationHelper.ValidateUserAccess(user);
         var student = Helpers.StudentHelper.GetStudentById(students);
 
-        if (student is not null)
-        {
-            Console.Write("Enter new Student Name: ");
-            var newName = Console.ReadLine();
-            ValidationHelper.ValidateNotEmpty(newName, "New Student Name cannot be empty.");
-            Helpers.StudentHelper.UpdateStudentFullName(student, newName);
-        }
+        if (student is null) return;
+        Console.Write("Enter new Student Name: ");
+        var newName = Console.ReadLine();
+        ValidationHelper.ValidateNotEmpty(newName, "New Student Name cannot be empty.");
+        Helpers.StudentHelper.UpdateStudentFullName(student, newName);
     }
 
     public static void AddNewStudent(List<Student> students, IUser user)
@@ -70,14 +79,24 @@ public static class StudentHandler
 
     public static void DisplayAllStudents(List<Student?> students)
     {
-        if (students is null || !students.Any())
+        try
         {
-            Console.WriteLine("No students available.");
-            return;
-        }
+            if (students is null || !students.Any())
+            {
+                throw new Exceptions.NoStudentsAvailableException("No students available.");
+            }
 
-        foreach (var student in students.OfType<Student>())
-            Console.WriteLine(
-                $"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+            foreach (var student in students.OfType<Student>())
+                Console.WriteLine(
+                    $"Student ID: {student.GetStudentId()}, Name: {student.GetStudentFullName()}, GPA: {student.GetGpa()}");
+        }
+        catch (Exceptions.NoStudentsAvailableException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while displaying all students: {ex.Message}");
+        }
     }
 }

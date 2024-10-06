@@ -17,17 +17,6 @@ public class Course : ISchoolActions, ICourseActions
     }
 
     #endregion
-
-    public void StartCourse(Course course)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void EndCourse(Course course)
-    {
-        throw new NotImplementedException();
-    }
-
     #region Fields
 
     private const int MaxStudents = 30;
@@ -40,14 +29,7 @@ public class Course : ISchoolActions, ICourseActions
     private int _credits;
 
     #endregion
-
     #region Methods
-
-    public void SetCredits(int newCredits)
-    {
-        _credits = newCredits;
-    }
-
     public int GetCourseId()
     {
         return _courseId;
@@ -62,12 +44,7 @@ public class Course : ISchoolActions, ICourseActions
     {
         _courseId = newCourseId;
     }
-
-    public List<double> GetGrades()
-    {
-        return _studentGrades.Values.Select(grade => grade.GetGradeValue()).ToList();
-    }
-
+    
     public static string GetAssignedTeacherName()
     {
         return _assignedTeacher != null ? $"Teacher: {_assignedTeacher.GetTeacherFullName()}" : "No assigned teacher";
@@ -108,7 +85,6 @@ public class Course : ISchoolActions, ICourseActions
         Console.WriteLine($"Enrolled {student.GetStudentFullName()} in {GetCourseName()}.");
     }
 
-
     public void UnenrollStudent(Student? student)
     {
         if (student == null)
@@ -147,16 +123,6 @@ public class Course : ISchoolActions, ICourseActions
         return _enrolledStudents;
     }
 
-    public void ListStudents()
-    {
-        Console.WriteLine($"Course {_courseName} has the following students:");
-        if (_enrolledStudents != null)
-            foreach (var student in _enrolledStudents)
-                Console.WriteLine(student?.GetStudentFullName());
-        else
-            Console.WriteLine("No students are enrolled in this course.");
-    }
-
     public void AssignGrade(Student? student, double grade)
     {
         if (!IsStudentEnrolled(student))
@@ -178,14 +144,6 @@ public class Course : ISchoolActions, ICourseActions
 
         student?.CalculateGpa();
     }
-
-    public double GetAssignedGrades(Student? student)
-    {
-        return student != null && _studentGrades.TryGetValue(student.GetStudentId(), out var grade)
-            ? grade.GetGradeValue()
-            : -1.0;
-    }
-
     public override string? ToString()
     {
         return _assignedTeacher != null
@@ -193,19 +151,22 @@ public class Course : ISchoolActions, ICourseActions
             : null;
     }
 
-    public void ListGrades()
+    public double GetAssignedGrades(Student? student)
     {
-        if (_studentGrades.Count == 0)
-        {
-            Console.WriteLine($"No grades assigned yet for the course {_courseName}.");
-            return;
-        }
-
-        Console.WriteLine($"Course {_courseName} has the following grades:");
-        foreach (var gradeEntry in _studentGrades)
-            Console.WriteLine($"Student ID: {gradeEntry.Key}, Grade: {gradeEntry.Value.GetGradeValue()}");
+        return student != null && _studentGrades.TryGetValue(student.GetStudentId(), out var grade)
+            ? grade.GetGradeValue()
+            : -1.0;
     }
-
+    
+    public void SetCredits(int newCredits)
+    {
+        _credits = newCredits;
+    }
+    public List<double> GetGrades()
+    {
+        return _studentGrades.Values.Select(grade => grade.GetGradeValue()).ToList();
+    }
+    
     public void UpdateStudentGpa(Student? student, double newGpa)
     {
         if (!IsStudentEnrolled(student))
@@ -227,7 +188,6 @@ public class Course : ISchoolActions, ICourseActions
     }
 
     #endregion
-
     #region ISchoolActions
 
     public void AssignCourse(Course course)
@@ -239,6 +199,26 @@ public class Course : ISchoolActions, ICourseActions
     {
         Console.WriteLine($"Course {course.GetCourseName()} removed.");
     }
+    
+    #endregion
+    #region ICourseActions
+    public void StartCourse(Course course)
+    {
+        if (course == null)
+        {
+            throw new ArgumentNullException(nameof(course), "Course cannot be null.");
+        }
 
+        Console.WriteLine($"Course {course.GetCourseName()} has started.");
+    }
+    public void EndCourse(Course course)
+    {
+        if (course == null)
+        {
+            throw new ArgumentNullException(nameof(course), "Course cannot be null.");
+        }
+
+        Console.WriteLine($"Course {course.GetCourseName()} has ended.");
+    }
     #endregion
 }

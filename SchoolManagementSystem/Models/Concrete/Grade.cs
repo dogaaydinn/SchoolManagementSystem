@@ -12,7 +12,6 @@ public class Grade
     }
 
     #endregion
-
     #region Properties
 
     private int StudentId { get; }
@@ -20,7 +19,6 @@ public class Grade
     private double Value { get; set; }
 
     #endregion
-
     #region Methods
 
     public void UpdateValue(double newValue)

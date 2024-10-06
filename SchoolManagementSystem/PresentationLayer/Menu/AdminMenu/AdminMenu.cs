@@ -1,14 +1,17 @@
+using SchoolManagementSystem.BusinessLogicLayer.Authentications;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Handlers;
+using SchoolManagementSystem.PresentationLayer.Helpers;
 
 namespace SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
 
 public static class AdminMenu
 {
-    public static void DisplayAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers,
-        object user)
+    public static void DisplayAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers, object user)
     {
+        var schoolHelper = new SchoolHelper(); 
+
         while (true)
         {
             Console.WriteLine("\nAdmin Menu:");
@@ -22,7 +25,7 @@ public static class AdminMenu
                 continue;
             }
 
-            if (!HandleMenuChoice(choice, courses, students, teachers, user)) return;
+            if (!HandleMenuChoice(choice, courses, students, teachers, user, schoolHelper)) return;
         }
     }
 
@@ -32,12 +35,13 @@ public static class AdminMenu
         Console.WriteLine("2. Manage Students");
         Console.WriteLine("3. Manage Teachers");
         Console.WriteLine("4. View All Details");
-        Console.WriteLine("5. Exit");
+        Console.WriteLine("5. Add Member To School");
+        Console.WriteLine("6. Reset All Passwords");
+        Console.WriteLine("7. Exit");
         Console.Write("Enter your choice: ");
     }
 
-    private static bool HandleMenuChoice(string choice, List<Course> courses, List<Student?>? students,
-        List<Teacher?> teachers, object user)
+    private static bool HandleMenuChoice(string choice, List<Course> courses, List<Student?>? students, List<Teacher?> teachers, object user, SchoolHelper schoolHelper)
     {
         switch (choice)
         {
@@ -54,10 +58,14 @@ public static class AdminMenu
                 AdminTeacherMenu.DisplayTeacherMenu(teachers, courses, user);
                 break;
             case "4":
-                SchoolHandler.DisplayAllDetails(courses, students, teachers, user);
+                SchoolHandler.DisplayAllDetails(schoolHelper, courses, students, teachers, user);
                 break;
             case "5":
-                return false;
+                AddMemberMenu.DisplayAddMemberMenu();
+                break;
+            case "6":
+                Authenticator.ResetAllPasswords();
+                break;
             default:
                 Console.WriteLine("Invalid choice. Please try again.");
                 break;

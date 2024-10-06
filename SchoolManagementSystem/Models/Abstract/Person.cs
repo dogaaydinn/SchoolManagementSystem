@@ -7,46 +7,32 @@ public abstract class Person : IUser
 {
     #region Constructors
 
-    protected Person(string firstName, string lastName, DateTime dateOfBirth, bool ısAdmin)
+    protected Person(string firstName, string lastName, DateTime dateOfBirth, bool ısAdmin, string password)
     {
         FirstName = firstName;
         LastName = lastName;
         DateOfBirth = dateOfBirth;
         IsAdmin = ısAdmin;
-        Password = GenerateRandomPassword();
+        Password = password;
     }
 
     #endregion
-
     #region Properties
 
     private string FirstName { get; }
     private string LastName { get; }
     private DateTime DateOfBirth { get; }
-    private string Password { get; set; }
+    protected internal string Password { get; private set; }
     public int Id { get; set; }
-
+    public bool IsAdmin { get; }
     #endregion
-
     #region Methods
 
-    public bool IsAdmin { get; }
-
-    public void SetPassword(string password)
+    public string GetPassword()
     {
-        Password = password;
+        return Password;
     }
-
-    public bool ValidatePassword(string password)
-    {
-        return Password == password;
-    }
-
-    public void GeneratePassword()
-    {
-        Password = Guid.NewGuid().ToString("N").Substring(0, 8); // Example password generation
-    }
-
+    
     public void DisplayUserInfo()
     {
         Console.WriteLine($"ID: {Id}");
@@ -72,27 +58,10 @@ public abstract class Person : IUser
         if (GetDateOfBirth().Date > today.AddYears(-age)) age--;
         return age;
     }
-
-    private string GenerateRandomPassword()
+    
+    public void SetPassword(string password)
     {
-        const int passwordLength = 8;
-        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        var password = new StringBuilder();
-        var random = new Random();
-
-        for (var i = 0; i < passwordLength; i++) password.Append(validChars[random.Next(validChars.Length)]);
-
-        return password.ToString();
-    }
-
-    public string GetPassword()
-    {
-        return Password;
-    }
-
-    public int GetId()
-    {
-        return Id;
+        Password = password;
     }
 
     public abstract void DisplayDetails();

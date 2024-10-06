@@ -8,11 +8,10 @@ public class Student : SchoolMember, IStudentActions, IUser
 {
     #region Constructors
 
-    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa)
-        : base(firstName, lastName, dateOfBirth)
+    public Student(string firstName, string lastName, DateTime dateOfBirth, int studentId, double gpa,
+        string hashedPassword)
+        : base(firstName, lastName, dateOfBirth, hashedPassword)
     {
-        FirstName = firstName;
-        LastName = lastName;
         StudentId = studentId;
         StudentName = $"{firstName} {lastName}";
         Gpa = gpa;
@@ -21,9 +20,6 @@ public class Student : SchoolMember, IStudentActions, IUser
     }
 
     #endregion
-
-    public int Id { get; set; }
-
     #region Properties
 
     private int StudentId { get; set; }
@@ -34,67 +30,9 @@ public class Student : SchoolMember, IStudentActions, IUser
 
     private string FirstName { get; set; }
     private string LastName { get; set; }
+    public int Id { get; set; }
 
     #endregion
-
-    #region IPersonActions Members
-
-    public void Communicate()
-    {
-        Console.WriteLine($"{GetFullName()} is communicating.");
-    }
-
-    public void PerformDailyRoutine()
-    {
-        Console.WriteLine($"{GetFullName()} is performing daily routine.");
-    }
-
-    public void Rest()
-    {
-        Console.WriteLine($"{GetFullName()} is resting.");
-    }
-
-    #endregion
-
-    #region IStudentActions Members
-
-    public void AttendClass()
-    {
-        Console.WriteLine($"{GetStudentFullName()} is attending class.");
-    }
-
-    public void DoHomework()
-    {
-        Console.WriteLine($"{GetStudentFullName()} is doing homework.");
-    }
-
-    public void Learn()
-    {
-        Console.WriteLine($"{GetFullName()} is learning.");
-    }
-
-    public void TakeTest()
-    {
-        Console.WriteLine($"{GetFullName()} is taking a test.");
-    }
-
-    public void SubmitAssignment()
-    {
-        Console.WriteLine($"{GetStudentFullName()} is submitting an assignment.");
-    }
-
-    public void Study()
-    {
-        Console.WriteLine($"{GetStudentFullName()} is studying.");
-    }
-
-    public void ParticipateInClass()
-    {
-        Console.WriteLine($"{GetStudentFullName()} is participating in class.");
-    }
-
-    #endregion
-
     #region Methods
 
     public int GetAssignedGrades(Course course)
@@ -227,6 +165,62 @@ public class Student : SchoolMember, IStudentActions, IUser
     public new void DisplayUserInfo()
     {
         DisplayDetails();
+    }
+
+    #endregion
+    #region IPersonActions Members
+
+    public void Communicate()
+    {
+        Console.WriteLine($"{GetFullName()} is communicating.");
+    }
+
+    public void PerformDailyRoutine()
+    {
+        Console.WriteLine($"{GetFullName()} is performing daily routine.");
+    }
+
+    public void Rest()
+    {
+        Console.WriteLine($"{GetFullName()} is resting.");
+    }
+
+    #endregion
+    #region IStudentActions Members
+
+    public void AttendClass()
+    {
+        Console.WriteLine($"{GetStudentFullName()} is attending class.");
+    }
+
+    public void DoHomework()
+    {
+        Console.WriteLine($"{GetStudentFullName()} is doing homework.");
+    }
+
+    public void Learn()
+    {
+        Console.WriteLine($"{GetFullName()} is learning.");
+    }
+
+    public void TakeTest()
+    {
+        Console.WriteLine($"{GetFullName()} is taking a test.");
+    }
+
+    public void SubmitAssignment()
+    {
+        Console.WriteLine($"{GetStudentFullName()} is submitting an assignment.");
+    }
+
+    public void Study()
+    {
+        Console.WriteLine($"{GetStudentFullName()} is studying.");
+    }
+
+    public void ParticipateInClass()
+    {
+        Console.WriteLine($"{GetStudentFullName()} is participating in class.");
     }
 
     #endregion

@@ -1,20 +1,61 @@
+using Newtonsoft.Json;
+using SchoolManagementSystem.BusinessLogicLayer.Authentications;
+using SchoolManagementSystem.BusinessLogicLayer.Utilities;
 using SchoolManagementSystem.Models.Abstract;
 using SchoolManagementSystem.Models.Concrete;
+using Formatting = System.Xml.Formatting;
 
 namespace SchoolManagementSystem.Data;
 
 public static class DataProvider
 {
+    private const string FilePath = "schoolMembers.json";
     private static readonly List<SchoolMember?> SchoolMembers = new();
-    private static readonly List<Admin> Admins = new();
     private static int _nextStudentId = 1;
+    private static int _currentTeacherId = 26;
+    private static int _currentAdminId = 21;
+
+    static DataProvider()
+    {
+        if (File.Exists(FilePath))
+        {
+            var json = File.ReadAllText(FilePath);
+            SchoolMembers = JsonConvert.DeserializeObject<List<SchoolMember>>(json) ?? new List<SchoolMember>();
+        }
+        else
+        {
+            SchoolMembers = new List<SchoolMember>();
+        }
+    }
+
+    private static void SaveChanges()
+    {
+        var json = JsonConvert.SerializeObject(SchoolMembers, Newtonsoft.Json.Formatting.Indented);
+        File.WriteAllText(FilePath, json);
+    }
+
+    public static void AddSchoolMember(SchoolMember member)
+    {
+        SchoolMembers.Add(member);
+        SaveChanges();
+    }
 
     public static SchoolMember? GetSchoolMemberByName(string firstName, string lastName)
     {
-        return SchoolMembers.FirstOrDefault(u =>
-            u.GetFullName().Equals($"{firstName} {lastName}", StringComparison.OrdinalIgnoreCase));
+        return SchoolMembers.FirstOrDefault(m =>
+            m.GetFullName().Equals($"{firstName} {lastName}", StringComparison.OrdinalIgnoreCase));
+    }
+    
+    public static int GenerateTeacherId()
+    {
+        return _currentTeacherId++;
     }
 
+    public static int GenerateAdminId()
+    {
+        return _currentAdminId++;
+    }
+    
     public static IEnumerable<SchoolMember?> GetAllSchoolMembers()
     {
         return SchoolMembers;
@@ -25,84 +66,98 @@ public static class DataProvider
         return _nextStudentId++;
     }
 
-    public static bool SchoolMemberExists(string firstName, string lastName, DateTime dateOfBirth, int id)
+  public static List<Teacher> GetTeachers()
+{
+    var teacherList = new List<Teacher>
     {
-        return SchoolMembers.Any(u =>
-            u.GetFullName() == $"{firstName} {lastName}" && u.DateOfBirth == dateOfBirth && u.Id == id);
-    }
-
-    public static void AddSchoolMember(SchoolMember? schoolMember)
+        new("John", "Doe", new DateTime(1980, 5, 15), 1, "Mathematics", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jane", "Doe", new DateTime(1985, 7, 25), 2, "Physics", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jack", "Smith", new DateTime(1975, 9, 5), 3, "Chemistry", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jill", "Johnson", new DateTime(1990, 11, 20), 4, "Biology", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("James", "Williams", new DateTime(1995, 1, 10), 5, "History", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jessica", "Brown", new DateTime(1992, 3, 30), 6, "Geography", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Justin", "Lee", new DateTime(1998, 6, 15), 7, "Literature", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Julia", "Garcia", new DateTime(2000, 8, 25), 8, "Art", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jacob", "Martinez", new DateTime(2002, 10, 5), 9, "Music", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jasmine", "Hernandez", new DateTime(2004, 12, 20), 10, "Physical Education", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Michael", "Scott", new DateTime(1970, 3, 15), 11, "Business Studies", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Pam", "Beesly", new DateTime(1981, 3, 25), 12, "Art", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Jim", "Halpert", new DateTime(1978, 10, 1), 13, "Sports", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Dwight", "Schrute", new DateTime(1975, 1, 20), 14, "Agriculture", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Stanley", "Hudson", new DateTime(1958, 2, 19), 15, "Economics", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Angela", "Martin", new DateTime(1971, 6, 25), 16, "Accounting", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Kevin", "Malone", new DateTime(1973, 5, 1), 17, "Mathematics", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Oscar", "Martinez", new DateTime(1974, 7, 4), 18, "Accounting", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Phyllis", "Vance", new DateTime(1955, 7, 10), 19, "Home Economics", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Meredith", "Palmer", new DateTime(1960, 12, 11), 20, "Health Education", PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword()))
+    };
+    
+    foreach (var teacher in teacherList)
     {
-        SchoolMembers.Add(schoolMember);
-    }
-
-    public static List<Teacher> GetTeachers()
-    {
-        var teacherList = new List<Teacher>
+        var existingTeacher = SchoolMembers.OfType<Teacher>().FirstOrDefault(t => t.Id == teacher.Id);
+        if (existingTeacher == null)
         {
-            new("John", "Doe", new DateTime(1980, 5, 15), 1, "Mathematics"),
-            new("Jane", "Doe", new DateTime(1985, 7, 25), 2, "Physics"),
-            new("Jack", "Smith", new DateTime(1975, 9, 5), 3, "Chemistry"),
-            new("Jill", "Johnson", new DateTime(1990, 11, 20), 4, "Biology"),
-            new("James", "Williams", new DateTime(1995, 1, 10), 5, "History"),
-            new("Jessica", "Brown", new DateTime(1992, 3, 30), 6, "Geography"),
-            new("Justin", "Lee", new DateTime(1998, 6, 15), 7, "Literature"),
-            new("Julia", "Garcia", new DateTime(2000, 8, 25), 8, "Art"),
-            new("Jacob", "Martinez", new DateTime(2002, 10, 5), 9, "Music"),
-            new("Jasmine", "Hernandez", new DateTime(2004, 12, 20), 10, "Physical Education"),
-            new("Michael", "Scott", new DateTime(1970, 3, 15), 11, "Business Studies"),
-            new("Pam", "Beesly", new DateTime(1981, 3, 25), 12, "Art"),
-            new("Jim", "Halpert", new DateTime(1978, 10, 1), 13, "Sports"),
-            new("Dwight", "Schrute", new DateTime(1975, 1, 20), 14, "Agriculture"),
-            new("Stanley", "Hudson", new DateTime(1958, 2, 19), 15, "Economics"),
-            new("Angela", "Martin", new DateTime(1971, 6, 25), 16, "Accounting"),
-            new("Kevin", "Malone", new DateTime(1973, 5, 1), 17, "Mathematics"),
-            new("Oscar", "Martinez", new DateTime(1974, 7, 4), 18, "Accounting"),
-            new("Phyllis", "Vance", new DateTime(1955, 7, 10), 19, "Home Economics"),
-            new("Meredith", "Palmer", new DateTime(1960, 12, 11), 20, "Health Education")
-        };
-        
-        SchoolMembers.AddRange(teacherList);
-
-        return teacherList;
-    }
-
-    public static List<Student> GetStudents()
-    {
-        var studentList = new List<Student>
+            SchoolMembers.Add(teacher);
+        }
+        else
         {
-            new("Alice", "Smith", new DateTime(2005, 3, 22), 101, 3.8),
-            new("Bob", "Johnson", new DateTime(2004, 7, 19), 102, 3.2),
-            new("Charlie", "Brown", new DateTime(2006, 9, 11), 103, 3.9),
-            new("David", "Lee", new DateTime(2003, 11, 30), 104, 3.5),
-            new("Eve", "Williams", new DateTime(2007, 1, 25), 105, 3.7),
-            new("Frank", "Davis", new DateTime(2002, 5, 5), 106, 3.6),
-            new("Grace", "Rodriguez", new DateTime(2008, 8, 15), 107, 3.4),
-            new("Henry", "Martinez", new DateTime(2001, 10, 10), 108, 3.3),
-            new("Isabel", "Hernandez", new DateTime(2009, 12, 1), 109, 3.1),
-            new("Kevin", "Garcia", new DateTime(2000, 2, 20), 110, 3.0),
-            new("Linda", "Lopez", new DateTime(2010, 4, 10), 111, 2.9),
-            new("Michael", "Perez", new DateTime(1999, 6, 5), 112, 2.8),
-            new("Nancy", "Torres", new DateTime(2011, 7, 30), 113, 2.7),
-            new("Olivia", "Adams", new DateTime(2005, 2, 14), 114, 3.6),
-            new("Paul", "Baker", new DateTime(2004, 5, 21), 115, 3.4),
-            new("Quincy", "Clark", new DateTime(2006, 8, 9), 116, 3.5),
-            new("Rachel", "Davis", new DateTime(2003, 12, 3), 117, 3.8),
-            new("Sam", "Evans", new DateTime(2007, 4, 17), 118, 3.2),
-            new("Tina", "Foster", new DateTime(2002, 6, 25), 119, 3.9),
-            new("Uma", "Green", new DateTime(2008, 9, 13), 120, 3.1),
-            new("Victor", "Harris", new DateTime(2001, 11, 7), 121, 3.0),
-            new("Wendy", "Iverson", new DateTime(2009, 1, 19), 122, 2.9),
-            new("Xander", "Jackson", new DateTime(2000, 3, 11), 123, 2.8),
-            new("Yara", "King", new DateTime(2010, 5, 23), 124, 2.7),
-            new("Zane", "Lewis", new DateTime(2011, 7, 15), 125, 2.6)
-        };
-        
-        SchoolMembers.AddRange(studentList);
-
-        return studentList;
+            teacher.SetPassword(existingTeacher.Password);
+        }
     }
 
+    SchoolMembers.AddRange(teacherList);
+
+    return teacherList;
+}
+
+public static List<Student> GetStudents()
+{
+    var studentList = new List<Student>
+    {
+        new("Alice", "Smith", new DateTime(2005, 3, 22), 101, 3.8, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Bob", "Johnson", new DateTime(2004, 7, 19), 102, 3.2, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Charlie", "Brown", new DateTime(2006, 9, 11), 103, 3.9, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("David", "Lee", new DateTime(2003, 11, 30), 104, 3.5, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Eve", "Williams", new DateTime(2007, 1, 25), 105, 3.7, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Frank", "Davis", new DateTime(2002, 5, 5), 106, 3.6, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Grace", "Rodriguez", new DateTime(2008, 8, 15), 107, 3.4, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Henry", "Martinez", new DateTime(2001, 10, 10), 108, 3.3, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Isabel", "Hernandez", new DateTime(2009, 12, 1), 109, 3.1, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Kevin", "Garcia", new DateTime(2000, 2, 20), 110, 3.0, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Linda", "Lopez", new DateTime(2010, 4, 10), 111, 2.9, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Michael", "Perez", new DateTime(1999, 6, 5), 112, 2.8, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Nancy", "Torres", new DateTime(2011, 7, 30), 113, 2.7, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Olivia", "Adams", new DateTime(2005, 2, 14), 114, 3.6, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Paul", "Baker", new DateTime(2004, 5, 21), 115, 3.4, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Quincy", "Clark", new DateTime(2006, 8, 9), 116, 3.5, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Rachel", "Davis", new DateTime(2003, 12, 3), 117, 3.8, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Sam", "Evans", new DateTime(2007, 4, 17), 118, 3.2, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Tina", "Foster", new DateTime(2002, 6, 25), 119, 3.9, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Uma", "Green", new DateTime(2008, 9, 13), 120, 3.1, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Victor", "Harris", new DateTime(2001, 11, 7), 121, 3.0, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Wendy", "Iverson", new DateTime(2009, 1, 19), 122, 2.9, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Xander", "Jackson", new DateTime(2000, 3, 11), 123, 2.8, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Yara", "King", new DateTime(2010, 5, 23), 124, 2.7, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword())),
+        new("Zane", "Lewis", new DateTime(2011, 7, 15), 125, 2.6, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword()))
+    };
+    
+    foreach (var student in studentList)
+    {
+        var existingStudent = SchoolMembers.OfType<Student>().FirstOrDefault(s => s.Id == student.Id);
+        if (existingStudent == null)
+        {
+            SchoolMembers.Add(student);
+        }
+        else
+        {
+            student.SetPassword(existingStudent.Password);
+        }
+    }
+
+    SchoolMembers.AddRange(studentList);
+
+    return studentList;
+}
     public static List<Course> GetCourses()
     {
         var teachers = GetTeachers();
@@ -136,7 +191,26 @@ public static class DataProvider
 
     public static List<Admin> GetAdmins()
     {
-        Admins.Add(new("Admin", "Admin", new DateTime(1990, 1, 1), 1000, "admin"));
-        return Admins;
+        var adminList = new List<Admin>
+        {
+            new("Admin", "Admin", new DateTime(1990, 1, 1), 1000, PasswordHelper.HashPassword(Authenticator.GenerateRandomPassword()))
+        };
+
+        foreach (var admin in adminList)
+        {
+            var existingAdmin = SchoolMembers.OfType<Admin>().FirstOrDefault(a => a.Id == admin.Id);
+            if (existingAdmin == null)
+            {
+                SchoolMembers.Add(admin);
+            }
+            else
+            {
+                admin.SetPassword(existingAdmin.GetPassword());
+            }
+        }
+
+        SchoolMembers.AddRange(adminList);
+
+        return adminList;
     }
 }

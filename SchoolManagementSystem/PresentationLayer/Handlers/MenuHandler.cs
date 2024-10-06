@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Menu.AdminMenu;
@@ -24,16 +25,26 @@ public static class MenuHandler
                 switch (choice)
                 {
                     case 1:
-                        if (user is Admin)
+                        try
+                        {
+                            ValidationHelper.ValidateAdminAccess(user);
                             AdminMenu.DisplayAdminMenu(courses, students, teachers, user);
-                        else
-                            Console.WriteLine("You do not have access to the Admin Menu.");
+                        }
+                        catch (UnauthorizedAccessException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                         break;
                     case 2:
-                        if (user is Teacher)
+                        try
+                        {
+                            ValidationHelper.ValidateUserPermission(user, requireTeacherOrAdmin: true);
                             TeacherMenu.DisplayTeacherMenu(teachers, students, courses, user);
-                        else
-                            Console.WriteLine("You do not have access to the Teacher Menu.");
+                        }
+                        catch (UnauthorizedAccessException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                         break;
                     case 3:
                         StudentMenu.DisplayStudentMenu(students, courses, user);

@@ -56,34 +56,10 @@ public static class Exceptions
         if (student == null) throw new ArgumentNullException(nameof(student), "Student cannot be null.");
     }
 
-    public static void CheckHasPermission(object? user, bool isAdmin = false, bool isTeacherOrAdmin = false)
-    {
-        if (!HasPermission(user, isAdmin, isTeacherOrAdmin))
-            throw new PermissionDeniedException("You do not have the required permissions.");
-    }
-
-    private static bool HasPermission(object? user, bool isAdmin, bool isTeacherOrAdmin)
-    {
-        if (isAdmin && user is Admin) return true;
-        return isTeacherOrAdmin && user is Admin or Teacher;
-    }
-
     public static void CheckUserPermission(IUser? user)
     {
         if (user is not Admin && user is not Teacher)
             throw new PermissionDeniedException("You do not have permission to update the course name.");
-    }
-
-    public static void CheckPermission(object? user)
-    {
-        if (!HasPermission(user))
-            throw new UnauthorizedAccessException("You do not have permission to demonstrate actions.");
-    }
-
-    private static bool HasPermission(object? user)
-    {
-        if (user is Admin) return true;
-        return user is Teacher or Student;
     }
 
     private class PermissionDeniedException : Exception
@@ -107,6 +83,57 @@ public static class Exceptions
         {
         }
     }
+    public class NoStudentsAvailableException : Exception
+    {
+        public NoStudentsAvailableException(string message) : base(message)
+        {
+        }
+    }
+    public class EntityNotFoundException : Exception
+    {
+        public EntityNotFoundException(string message) : base(message)
+        {
+        }
+    }
+    public class PersonNotFoundException : Exception
+    {
+        public PersonNotFoundException(string message) : base(message)
+        {
+        }
+    }
+    public class InvalidCourseException : Exception
+    {
+        public InvalidCourseException(string message) : base(message) { }
+    }
+    public class StudentNotSelectedException : Exception
+    {
+        public StudentNotSelectedException() : base("Error: No student selected.")
+        {
+        }
+
+        public StudentNotSelectedException(string message) : base(message)
+        {
+        }
+
+        public StudentNotSelectedException(string message, Exception inner) : base(message, inner)
+        {
+        }
+    }
+    public class CourseNotSelectedException : Exception
+    {
+        public CourseNotSelectedException() : base("Error: No course selected.")
+        {
+        }
+
+        public CourseNotSelectedException(string message) : base(message)
+        {
+        }
+
+        public CourseNotSelectedException(string message, Exception inner) : base(message, inner)
+        {
+        }
+    }
+
 
     public class CourseNotFoundException : Exception
     {
@@ -123,4 +150,9 @@ public static class Exceptions
         {
         }
     }
+    public class UserNotFoundException : Exception
+    {
+        public UserNotFoundException() : base("Error: User is null.") { }
+    }
+    
 }

@@ -6,10 +6,20 @@ namespace SchoolManagementSystem.Models.Concrete;
 
 public class Teacher : SchoolMember, ITeacherActions, IUser
 {
+    #region Properties
+    public new int Id { get; set; }
+    private int TeacherId { get; set; }
+    private string Subject { get; set; }
+
+    private string FullName { get; set; }
+    private static string FirstName { get; set; }
+    private static string LastName { get; set; }
+
+    #endregion
     #region Constructors
 
-    public Teacher(string firstName, string lastName, DateTime dateOfBirth, int teacherId, string subject)
-        : base(firstName, lastName, dateOfBirth)
+    public Teacher(string firstName, string lastName, DateTime dateOfBirth, int teacherId, string subject, string hashedPassword)
+        : base(firstName, lastName, dateOfBirth, hashedPassword)
     {
         TeacherId = teacherId;
         Subject = subject;
@@ -17,18 +27,59 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
 
     #endregion
+    #region Methods
 
-    public new int Id { get; set; }
+    public override string ToString()
+    {
+        return $"{TeacherId}: {GetFullName()}, Subject: {Subject}";
+    }
 
-    #region Properties
+    public override void DisplayDetails()
+    {
+        Console.WriteLine(
+            $"{GetFullName()} (Age: {GetAge()}), Subject: {Subject}, Teacher ID: {TeacherId}, (Date of Birth: {GetDateOfBirth():d})");
+    }
 
-    private int TeacherId { get; set; }
-    private string Subject { get; set; }
+    public new void DisplayUserInfo()
+    {
+        DisplayDetails();
+    }
+    
+    public string GetTeacherFullName()
+    {
+        return GetFullName();
+    }
 
-    private string FullName { get; set; }
+    public int GetTeacherId()
+    {
+        return TeacherId;
+    }
+
+    public string GetSubject()
+    {
+        return Subject;
+    }
+
+    public void SetSubject(string newSubject)
+    {
+        Subject = newSubject;
+    }
+
+    public void SetTeacherId(int newTeacherId)
+    {
+        TeacherId = newTeacherId;
+    }
+    public static void SetFirstName(string firstName)
+    {
+        FirstName = firstName;
+    }
+
+    public static void SetLastName(string lastName)
+    {
+        LastName = lastName;
+    }
 
     #endregion
-
     #region ITeacherActions
 
     public void Teach()
@@ -57,7 +108,6 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
     }
 
     #endregion
-
     #region IPersonActions
 
     public void Communicate()
@@ -77,63 +127,4 @@ public class Teacher : SchoolMember, ITeacherActions, IUser
 
     #endregion
 
-    #region Methods
-
-    public override string ToString()
-    {
-        return $"{TeacherId}: {GetFullName()}, Subject: {Subject}";
-    }
-
-    public override void DisplayDetails()
-    {
-        Console.WriteLine(
-            $"{GetFullName()} (Age: {GetAge()}), Subject: {Subject}, Teacher ID: {TeacherId}, (Date of Birth: {GetDateOfBirth():d})");
-    }
-
-    public new void DisplayUserInfo()
-    {
-        DisplayDetails();
-    }
-
-    public void SetTeacherFullName(string fullName)
-    {
-        FullName = fullName;
-    }
-
-    public string GetTeacherFullName()
-    {
-        return GetFullName();
-    }
-
-    public int GetTeacherId()
-    {
-        return TeacherId;
-    }
-
-    public string GetSubject()
-    {
-        return Subject;
-    }
-
-    public void SetSubject(string newSubject)
-    {
-        Subject = newSubject;
-    }
-
-    public void SetTeacherId(int newTeacherId)
-    {
-        TeacherId = newTeacherId;
-    }
-
-    public void SetFirstName(string firstName)
-    {
-        // Implementation for setting the first name
-    }
-
-    public void SetLastName(string lastName)
-    {
-        // Implementation for setting the last name
-    }
-
-    #endregion
 }

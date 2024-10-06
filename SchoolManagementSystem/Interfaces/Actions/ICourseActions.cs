@@ -1,3 +1,4 @@
+
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.Interfaces.Actions;

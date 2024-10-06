@@ -1,10 +1,11 @@
+using SchoolManagementSystem.BusinessLogicLayer.Authentications;
+using SchoolManagementSystem.BusinessLogicLayer.Utilities;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
-using SchoolManagementSystem.Interfaces.Helper;
 using SchoolManagementSystem.Models.Concrete;
 
 namespace SchoolManagementSystem.PresentationLayer.Helpers;
 
-public class TeacherHelper : ITeacherHelper
+public static class TeacherHelper
 {
     private static void ValidateUserPermissions(object? user)
     {
@@ -26,9 +27,12 @@ public class TeacherHelper : ITeacherHelper
         var subject = GetValidatedTeacherSubject();
         if (string.IsNullOrEmpty(subject)) return;
 
-        var newTeacher = new Teacher(id.Value.ToString(), names[0], DateTime.Now, 0, subject);
+        var password = Authenticator.GenerateRandomPassword();
+        var hashedPassword = PasswordHelper.HashPassword(password);
+        var newTeacher = new Teacher(id.Value.ToString(), names[0], DateTime.Now, 0, subject, hashedPassword);
         nonNullTeachers.Add(newTeacher);
-        Console.WriteLine("Teacher added successfully.");
+        Console.WriteLine($"Teacher added successfully. Your ID is: {id.Value}. Your password is: {password}");
+        Console.WriteLine("Warning: This information is important. Please note it down.");
     }
 
     private static int? GetValidatedTeacherId(List<Teacher> nonNullTeachers)
@@ -128,7 +132,7 @@ public class TeacherHelper : ITeacherHelper
             : "Teacher not found.");
     }
 
-    public void UpdateTeacherDetails(List<Teacher?> teachers, object? user)
+    public static void UpdateTeacherDetails(List<Teacher?> teachers, object? user)
     {
         ValidateUserPermissions(user);
         var nonNullTeachers = ValidateTeacherList(teachers);
@@ -194,7 +198,6 @@ public class TeacherHelper : ITeacherHelper
     private static void UpdateTeacherId(List<Teacher>? teachers)
     {
         var teacher = GetTeacherById(teachers);
-        if (teacher == null) return;
 
         Console.Write("Enter new Teacher ID: ");
         var newId = Console.ReadLine();
@@ -206,7 +209,6 @@ public class TeacherHelper : ITeacherHelper
     private static void UpdateTeacherSubject(List<Teacher>? teachers)
     {
         var teacher = GetTeacherById(teachers);
-        if (teacher == null) return;
 
         Console.Write("Enter new Subject: ");
         var newSubject = Console.ReadLine();
@@ -218,16 +220,14 @@ public class TeacherHelper : ITeacherHelper
     private static void UpdateTeacherName(List<Teacher>? teachers)
     {
         var teacher = GetTeacherById(teachers);
-        if (teacher == null) return;
 
         var names = GetValidatedTeacherName();
         if (names == null) return;
 
-        teacher.SetFirstName(names[0]);
-        teacher.SetLastName(names[1]);
+        Teacher.SetFirstName(names[0]);
+        Teacher.SetLastName(names[1]);
         Console.WriteLine("Teacher name updated successfully.");
     }
-
     private static void DisplayAllTeachers(List<Teacher?> teachers)
     {
         Console.WriteLine("All Teachers:");

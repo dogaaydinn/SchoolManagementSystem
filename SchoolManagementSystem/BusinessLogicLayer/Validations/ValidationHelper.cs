@@ -1,3 +1,4 @@
+using SchoolManagementSystem.Interfaces.User;
 using SchoolManagementSystem.Models.Concrete;
 using SchoolManagementSystem.PresentationLayer.Helpers;
 
@@ -5,16 +6,6 @@ namespace SchoolManagementSystem.BusinessLogicLayer.Validations;
 
 public static class ValidationHelper
 {
-    public static void CheckHasPermission(object? user, bool isAdmin = false, bool isTeacherOrAdmin = false)
-    {
-        if (user == null) throw new UnauthorizedAccessException("User is not authenticated.");
-
-        if (isAdmin && user is not Admin)
-            throw new UnauthorizedAccessException("User does not have admin permissions.");
-
-        if (isTeacherOrAdmin && user is not (Teacher or Admin))
-            throw new UnauthorizedAccessException("User does not have teacher or admin permissions.");
-    }
 
     public static void ValidateNotNull(object entity, string entityName)
     {
@@ -37,12 +28,6 @@ public static class ValidationHelper
     public static void ValidateAdminAccess(object? user)
     {
         if (user is not Admin) throw new UnauthorizedAccessException("User does not have admin access.");
-    }
-
-    public static void ValidateTeacherOrAdminAccess(object user)
-    {
-        if (user is not (Teacher or Admin))
-            throw new UnauthorizedAccessException("User does not have teacher or admin access.");
     }
 
     public static void ValidateStudentNotNull(Student? student)
@@ -130,46 +115,39 @@ public static class ValidationHelper
 
         if (user is not Admin) throw new UnauthorizedAccessException("User does not have admin access.");
     }
-
-    public static void ValidateAdminPermissions(object? user, bool isAdmin = false)
+    public static void CheckHasPermission(IUser? user, bool isAdmin)
     {
-        if (user == null) throw new ArgumentNullException(nameof(user), "User cannot be null.");
-
-        if (isAdmin && !(user is Admin)) throw new UnauthorizedAccessException("User does not have admin permissions.");
-    }
-
-    public static List<Teacher> ValidateTeacherList(List<Teacher?>? teachers)
-    {
-        if (teachers == null || !teachers.Any())
-            throw new ArgumentException("Teacher list cannot be null or empty.", nameof(teachers));
-
-        return teachers.OfType<Teacher>().ToList();
-    }
-
-    public static List<Teacher> ValidateAndFilterTeacherList(List<Teacher?>? teachers)
-    {
-        if (teachers == null || !teachers.Any())
-            throw new ArgumentException("Teacher list cannot be null or empty.", nameof(teachers));
-
-        var nonNullTeachers = teachers.OfType<Teacher>().ToList();
-        if (!nonNullTeachers.Any())
-            throw new ArgumentException("Teacher list contains no valid teachers.", nameof(teachers));
-
-        return nonNullTeachers;
-    }
-
-    public static void Validate(object parameter)
-    {
-        if (parameter == null) throw new ArgumentNullException(nameof(parameter), "Parameter cannot be null.");
-    }
-
-    public static int GetValidatedUserChoice(string prompt, int min, int max)
-    {
-        while (true)
+        if (user == null)
         {
-            var choice = InputHelper.GetValidatedIntInput(prompt);
-            if (choice >= min && choice <= max) return choice;
-            Console.WriteLine($"Invalid choice. Please select between {min} and {max}.");
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
         }
+
+        if (isAdmin && !user.IsAdmin)
+        {
+            throw new UnauthorizedAccessException("User does not have admin permissions.");
+        }
+    }
+    public static void ValidateUserAndEntities(IUser? user, bool isAdmin, params object[] entities)
+    {
+       CheckHasPermission(user, isAdmin);
+        foreach (var entity in entities)
+            switch (entity)
+            {
+                case List<object> entityList:
+                    ValidateNotNull(entityList,
+                        true ? $"{entity.GetType().Name} cannot be null." : "Entity list cannot be null.");
+                    break;
+                case List<Course> courseList:
+                   ValidateNotNull(courseList, "Course list cannot be null.");
+                    break;
+                case List<Student?> studentList:
+                    ValidateNotNull(studentList, "Student list cannot be null.");
+                    break;
+                case List<Teacher?> teacherList:
+                    ValidateNotNull(teacherList, "Teacher list cannot be null.");
+                    break;
+                default:
+                    throw new ArgumentException("Entity is not a valid list.");
+            }
     }
 }

@@ -1,3 +1,4 @@
+using SchoolManagementSystem.BusinessLogicLayer.Exceptions;
 using SchoolManagementSystem.Interfaces.Actions;
 using SchoolManagementSystem.PresentationLayer.Helpers;
 
@@ -7,13 +8,19 @@ public static class PersonHandler
 {
     public static void DemonstrateActions(ISchoolMemberActions? person, object? user)
     {
-        if (person == null)
+        try
         {
-            Console.WriteLine("No person provided.");
-            return;
-        }
+            if (person == null)
+            {
+                throw new Exceptions.PersonNotFoundException("No person provided.");
+            }
 
-        var personHelper = new PersonHelper();
-        personHelper.CheckAndDemonstrateActions(person, user);
+            var personHelper = new PersonHelper();
+            personHelper.CheckAndDemonstrateActions(person, user);
+        }
+        catch (Exceptions.PersonNotFoundException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

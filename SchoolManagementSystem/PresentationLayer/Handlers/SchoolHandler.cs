@@ -7,45 +7,37 @@ using SchoolManagementSystem.PresentationLayer.Handlers.ActionHandler;
 
 namespace SchoolManagementSystem.PresentationLayer.Handlers;
 
-public class SchoolHandler
+public static class SchoolHandler
 {
-    private static ISchoolHelper _schoolHelper;
-    private static IValidationHelper _validationHelper;
-
-    public SchoolHandler(ISchoolHelper schoolHelper, IValidationHelper validationHelper)
+    public static void DisplayAllDetails(ISchoolHelper schoolHelper, List<Course> courses, List<Student?>? students, List<Teacher?>? teachers, object? user)
     {
-        _schoolHelper = schoolHelper;
-        _validationHelper = validationHelper;
-    }
-
-    public static void DisplayAllDetails(List<Course> courses, List<Student?>? students, List<Teacher?>? teachers,
-        object? user)
-    {
-        ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
+        ValidationHelper.ValidateUserAndEntities(user as IUser, true, courses, students, teachers);
         Console.WriteLine("Courses:");
-        _schoolHelper.DisplayCourses(courses ?? new List<Course>());
+        schoolHelper.DisplayCourses(courses);
 
         Console.WriteLine("\nStudents:");
-        _schoolHelper.DisplayStudents(students ?? new List<Student?>());
+        schoolHelper.DisplayStudents(students);
 
         Console.WriteLine("\nTeachers:");
-        DisplayTeacherDetails(teachers ?? new List<Teacher?>());
+        DisplayTeacherDetails(teachers);
     }
 
-    public static void AssignCoursesToStudents(List<Course> courses, List<Student?> students, object user)
+    public static void AssignCoursesToStudents(ISchoolHelper schoolHelper, List<Course> courses, List<Student?> students, object user)
     {
-        ValidateUserAndEntities(user as IUser, true, courses, students);
+        ValidationHelper.ValidateUserAndEntities(user as IUser, true, courses, students);
 
-        foreach (var student in students.OfType<Student>()) AssignCoursesToStudent(student, courses);
+        foreach (var student in students.OfType<Student>()) AssignCoursesToStudent(schoolHelper, student, courses);
     }
 
-    public static void RecordGradesForStudents(List<Course> courses, object user)
+    public static void RecordGradesForStudents(ISchoolHelper schoolHelper, List<Course> courses, object user)
     {
-        ValidateUserAndEntities(user as IUser, true, courses);
+        ValidationHelper.ValidateUserAndEntities(user as IUser, true, courses);
 
-        foreach (var course in courses ?? Enumerable.Empty<Course>()) RecordGradesForCourse(course);
+        foreach (var course in courses)
+        {
+            RecordGradesForCourse(schoolHelper, course);
+        }
     }
-
     public static void EnrollStudentInCourse(List<Course?>? courses, List<Student?> students, IUser user)
     {
         ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
@@ -70,10 +62,9 @@ public class SchoolHandler
         }
     }
 
-
     public static void DemonstrateActions(object person, object user)
     {
-        _validationHelper.CheckHasPermission(user as IUser, true);
+        ValidationHelper.CheckHasPermission(user as IUser, true);
         switch (person)
         {
             case Teacher teacher:
@@ -87,38 +78,14 @@ public class SchoolHandler
                 break;
         }
     }
-
-    private static void ValidateUserAndEntities(IUser? user, bool isAdmin, params object[] entities)
-    {
-        _validationHelper.CheckHasPermission(user, isAdmin);
-        foreach (var entity in entities)
-            switch (entity)
-            {
-                case List<object> entityList:
-                    _validationHelper.ValidateNotNull(entityList,
-                        true ? $"{entity.GetType().Name} cannot be null." : "Entity list cannot be null.");
-                    break;
-                case List<Course> courseList:
-                    _validationHelper.ValidateNotNull(courseList, "Course list cannot be null.");
-                    break;
-                case List<Student?> studentList:
-                    _validationHelper.ValidateNotNull(studentList, "Student list cannot be null.");
-                    break;
-                case List<Teacher?> teacherList:
-                    _validationHelper.ValidateNotNull(teacherList, "Teacher list cannot be null.");
-                    break;
-                default:
-                    throw new ArgumentException("Entity is not a valid list.");
-            }
-    }
-
-    private static void AssignCoursesToStudent(Student student, List<Course> courses)
+    
+    private static void AssignCoursesToStudent(ISchoolHelper schoolHelper, Student student, List<Course> courses)
     {
         Console.WriteLine($"Assigning courses to {student.GetStudentFullName()} (ID: {student.GetStudentId()})");
 
         while (true)
         {
-            var course = _schoolHelper.GetCourseFromUserInput(courses);
+            var course = schoolHelper.GetCourseFromUserInput(courses);
             if (course == null) break;
 
             course.EnrollStudent(student);
@@ -126,7 +93,7 @@ public class SchoolHandler
         }
     }
 
-    private static void RecordGradesForCourse(Course course)
+    private static void RecordGradesForCourse(ISchoolHelper schoolHelper, Course course)
     {
         Console.WriteLine($"Recording grades for course: {course.GetCourseName()} (ID: {course.GetCourseId()})");
 
@@ -139,7 +106,7 @@ public class SchoolHandler
 
         foreach (var student in enrolledStudents.OfType<Student>())
         {
-            var grade = _schoolHelper.GetValidGrade(student);
+            var grade = schoolHelper.GetValidGrade(student);
             if (grade == null) continue;
             course.AssignGrade(student, grade.Value);
             Console.WriteLine(

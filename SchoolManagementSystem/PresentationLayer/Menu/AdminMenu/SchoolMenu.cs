@@ -52,13 +52,13 @@ public static class SchoolMenu
         switch (choice)
         {
             case "1":
-                SchoolHandler.DisplayAllDetails(courses, students, new List<Teacher?>(), student);
+                SchoolHandler.DisplayAllDetails(schoolHelper, courses, students, new List<Teacher?>(), student);
                 break;
             case "2":
                 if (courses == null)
                     Console.WriteLine("Courses list is null. Cannot enroll student in course.");
                 else
-                    SchoolHandler.EnrollStudentInCourse(courses, students?.OfType<Student?>().ToList(), student);
+                    SchoolHandler.EnrollStudentInCourse(courses.Cast<Course?>().ToList(), students?.OfType<Student?>().ToList(), student);
                 break;
             case "3":
                 var course = schoolHelper.SelectCourse(courses);
@@ -75,18 +75,19 @@ public static class SchoolMenu
         }
     }
 
-    private static void HandleAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers,
-        Admin admin)
+    private static void HandleAdminMenu(List<Course> courses, List<Student?>? students, List<Teacher?> teachers, Admin admin)
     {
         var choice = GetUserChoice();
 
         if (choice == null) return;
 
+        var schoolHelper = new SchoolHelper(); 
+
         switch (choice)
         {
             case "1":
                 if (students != null)
-                    SchoolHandler.DisplayAllDetails(courses, students.ToList(), teachers, admin);
+                    SchoolHandler.DisplayAllDetails(schoolHelper, courses, students.ToList(), teachers, admin);
                 else
                     Console.WriteLine("Students list is null. Cannot display details.");
                 break;
@@ -97,9 +98,8 @@ public static class SchoolMenu
                 // Add code for student and teacher management here
                 break;
             case "4":
-                SchoolHandler.RecordGradesForStudents(courses, teachers);
+                SchoolHandler.RecordGradesForStudents(schoolHelper, courses, admin);
                 break;
-            case "5":
                 return;
             default:
                 Console.WriteLine("Invalid choice.");

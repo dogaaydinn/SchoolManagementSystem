@@ -98,7 +98,7 @@ public static class AdminCourseMenu
                 schoolHelper.GetCourseFromUserInput(courses);
                 break;
             case "11":
-                courseHelper.GetCourseById(courses);
+                CourseHelper.GetCourseById(courses);
                 break;
             case "12":
                 selectedCourse = schoolHelper.SelectCourse(courses);
@@ -117,10 +117,9 @@ public static class AdminCourseMenu
                 if (selectedCourse != null) CourseHandler.UpdateCourseName(selectedCourse);
                 break;
             case "16":
-                if (courses != null && students != null)
-                    SchoolHandler.AssignCoursesToStudents(courses, students, user);
-                else
-                    Console.WriteLine("Courses or students list is null.");
+                ValidationHelper.ValidateNotNull(courses, "Courses list cannot be null.");
+                ValidationHelper.ValidateNotNull(students, "Students list cannot be null.");
+                SchoolHandler.AssignCoursesToStudents(schoolHelper, courses, students, user);
                 break;
             case "17":
                 return;

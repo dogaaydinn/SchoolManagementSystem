@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using SchoolManagementSystem.BusinessLogicLayer.Authentications;
+using SchoolManagementSystem.BusinessLogicLayer.Utilities;
 using SchoolManagementSystem.BusinessLogicLayer.Validations;
 using SchoolManagementSystem.Data;
 using SchoolManagementSystem.Interfaces.User;
@@ -123,15 +126,20 @@ public static class TeacherHandler
 
     public static void DisplayAllTeachers(List<Teacher?> teachers)
     {
-        if (teachers == null || !teachers.Any())
+        try
         {
-            Console.WriteLine("No teachers available.");
-            return;
-        }
+            ValidationHelper.ValidateList(teachers, "Teacher list cannot be null or empty.");
 
-        foreach (var teacher in teachers.OfType<Teacher>())
-            Console.WriteLine(
-                $"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
+            foreach (var teacher in teachers.OfType<Teacher>())
+            {
+                Console.WriteLine(
+                    $"ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
+            }
+        }
+        catch (ValidationException ex)
+        {
+            Console.WriteLine($"Validation error: {ex.Message}");
+        }
     }
 
 
@@ -190,9 +198,12 @@ public static class TeacherHandler
         }
 
         var hireDate = InputHelper.GetValidatedDateInput("Enter Hire Date (yyyy-MM-dd):");
-        var newTeacher = new Teacher(names[0], names[1], hireDate, subjectId, id.Value.ToString());
+        var password = Authenticator.GenerateRandomPassword();
+        var hashedPassword = PasswordHelper.HashPassword(password);
+        var newTeacher = new Teacher(names[0], names[1], hireDate, subjectId, id.Value.ToString(), hashedPassword);
         nonNullTeachers.Add(newTeacher);
-        Console.WriteLine("Teacher added successfully.");
+        Console.WriteLine($"Teacher added successfully. Your ID is: {id.Value}. Your password is: {password}");
+        Console.WriteLine("Warning: This information is important. Please note it down.");
     }
 
     private static int? GetValidatedTeacherId(List<Teacher> nonNullTeachers)
@@ -245,14 +256,7 @@ public static class TeacherHandler
         Console.WriteLine("Please enter both first and last names.");
         return null;
     }
-
-    private static string GetValidatedTeacherSubject()
-    {
-        Console.Write("Enter Teacher Subject: ");
-        var subject = Console.ReadLine();
-        ValidationHelper.ValidateNotEmpty(subject, "Teacher Subject cannot be empty.");
-        return subject;
-    }
+    
 
     public static void UpdateTeacherName(Teacher? teacher, object user)
     {
@@ -262,8 +266,8 @@ public static class TeacherHandler
         var names = newName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (names.Length >= 2)
         {
-            teacher.SetFirstName(names[0]);
-            teacher.SetLastName(names[1]);
+            Teacher.SetFirstName(names[0]);
+            Teacher.SetLastName(names[1]);
             Console.WriteLine("Teacher Name updated successfully.");
         }
         else
@@ -281,7 +285,7 @@ public static class TeacherHandler
                 $"Teacher ID: {teacher.GetTeacherId()}, Name: {teacher.GetTeacherFullName()}, Subject: {teacher.GetSubject()}");
     }
 
-    public static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
+    private static void PromptToDisplayAllTeachers(List<Teacher?> teachers)
     {
         Console.WriteLine("Teacher not found. Would you like to see the list of teachers? (yes/no)");
         if (Console.ReadLine()?.Trim().ToLower() == "yes") DisplayTeacherNames(teachers);
@@ -289,37 +293,24 @@ public static class TeacherHandler
 
     public static void DisplayTeacherCourses(List<Teacher?> teachers, object user)
     {
-        if (teachers == null || !teachers.Any())
-        {
-            Console.WriteLine("No teachers available.");
-            return;
-        }
-
+        ValidationHelper.ValidateList(teachers, "Teacher list cannot be null or empty.");
         Console.Write("Enter Teacher ID: ");
         var idInput = Console.ReadLine();
         if (!int.TryParse(idInput, out var id))
         {
-            Console.WriteLine("Invalid Teacher ID.");
-            return;
+            throw new ValidationException("Invalid Teacher ID.");
         }
 
         var teacher = teachers.FirstOrDefault(t => t?.GetTeacherId() == id);
-        if (teacher == null)
-        {
-            Console.WriteLine("Teacher not found.");
-            return;
-        }
+        ValidationHelper.ValidateNotNull(teacher, "Teacher not found.");
+
 
         var students = DataProvider.GetStudents();
         var courses = DataProvider.GetCourses()
             .Where(c => Course.GetTeacherId() == teacher.GetTeacherId())
             .ToList();
 
-        if (!courses.Any())
-        {
-            Console.WriteLine("This teacher has no courses assigned.");
-            return;
-        }
+        ValidationHelper.ValidateList(courses, "This teacher has no courses assigned.");
 
         Console.WriteLine($"Courses for {teacher.GetTeacherFullName()}:");
         foreach (var course in courses) Console.WriteLine($"- {course.GetCourseName()} (ID: {course.GetCourseId()})");

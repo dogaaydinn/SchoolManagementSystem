@@ -101,18 +101,27 @@ public static class AdminStudentMenu
                     var studentToRemove = ValidationHelper.SelectAndValidateStudent(students);
                     if (studentToRemove != null && ValidationHelper.ValidateUser(user))
                     {
-                        var studentHelper = new StudentHelper(); // Create an instance of StudentHelper
-                        studentHelper.RemoveStudent(students, studentToRemove); // Use the instance method
+                        var studentHelper = new StudentHelper(); 
+                        studentHelper.RemoveStudent(students, studentToRemove);
                     }
 
                     break;
                 case "13":
                     if (ValidationHelper.ValidateUser(user))
-                        SchoolHandler.AssignCoursesToStudents(new List<Course>(), new List<Student?>(), (IUser)user);
+                    {
+                        var courses = new List<Course>();
+                        var studentsToAssign = new List<Student?>(); 
+                        var schoolHelper = new SchoolHelper(); 
+                        SchoolHandler.AssignCoursesToStudents(schoolHelper, courses, studentsToAssign, (IUser)user);
+                    }
                     break;
                 case "14":
                     if (ValidationHelper.ValidateUser(user))
-                        SchoolHandler.RecordGradesForStudents(new List<Course>(), (IUser)user);
+                    {
+                        var courses = new List<Course>(); 
+                        var schoolHelper = new SchoolHelper(); 
+                        SchoolHandler.RecordGradesForStudents(schoolHelper, courses, (IUser)user);
+                    }
                     break;
                 case "15":
                     return;
