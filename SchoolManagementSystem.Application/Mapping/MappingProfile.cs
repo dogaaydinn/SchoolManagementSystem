@@ -139,5 +139,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.FileName, opt => opt.Ignore())
             .ForMember(dest => dest.FilePath, opt => opt.Ignore())
             .ForMember(dest => dest.UploadedBy, opt => opt.Ignore());
+
+        // Audit log mappings
+        CreateMap<AuditLog, AuditLogDto>()
+            .ForMember(dest => dest.PerformedByName, opt => opt.Ignore());
     }
 }

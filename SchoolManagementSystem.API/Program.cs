@@ -141,6 +141,8 @@ builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IDocume
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IBackgroundJobService, SchoolManagementSystem.Application.Services.BackgroundJobService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IPdfService, SchoolManagementSystem.Application.Services.PdfService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IExcelService, SchoolManagementSystem.Application.Services.ExcelService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IAuditService, SchoolManagementSystem.Application.Services.AuditService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IMetricsService, SchoolManagementSystem.Application.Services.MetricsService>();
 
 // Register file storage service
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IFileStorageService, SchoolManagementSystem.Infrastructure.Storage.LocalFileStorageService>();
@@ -214,8 +216,14 @@ var app = builder.Build();
 // Use Serilog request logging
 app.UseSerilogRequestLogging();
 
+// Performance monitoring middleware
+app.UseMiddleware<PerformanceMonitoringMiddleware>();
+
 // Global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// Audit logging middleware
+app.UseMiddleware<AuditLoggingMiddleware>();
 
 // Use Swagger
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
