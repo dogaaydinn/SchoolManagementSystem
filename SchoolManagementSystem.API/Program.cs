@@ -137,6 +137,13 @@ builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IStuden
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IGradeService, SchoolManagementSystem.Application.Services.GradeService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IReportingService, SchoolManagementSystem.Application.Services.ReportingService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.INotificationService, SchoolManagementSystem.Application.Services.NotificationService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IDocumentService, SchoolManagementSystem.Application.Services.DocumentService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IBackgroundJobService, SchoolManagementSystem.Application.Services.BackgroundJobService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IPdfService, SchoolManagementSystem.Application.Services.PdfService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IExcelService, SchoolManagementSystem.Application.Services.ExcelService>();
+
+// Register file storage service
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IFileStorageService, SchoolManagementSystem.Infrastructure.Storage.LocalFileStorageService>();
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

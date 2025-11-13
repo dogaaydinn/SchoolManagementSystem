@@ -129,5 +129,15 @@ public class MappingProfile : Profile
         CreateMap<Semester, object>()
             .ForMember("Name", opt => opt.MapFrom(src => src.Name))
             .ForMember("Code", opt => opt.MapFrom(src => src.Code));
+
+        // Document mappings
+        CreateMap<Document, DocumentDto>()
+            .ForMember(dest => dest.UploadedByName, opt => opt.Ignore())
+            .ForMember(dest => dest.FileUrl, opt => opt.Ignore());
+
+        CreateMap<UploadDocumentRequestDto, Document>()
+            .ForMember(dest => dest.FileName, opt => opt.Ignore())
+            .ForMember(dest => dest.FilePath, opt => opt.Ignore())
+            .ForMember(dest => dest.UploadedBy, opt => opt.Ignore());
     }
 }
