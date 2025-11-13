@@ -11,6 +11,7 @@ public class GradeDto
     public string GradeType { get; set; } = string.Empty;
     public decimal Value { get; set; }
     public decimal MaxValue { get; set; }
+    public decimal Percentage { get; set; }
     public string? LetterGrade { get; set; }
     public decimal Weight { get; set; }
     public DateTime GradeDate { get; set; }
