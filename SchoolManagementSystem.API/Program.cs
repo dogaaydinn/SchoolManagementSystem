@@ -126,11 +126,20 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register application services
+// Register infrastructure services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+// Register application services
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IStudentService, SchoolManagementSystem.Application.Services.StudentService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IGradeService, SchoolManagementSystem.Application.Services.GradeService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IReportingService, SchoolManagementSystem.Application.Services.ReportingService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.INotificationService, SchoolManagementSystem.Application.Services.NotificationService>();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add API Versioning
 builder.Services.AddApiVersioning(options =>
