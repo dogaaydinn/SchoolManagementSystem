@@ -42,8 +42,12 @@ public class CreateStudentRequestDto
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public DateTime? DateOfBirth { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public string? Major { get; set; }
     public string? Minor { get; set; }
+    public DateTime? EnrollmentDate { get; set; }
+    public DateTime? ExpectedGraduationDate { get; set; }
     public int? AdvisorId { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }
@@ -52,6 +56,7 @@ public class CreateStudentRequestDto
     public string? PostalCode { get; set; }
     public string? EmergencyContactName { get; set; }
     public string? EmergencyContactPhone { get; set; }
+    public string? EmergencyContactRelationship { get; set; }
 }
 
 public class UpdateStudentRequestDto
@@ -59,8 +64,11 @@ public class UpdateStudentRequestDto
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime? DateOfBirth { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public string? Major { get; set; }
     public string? Minor { get; set; }
+    public DateTime? ExpectedGraduationDate { get; set; }
     public int? AdvisorId { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }
@@ -69,6 +77,7 @@ public class UpdateStudentRequestDto
     public string? PostalCode { get; set; }
     public string? EmergencyContactName { get; set; }
     public string? EmergencyContactPhone { get; set; }
+    public string? EmergencyContactRelationship { get; set; }
     public string? Status { get; set; }
 }
 
@@ -99,4 +108,10 @@ public class SemesterGradesDto
     public List<GradeDto> Grades { get; set; } = new();
     public decimal SemesterGPA { get; set; }
     public int CreditsEarned { get; set; }
+}
+
+public class EnrollStudentRequestDto
+{
+    public int StudentId { get; set; }
+    public int CourseId { get; set; }
 }

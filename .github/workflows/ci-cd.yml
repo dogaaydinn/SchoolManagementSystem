@@ -11,7 +11,9 @@ env:
   DOTNET_VERSION: '6.0.x'
   SOLUTION_PATH: './SchoolManagementSystem.sln'
   PROJECT_PATH: './SchoolManagementSystem.API/SchoolManagementSystem.API.csproj'
-  TEST_PROJECT_PATH: './SchoolManagementSystem.Tests/SchoolManagementSystem.Tests.csproj'
+  UNIT_TEST_PATH: './SchoolManagementSystem.Tests.Unit/SchoolManagementSystem.Tests.Unit.csproj'
+  INTEGRATION_TEST_PATH: './SchoolManagementSystem.Tests.Integration/SchoolManagementSystem.Tests.Integration.csproj'
+  COVERAGE_THRESHOLD: 80
 
 jobs:
   # Build and Test Job
@@ -44,16 +46,57 @@ jobs:
     - name: Build solution
       run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
-    - name: Run unit tests
-      run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory ./TestResults
+    - name: Run unit tests with coverage
+      run: dotnet test ${{ env.UNIT_TEST_PATH }} --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory ./TestResults/Unit
+
+    - name: Run integration tests with coverage
+      run: dotnet test ${{ env.INTEGRATION_TEST_PATH }} --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger trx --results-directory ./TestResults/Integration
+
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
     - name: Generate code coverage report
+      run: |
+        reportgenerator \
+          -reports:"./TestResults/**/coverage.cobertura.xml" \
+          -targetdir:"./CoverageReport" \
+          -reporttypes:"Html;Cobertura;TextSummary" \
+          -verbosity:"Info"
+
+    - name: Display coverage summary
+      run: cat ./CoverageReport/Summary.txt
+
+    - name: Check coverage threshold
+      shell: bash
+      run: |
+        # Extract line coverage percentage from Cobertura report
+        COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' ./CoverageReport/Cobertura.xml | head -1)
+        COVERAGE_PERCENT=$(echo "$COVERAGE * 100" | bc -l | cut -d. -f1)
+
+        echo "Current code coverage: ${COVERAGE_PERCENT}%"
+        echo "Required threshold: ${{ env.COVERAGE_THRESHOLD }}%"
+
+        if [ "$COVERAGE_PERCENT" -lt "${{ env.COVERAGE_THRESHOLD }}" ]; then
+          echo "❌ Code coverage ${COVERAGE_PERCENT}% is below the required threshold of ${{ env.COVERAGE_THRESHOLD }}%"
+          exit 1
+        else
+          echo "✅ Code coverage ${COVERAGE_PERCENT}% meets the required threshold of ${{ env.COVERAGE_THRESHOLD }}%"
+        fi
+
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: ./TestResults/**/coverage.cobertura.xml
-        flags: unittests
+        files: ./CoverageReport/Cobertura.xml
+        flags: tests
         name: codecov-umbrella
         fail_ci_if_error: false
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: ./CoverageReport
 
     - name: Upload test results
       uses: actions/upload-artifact@v3
@@ -61,6 +104,15 @@ jobs:
       with:
         name: test-results
         path: ./TestResults
+
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: './TestResults/**/*.trx'
+        reporter: dotnet-trx
+        fail-on-error: true
 
     - name: Publish build artifacts
       uses: actions/upload-artifact@v3

@@ -124,13 +124,42 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowCredentials();
     });
+
+    // SignalR CORS policy
+    options.AddPolicy("SignalRCors", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
 });
 
-// Register application services
+// Register infrastructure services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+// Register application services
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IStudentService, SchoolManagementSystem.Application.Services.StudentService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IGradeService, SchoolManagementSystem.Application.Services.GradeService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IReportingService, SchoolManagementSystem.Application.Services.ReportingService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.INotificationService, SchoolManagementSystem.Application.Services.NotificationService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IDocumentService, SchoolManagementSystem.Application.Services.DocumentService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IBackgroundJobService, SchoolManagementSystem.Application.Services.BackgroundJobService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IPdfService, SchoolManagementSystem.Application.Services.PdfService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IExcelService, SchoolManagementSystem.Application.Services.ExcelService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IAuditService, SchoolManagementSystem.Application.Services.AuditService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IMetricsService, SchoolManagementSystem.Application.Services.MetricsService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IBulkImportService, SchoolManagementSystem.Application.Services.BulkImportService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IRealtimeNotificationService, SchoolManagementSystem.Infrastructure.Services.RealtimeNotificationService>();
+
+// Register file storage service
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IFileStorageService, SchoolManagementSystem.Infrastructure.Storage.LocalFileStorageService>();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -191,6 +220,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -198,8 +235,14 @@ var app = builder.Build();
 // Use Serilog request logging
 app.UseSerilogRequestLogging();
 
+// Performance monitoring middleware
+app.UseMiddleware<PerformanceMonitoringMiddleware>();
+
 // Global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// Audit logging middleware
+app.UseMiddleware<AuditLoggingMiddleware>();
 
 // Use Swagger
 if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
@@ -227,6 +270,9 @@ app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<SchoolManagementSystem.API.Hubs.NotificationHub>("/hubs/notifications").RequireCors("SignalRCors");
 
 // Map health checks
 app.MapHealthChecks("/health");
