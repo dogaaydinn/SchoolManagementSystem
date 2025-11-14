@@ -124,6 +124,15 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowCredentials();
     });
+
+    // SignalR CORS policy
+    options.AddPolicy("SignalRCors", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
 });
 
 // Register infrastructure services
@@ -143,6 +152,8 @@ builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IPdfSer
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IExcelService, SchoolManagementSystem.Application.Services.ExcelService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IAuditService, SchoolManagementSystem.Application.Services.AuditService>();
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IMetricsService, SchoolManagementSystem.Application.Services.MetricsService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IBulkImportService, SchoolManagementSystem.Application.Services.BulkImportService>();
+builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IRealtimeNotificationService, SchoolManagementSystem.Infrastructure.Services.RealtimeNotificationService>();
 
 // Register file storage service
 builder.Services.AddScoped<SchoolManagementSystem.Application.Interfaces.IFileStorageService, SchoolManagementSystem.Infrastructure.Storage.LocalFileStorageService>();
@@ -209,6 +220,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -251,6 +270,9 @@ app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<SchoolManagementSystem.API.Hubs.NotificationHub>("/hubs/notifications").RequireCors("SignalRCors");
 
 // Map health checks
 app.MapHealthChecks("/health");
