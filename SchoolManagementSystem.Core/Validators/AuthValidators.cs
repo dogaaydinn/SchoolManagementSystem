@@ -75,7 +75,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequestDto>
             .WithMessage("Last name contains invalid characters");
 
         RuleFor(x => x.PhoneNumber)
-            .Matches(@"^\+?[1-9]\d{1,14}$")
+            .Matches(@"^\+?[1-9]\d{0,14}$")
             .When(x => !string.IsNullOrEmpty(x.PhoneNumber))
             .WithMessage("Invalid phone number format");
 
