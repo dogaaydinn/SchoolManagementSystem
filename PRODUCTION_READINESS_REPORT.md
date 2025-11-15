@@ -667,7 +667,13 @@ Phase 8 (Weeks 31-32): Production Readiness ❌ NOT STARTED
 
 5. **Hash Password Reset Tokens** (2 hours)
    ```csharp
-   user.PasswordResetToken = BCrypt.Net.BCrypt.HashPassword(token);
+   // Add at the top of your file:
+   // using System.Security.Cryptography;
+   // using System.Text;
+   // Hash the token using SHA256 and store as Base64
+   user.PasswordResetToken = Convert.ToBase64String(
+       SHA256.HashData(Encoding.UTF8.GetBytes(token))
+   );
    ```
 
 6. **Use Crypto RNG** (1 hour)
