@@ -11,6 +11,7 @@ using SchoolManagementSystem.Core.Constants;
 using SchoolManagementSystem.Core.Entities;
 using SchoolManagementSystem.Core.Interfaces;
 using SchoolManagementSystem.Core.Validators;
+using SchoolManagementSystem.Application.Services;
 using SchoolManagementSystem.Infrastructure.Caching;
 using SchoolManagementSystem.Infrastructure.Data;
 using SchoolManagementSystem.Infrastructure.Identity;
@@ -137,6 +138,9 @@ builder.Services.AddCors(options =>
 // Register application services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
