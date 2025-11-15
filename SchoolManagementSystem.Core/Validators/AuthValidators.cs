@@ -132,7 +132,7 @@ public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequ
             .WithMessage("Password must contain at least one lowercase letter")
             .Matches(@"[0-9]")
             .WithMessage("Password must contain at least one number")
-            .Matches(@"[\W_]")
+            .Matches(@"[\W]")
             .WithMessage("Password must contain at least one special character");
 
         RuleFor(x => x.ConfirmPassword)
