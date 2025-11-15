@@ -83,7 +83,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequestDto>
             .NotEmpty()
             .WithMessage("Role is required")
             .Must(role => RoleConstants.AllowedPublicRegistrationRoles.Contains(role))
-            .WithMessage($"Only '{RoleConstants.Student}' role is allowed for public registration");
+            .WithMessage($"Only the following role(s) are allowed for public registration: '{string.Join("', '", RoleConstants.AllowedPublicRegistrationRoles)}'");
     }
 }
 
