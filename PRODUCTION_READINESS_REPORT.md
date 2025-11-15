@@ -678,7 +678,7 @@ Phase 8 (Weeks 31-32): Production Readiness ❌ NOT STARTED
 
 6. **Use Crypto RNG** (1 hour)
    ```csharp
-   var random = RandomNumberGenerator.GetInt32(1000, 9999);
+   var random = RandomNumberGenerator.GetInt32(1000, 10000);
    ```
 
 **Total Effort**: ~23 hours (3 days)
