@@ -1,12 +1,16 @@
 using System.Text;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using SchoolManagementSystem.Core.Constants;
 using SchoolManagementSystem.Core.Entities;
 using SchoolManagementSystem.Core.Interfaces;
+using SchoolManagementSystem.Core.Validators;
 using SchoolManagementSystem.Infrastructure.Caching;
 using SchoolManagementSystem.Infrastructure.Data;
 using SchoolManagementSystem.Infrastructure.Identity;
@@ -70,7 +74,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment(); // True in production
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -87,10 +91,14 @@ builder.Services.AddAuthentication(options =>
 // Add Authorization
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("SuperAdmin"));
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("SuperAdmin", "Admin"));
-    options.AddPolicy("TeacherOnly", policy => policy.RequireRole("SuperAdmin", "Admin", "Teacher"));
-    options.AddPolicy("StudentOnly", policy => policy.RequireRole("Student"));
+    options.AddPolicy(PolicyConstants.SuperAdminOnly, policy =>
+        policy.RequireRole(RoleConstants.SuperAdmin));
+    options.AddPolicy(PolicyConstants.AdminOnly, policy =>
+        policy.RequireRole(RoleConstants.SuperAdmin, RoleConstants.Admin));
+    options.AddPolicy(PolicyConstants.TeacherOnly, policy =>
+        policy.RequireRole(RoleConstants.SuperAdmin, RoleConstants.Admin, RoleConstants.Teacher));
+    options.AddPolicy(PolicyConstants.StudentOnly, policy =>
+        policy.RequireRole(RoleConstants.Student));
 });
 
 // Add Redis Distributed Cache
@@ -187,6 +195,11 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();

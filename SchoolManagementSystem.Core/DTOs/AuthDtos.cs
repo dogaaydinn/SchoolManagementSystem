@@ -17,6 +17,7 @@ public class RegisterRequestDto
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public DateTime? DateOfBirth { get; set; }
+    public string? PhoneNumber { get; set; }
     public string Role { get; set; } = "Student";
 }
 
@@ -29,6 +30,18 @@ public class AuthResponseDto
     public DateTime? ExpiresAt { get; set; }
     public UserDto? User { get; set; }
     public bool RequiresTwoFactor { get; set; } = false;
+
+    /// <summary>
+    /// Helper method to create a failure response
+    /// </summary>
+    public static AuthResponseDto Failure(string message)
+    {
+        return new AuthResponseDto
+        {
+            Success = false,
+            Message = message
+        };
+    }
 }
 
 public class ResetPasswordRequestDto
@@ -56,8 +69,21 @@ public class UserDto
     public string FullName { get; set; } = string.Empty;
     public DateTime? DateOfBirth { get; set; }
     public int? Age { get; set; }
+    public string? PhoneNumber { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public List<string> Roles { get; set; } = new();
     public bool IsActive { get; set; }
+    public bool TwoFactorEnabled { get; set; }
     public DateTime CreatedAt { get; set; }
+}
+
+public class ForgotPasswordRequestDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+public class RefreshTokenRequestDto
+{
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
 }
