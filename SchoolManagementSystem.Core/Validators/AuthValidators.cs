@@ -51,7 +51,7 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequestDto>
             .WithMessage("Password must contain at least one lowercase letter")
             .Matches(@"[0-9]")
             .WithMessage("Password must contain at least one number")
-            .Matches(@"[\W_]")
+            .Matches(@"[^a-zA-Z0-9]")
             .WithMessage("Password must contain at least one special character");
 
         RuleFor(x => x.ConfirmPassword)
